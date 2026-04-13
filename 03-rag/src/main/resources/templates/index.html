@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Demo - Document Q&A</title>
+    <link rel="stylesheet" th:href="@{/css/rag-demo.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 RAG Demo - Document Q&A</h1>
+            <p>Upload documents and ask questions about their content</p>
+            <div class="stats">
+                <div class="stat">Step 1: Upload</div>
+                <div class="stat">Step 2: Query</div>
+                <div class="stat">Get Answers</div>
+            </div>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="section-card">
+            <div class="section-header">
+                <span class="section-icon">📤</span>
+                <h2>Step 1: Upload Document</h2>
+            </div>
+            <div class="section-body">
+                <p class="help-text">Upload a PDF or TXT file to create a searchable knowledge base</p>
+                
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📄</div>
+                    <p class="upload-text">Click to select or drag and drop a file here</p>
+                    <p class="upload-hint">Supported: PDF, TXT (max 10MB)</p>
+                    <input type="file" id="fileInput" accept=".pdf,.txt" hidden>
+                </div>
+
+                <div id="uploadStatus" class="status-message" style="display: none;"></div>
+
+                <div id="uploadProgress" class="progress-container" style="display: none;">
+                    <div class="progress-bar">
+                        <div id="progressFill" class="progress-fill"></div>
+                    </div>
+                    <p class="progress-text" id="progressText">Processing...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Query Section -->
+        <div class="section-card">
+            <div class="section-header">
+                <span class="section-icon">❓</span>
+                <h2>Step 2: Ask Questions</h2>
+            </div>
+            <div class="section-body">
+                <p class="help-text">Ask questions about your uploaded documents</p>
+                
+                <div class="query-form">
+                    <textarea 
+                        id="questionInput" 
+                        placeholder="What would you like to know about your documents?"
+                        rows="3"
+                    ></textarea>
+                    
+                    <button id="askButton" class="btn btn-primary" disabled>
+                        <span class="btn-icon">🔍</span> Ask Question
+                    </button>
+                </div>
+
+                <div id="queryStatus" class="status-message" style="display: none;"></div>
+
+                <!-- Answer Section -->
+                <div id="answerSection" class="answer-container" style="display: none;">
+                    <h3>Answer:</h3>
+                    <div id="answerText" class="answer-text"></div>
+                    
+                    <div id="sourcesSection" style="display: none;">
+                        <h4>Sources:</h4>
+                        <div id="sourcesList" class="sources-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- How It Works -->
+        <div class="info-section">
+            <h3>💡 How RAG Works</h3>
+            <div class="info-grid">
+                <div class="info-card">
+                    <span class="info-number">1</span>
+                    <h4>Upload & Process</h4>
+                    <p>Your document is split into chunks and converted to embeddings</p>
+                </div>
+                <div class="info-card">
+                    <span class="info-number">2</span>
+                    <h4>Find Relevant Content</h4>
+                    <p>Your question is used to search for the most relevant chunks</p>
+                </div>
+                <div class="info-card">
+                    <span class="info-number">3</span>
+                    <h4>Generate Answer</h4>
+                    <p>GPT-5 uses the relevant chunks to answer your question accurately</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/rag-demo.js}"></script>
+</body>
+</html>

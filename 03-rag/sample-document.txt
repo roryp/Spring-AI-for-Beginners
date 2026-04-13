@@ -1,0 +1,67 @@
+Introduction to Spring AI
+
+Spring AI is a Java framework that simplifies the development of AI-powered applications. It provides abstractions for working with Large Language Models (LLMs), embeddings, vector stores, and RAG implementations, all following familiar Spring conventions.
+
+Key Features
+
+1. Chat Models - Spring AI supports multiple LLM providers including Azure OpenAI, OpenAI, Anthropic, Ollama, and more. The ChatModel and StreamingChatModel interfaces provide a unified API regardless of the provider you choose.
+
+2. Prompt Engineering - The framework includes Prompt and PromptTemplate classes for structured prompt construction. SystemMessage, UserMessage, and AssistantMessage types map to conversational roles.
+
+3. Embeddings - Spring AI can generate vector embeddings from text using EmbeddingModel implementations like OpenAiSdkEmbeddingModel. These embeddings are essential for semantic search and RAG applications.
+
+4. Vector Stores - The framework integrates with multiple vector databases including Qdrant, Pinecone, Weaviate, Chroma, and provides SimpleVectorStore for in-memory development.
+
+5. Document Processing - Spring AI can split documents into chunks using TokenTextSplitter, create embeddings, and store them in vector stores. The TextSplitter and DocumentTransformer interfaces provide flexible chunking strategies.
+
+RAG Implementation
+
+Retrieval-Augmented Generation (RAG) is a powerful technique that combines information retrieval with language generation. Spring AI makes RAG implementation straightforward:
+
+- VectorStore handles embedding storage and similarity search via the similaritySearch method
+- SearchRequest configures query parameters like topK and similarityThreshold
+- TokenTextSplitter breaks large documents into manageable chunks
+- The ChatModel generates answers based on retrieved context assembled into a Prompt
+
+Benefits of Using Spring AI
+
+Developer Productivity - The framework reduces boilerplate code and provides high-level abstractions that let you focus on business logic rather than integration details.
+
+Provider Independence - Switch between different LLM providers without changing your application code. The abstraction layer makes your code portable.
+
+Production Ready - Spring AI includes features needed for production applications like error handling, retry logic, and resource management.
+
+Spring Boot Integration - The framework works seamlessly with Spring Boot, allowing you to configure AI components through beans and application properties. Auto-configuration is available for many providers.
+
+Getting Started
+
+To use Spring AI in your Maven project, add the following dependencies:
+
+spring-ai-openai-sdk provides the OpenAI SDK integration for chat and embedding models
+spring-ai-vector-store provides SimpleVectorStore and the VectorStore abstraction
+spring-ai-commons provides document processing utilities like TokenTextSplitter
+
+Create a chat model by configuring OpenAiSdkChatModel with OpenAiSdkChatOptions specifying your baseUrl, API key, and model name. For RAG, add an OpenAiSdkEmbeddingModel and SimpleVectorStore, then use VectorStore.similaritySearch to find relevant chunks.
+
+Best Practices
+
+Chunk Size - Use 300-500 token chunks with 10-15% overlap to maintain context across boundaries.
+
+Similarity Threshold - Set a minimum similarity score (typically 0.5-0.7) to filter out irrelevant chunks.
+
+Context Window - Stay within your model's context window by limiting the number of chunks included in each request.
+
+Error Handling - Implement proper error handling for LLM API calls, which can fail due to rate limits or network issues.
+
+Advanced Features
+
+Spring AI also supports:
+
+- Advisors - Interceptors that can modify prompts and responses, enabling patterns like question-answer with context
+- Tool Calling - Allow the LLM to call external functions and APIs via ToolCallback
+- Streaming - Stream responses token-by-token for better user experience via StreamingChatModel
+- Observability - Built-in Micrometer integration for monitoring AI operations
+
+Conclusion
+
+Spring AI provides a comprehensive framework for building AI applications in Java. Whether you're implementing simple chat interfaces or complex RAG systems, the framework offers the tools you need to build production-ready solutions.

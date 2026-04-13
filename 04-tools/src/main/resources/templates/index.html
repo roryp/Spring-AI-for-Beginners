@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agent Tools Demo</title>
+    <link rel="stylesheet" th:href="@{/css/tools-demo.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI Agent with Tools</h1>
+            <p>Ask the AI agent to convert temperatures, check the weather, or chain multiple tools together</p>
+            <div class="stats">
+                <div class="stat">🌡️ Temperature Conversion</div>
+                <div class="stat">🌤️ Weather</div>
+                <div class="stat">💬 Natural Language</div>
+            </div>
+        </div>
+
+        <!-- Quick Tools Section -->
+        <div class="section-card">
+            <div class="section-header">
+                <span class="section-icon">⚡</span>
+                <h2>Quick Tool Examples</h2>
+            </div>
+            <div class="section-body">
+                <p class="help-text">Click on any example to try it out:</p>
+                
+                <div class="examples-grid">
+                    <div class="example-card" onclick="tryExample('Convert 100°F to Celsius')">
+                        <div class="example-icon">🌡️</div>
+                        <div class="example-text">Convert 100°F to Celsius</div>
+                        <div class="example-tool">Temperature: Conversion</div>
+                    </div>
+                    
+                    <div class="example-card" onclick="tryExample('What is 25°C in Fahrenheit?')">
+                        <div class="example-icon">🌡️</div>
+                        <div class="example-text">What is 25°C in Fahrenheit?</div>
+                        <div class="example-tool">Temperature: Conversion</div>
+                    </div>
+                    
+                    <div class="example-card" onclick="tryExample('What is the weather in Seattle?')">
+                        <div class="example-icon">🌤️</div>
+                        <div class="example-text">Weather in Seattle?</div>
+                        <div class="example-tool">Weather: Current</div>
+                    </div>
+                    
+                    <div class="example-card" onclick="tryExample('Convert 300 Kelvin to Celsius')">
+                        <div class="example-icon">🌡️</div>
+                        <div class="example-text">Convert 300K to Celsius</div>
+                        <div class="example-tool">Temperature: Conversion</div>
+                    </div>
+                    
+                    <div class="example-card" onclick="tryExample('Get the 5-day forecast for Tokyo')">
+                        <div class="example-icon">📅</div>
+                        <div class="example-text">5-day forecast Tokyo</div>
+                        <div class="example-tool">Weather: Forecast</div>
+                    </div>
+                    
+                    <div class="example-card" onclick="tryExample('What is 0°C in Fahrenheit and Kelvin?')">
+                        <div class="example-icon">🎯</div>
+                        <div class="example-text">Multiple conversions</div>
+                        <div class="example-tool">Multiple Tools</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Section -->
+        <div class="section-card">
+            <div class="section-header">
+                <span class="section-icon">💬</span>
+                <h2>Chat with AI Agent</h2>
+            </div>
+            <div class="section-body">
+                <p class="help-text">Ask the agent anything that requires temperature conversions or weather information</p>
+                
+                <div class="chat-container" id="chatContainer">
+                    <div class="welcome-message">
+                        <div class="bot-icon">🤖</div>
+                        <div class="message-text">
+                            <strong>AI Agent Ready!</strong><br>
+                            I can help you with:
+                            <ul>
+                                <li>Temperature conversions (Celsius ↔ Fahrenheit ↔ Kelvin)</li>
+                                <li>Current weather information for any city</li>
+                                <li>Weather forecasts (up to 7 days)</li>
+                                <li>Chaining tools together (e.g., "What's the weather in Seattle and convert it to Fahrenheit")</li>
+                            </ul>
+                            Try asking me something like "Convert 100°F to Celsius" or "What's the weather in Paris and convert it to Fahrenheit?"
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-container">
+                    <textarea 
+                        id="messageInput" 
+                        placeholder="Ask me to convert temperatures or check the weather..."
+                        rows="2"
+                    ></textarea>
+                    
+                    <button id="sendButton" class="btn btn-primary">
+                        <span class="btn-icon">📤</span> Send
+                    </button>
+                    
+                    <button id="clearButton" class="btn btn-secondary">
+                        <span class="btn-icon">🗑️</span> Clear Chat
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Available Tools Section -->
+        <div class="section-card">
+            <div class="section-header">
+                <span class="section-icon">🛠️</span>
+                <h2>Available Tools</h2>
+            </div>
+            <div class="section-body">
+                <div class="tools-grid">
+                    <div class="tool-card">
+                        <div class="tool-icon">🌡️</div>
+                        <h3>Temperature Conversion</h3>
+                        <ul class="tool-methods">
+                            <li>Celsius to Fahrenheit</li>
+                            <li>Fahrenheit to Celsius</li>
+                            <li>Celsius to Kelvin</li>
+                            <li>Kelvin to Celsius</li>
+                            <li>Fahrenheit to Kelvin</li>
+                            <li>Kelvin to Fahrenheit</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <div class="tool-icon">🌤️</div>
+                        <h3>Weather</h3>
+                        <ul class="tool-methods">
+                            <li>Current weather by city</li>
+                            <li>Multi-day forecast</li>
+                            <li>Temperature info</li>
+                            <li>Weather conditions</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- How It Works -->
+        <div class="info-section">
+            <h3>💡 How AI Agents Work</h3>
+            <div class="info-grid">
+                <div class="info-card">
+                    <span class="info-number">1</span>
+                    <h4>Understand Intent</h4>
+                    <p>AI analyzes your request to understand what you need</p>
+                </div>
+                <div class="info-card">
+                    <span class="info-number">2</span>
+                    <h4>Select Tools</h4>
+                    <p>Agent chooses the right tools to fulfill your request</p>
+                </div>
+                <div class="info-card">
+                    <span class="info-number">3</span>
+                    <h4>Execute & Respond</h4>
+                    <p>Tools are called and results are formatted into a natural response</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/tools-demo.js}"></script>
+</body>
+</html>

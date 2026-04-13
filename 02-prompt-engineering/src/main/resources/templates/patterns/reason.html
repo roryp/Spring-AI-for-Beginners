@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step-by-Step Reasoning</title>
+    <link rel="stylesheet" th:href="@{/css/prompt-demo.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="demo-page">
+            <a th:href="@{/}" class="back-link">← Back to Dashboard</a>
+            
+            <div class="demo-header">
+                <span class="icon">🧠</span>
+                <div class="demo-title">
+                    <h1>Step-by-Step Reasoning</h1>
+                    <p>Explicit reasoning with clear verification</p>
+                </div>
+            </div>
+
+            <div class="demo-section">
+                <h2>Try It Out</h2>
+                <div class="input-group">
+                    <label for="problem">Enter your problem:</label>
+                    <textarea id="problem" placeholder="If Alice has 3 apples and gives 1 to Bob, then buys 2 more, how many does she have?"></textarea>
+                </div>
+
+                <div class="examples">
+                    <button class="example-btn" onclick="setExample('If Alice has 3 apples and gives 1 to Bob, then buys 2 more, how many does she have?')">Math problem</button>
+                    <button class="example-btn" onclick="setExample('A train leaves NYC at 2pm going 60mph. Another leaves Boston at 3pm going 80mph. When do they meet?')">Distance problem</button>
+                    <button class="example-btn" onclick="setExample('If all A are B, and all B are C, are all A also C?')">Logic puzzle</button>
+                </div>
+
+                <div class="button-group">
+                    <button id="submit-btn" class="btn" onclick="submitReasonStreaming()">🔴 Stream Response (Live)</button>
+                    <button id="submit-btn-sync" class="btn" onclick="submitReason()" style="margin-left:10px; opacity: 0.7;">Generate Response (Non-streaming)</button>
+                </div>
+            </div>
+
+            <div id="loading" class="loading">
+                <div class="loading-spinner"></div>
+                <p>Reasoning through problem...</p>
+            </div>
+
+            <div id="response"></div>
+
+            <div class="demo-section" style="margin-top: 40px;">
+                <h2>When to Use</h2>
+                <ul>
+                    <li>Math problems requiring step-by-step solutions</li>
+                    <li>Logic puzzles and reasoning challenges</li>
+                    <li>Debugging complex issues</li>
+                    <li>When you need to verify the thought process, not just the answer</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/pattern-demo.js}"></script>
+    <script>
+        function submitReasonStreaming() {
+            const problem = document.getElementById('problem').value.trim();
+            if (!problem) { alert('Please enter a problem'); return; }
+            callPatternStreaming('reason', { problem });
+        }
+
+        function submitReason() {
+            const problem = document.getElementById('problem').value.trim();
+            if (!problem) {
+                alert('Please enter a problem');
+                return;
+            }
+            callPattern('reason', { problem });
+        }
+    </script>
+</body>
+</html>

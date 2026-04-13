@@ -1,0 +1,37 @@
+server:
+  port: 8083
+  # Disable compression to prevent Chrome from buffering SSE streams.
+  # Compressed SSE responses are not delivered incrementally in Chrome.
+  compression:
+    enabled: false
+
+spring:
+  application:
+    name: prompt-engineering
+  mvc:
+    async:
+      request-timeout: -1
+
+# Azure OpenAI Configuration
+# These environment variables are set by 'azd up' deployment
+# Values are read from environment variables and injected into the SpringAiConfig bean
+# Note: GPT-5 reasoning effort is controlled via prompt engineering, not model configuration.
+# See Gpt5PromptService.java for examples of low/high eagerness prompting patterns.
+
+# Spring Boot Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# Logging
+logging:
+  level:
+    root: INFO
+    com.example.springai.prompts: DEBUG
+    org.springframework.ai: INFO
+

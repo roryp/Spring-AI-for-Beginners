@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: spring-ai-tools
+  main:
+    banner-mode: off
+  web:
+    error:
+      include-message: always
+      
+      # Azure OpenAI configuration
+
+server:
+  port: 8084
+azure:
+  openai:
+    endpoint: ${AZURE_OPENAI_ENDPOINT:}
+    api-key: ${AZURE_OPENAI_API_KEY:}
+    deployment: ${AZURE_OPENAI_DEPLOYMENT:}
+
+# Spring Boot Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    com.example.springai: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"

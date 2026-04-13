@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>High Eagerness - Thorough & Autonomous</title>
+    <link rel="stylesheet" th:href="@{/css/prompt-demo.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="demo-page">
+            <a th:href="@{/}" class="back-link">← Back to Dashboard</a>
+            
+            <div class="demo-header">
+                <span class="icon">🔍</span>
+                <div class="demo-title">
+                    <h1>High Eagerness</h1>
+                    <p>Thorough exploration with autonomous decision-making</p>
+                </div>
+            </div>
+
+            <div class="demo-section">
+                <h2>Try It Out</h2>
+                <div class="input-group">
+                    <label for="problem">Enter your problem:</label>
+                    <textarea id="problem" placeholder="Design a scalable microservices architecture for e-commerce"></textarea>
+                </div>
+
+                <div class="examples">
+                    <button class="example-btn" onclick="setExample('Design a caching strategy for high-traffic REST API')">Caching strategy</button>
+                    <button class="example-btn" onclick="setExample('Create a disaster recovery plan for cloud infrastructure')">DR plan</button>
+                    <button class="example-btn" onclick="setExample('Analyze trade-offs between microservices and monolithic architecture')">Architecture comparison</button>
+                </div>
+
+                <div class="button-group">
+                    <button id="submit-btn" class="btn" onclick="submitAutonomousStreaming()">🔴 Stream Response (Live)</button>
+                    <button id="submit-btn-sync" class="btn" onclick="submitAutonomous()" style="margin-left:10px; opacity: 0.7;">Generate Response (Non-streaming)</button>
+                </div>
+            </div>
+
+            <div id="loading" class="loading">
+                <div class="loading-spinner"></div>
+                <p>Generating thorough analysis...</p>
+            </div>
+
+            <div id="response"></div>
+
+            <div class="demo-section" style="margin-top: 40px;">
+                <h2>When to Use</h2>
+                <ul>
+                    <li>Complex system design and architecture decisions</li>
+                    <li>Comprehensive research and analysis</li>
+                    <li>Strategic planning and recommendations</li>
+                    <li>When quality and depth are more important than speed</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/pattern-demo.js}"></script>
+    <script>
+        function submitAutonomous() {
+            const problem = document.getElementById('problem').value.trim();
+            if (!problem) {
+                alert('Please enter a problem');
+                return;
+            }
+            callPattern('autonomous', { problem });
+        }
+
+        function submitAutonomousStreaming() {
+            const problem = document.getElementById('problem').value.trim();
+            if (!problem) {
+                alert('Please enter a problem');
+                return;
+            }
+            callPatternStreaming('autonomous', { problem });
+        }
+    </script>
+</body>
+</html>

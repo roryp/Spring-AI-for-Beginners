@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: mcp-client
+  main:
+    web-application-type: none
+  ai:
+    mcp:
+      client:
+        request-timeout: 120s
+        streamable-http:
+          connections:
+            weather-server:
+              url: http://localhost:8080
+
+logging:
+  level:
+    "[io.modelcontextprotocol.client]": WARN
+    "[io.modelcontextprotocol.spec]": WARN

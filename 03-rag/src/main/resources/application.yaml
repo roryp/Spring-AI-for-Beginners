@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: spring-ai-rag
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+server:
+  port: 8081
+
+# Azure OpenAI Configuration
+# These environment variables are set by 'azd up' deployment or loaded from .env
+# Values are read from environment variables and injected into the SpringAiConfig bean
+
+# Spring Boot Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# Logging
+logging:
+  level:
+    com.example.springai: DEBUG
+    org.springframework.ai: DEBUG
+    org.springframework: INFO

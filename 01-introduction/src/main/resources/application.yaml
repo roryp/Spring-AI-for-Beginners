@@ -1,0 +1,28 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: spring-ai-getting-started
+
+# Azure OpenAI configuration
+# These environment variables are set by 'azd up' deployment
+# Values are read from environment variables and injected into the SpringAiConfig bean
+
+# Spring Boot Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# Logging configuration
+logging:
+  level:
+    com.example.springai: INFO
+    org.springframework.ai: INFO
+
+# Values are read from environment variables (see .env.example)

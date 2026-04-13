@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Turn Chat</title>
+    <link rel="stylesheet" th:href="@{/css/prompt-demo.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="demo-page">
+            <a th:href="@{/}" class="back-link">← Back to Dashboard</a>
+            
+            <div class="demo-header">
+                <span class="icon">💬</span>
+                <div class="demo-title">
+                    <h1>Multi-Turn Chat</h1>
+                    <p>Context preservation across multiple messages</p>
+                </div>
+            </div>
+
+            <div class="demo-section">
+                <h2>Conversation</h2>
+                <div id="session-info" class="session-info" style="display: none;">
+                    Session ID: <span id="session-id"></span>
+                    <button onclick="clearChat()" class="btn-copy" style="float: right;">Clear Chat</button>
+                </div>
+
+                <div id="chat-container" class="chat-container">
+                    <p style="text-align: center; color: #9ca3af;">No messages yet. Start chatting below!</p>
+                </div>
+
+                <div class="input-group">
+                    <label for="message">Your message:</label>
+                    <textarea id="message" placeholder="What is Spring Boot?"></textarea>
+                </div>
+
+                <div class="examples">
+                    <button class="example-btn" onclick="setExample('What is Spring Boot?')">Ask about Spring</button>
+                    <button class="example-btn" onclick="setExample('Show me an example')">Request example</button>
+                    <button class="example-btn" onclick="setExample('How does it compare to Node.js?')">Compare</button>
+                </div>
+
+                <div class="button-group">
+                    <button id="submit-btn" class="btn" onclick="sendMessageStreaming()">🔴 Stream Message (Live)</button>
+                    <button id="submit-btn-sync" class="btn" onclick="sendMessage()" style="margin-left:10px; opacity: 0.7;">Send Message (Non-streaming)</button>
+                </div>
+            </div>
+
+            <div id="loading" class="loading">
+                <div class="loading-spinner"></div>
+                <p>Waiting for response...</p>
+            </div>
+
+            <div class="demo-section" style="margin-top: 40px;">
+                <h2>When to Use</h2>
+                <ul>
+                    <li>Interactive assistants and chatbots</li>
+                    <li>Multi-turn conversations requiring context</li>
+                    <li>Q&A sessions where follow-up questions are common</li>
+                    <li>When conversation history influences responses</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/pattern-demo.js}"></script>
+    <script>
+        let sessionId = null;
+
+        async function sendMessageStreaming() {
+            const message = document.getElementById('message').value.trim();
+            if (!message) { alert('Please enter a message'); return; }
+
+            if (!sessionId) {
+                sessionId = 'session-' + Date.now();
+                document.getElementById('session-id').textContent = sessionId;
+                document.getElementById('session-info').style.display = 'block';
+            }
+
+            addMessage('user', message);
+            document.getElementById('message').value = '';
+
+            const loadingDiv = document.getElementById('loading');
+            const submitBtn = document.getElementById('submit-btn');
+            loadingDiv.style.display = 'block';
+            submitBtn.disabled = true;
+
+            // Create streaming assistant message placeholder with unique elements
+            const container = document.getElementById('chat-container');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'chat-message assistant';
+            const outputEl = document.createElement('pre');
+            outputEl.style.cssText = 'white-space: pre-wrap; margin: 0;';
+            const statusEl = document.createElement('small');
+            statusEl.style.color = '#888';
+            statusEl.textContent = 'Connecting...';
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.appendChild(outputEl);
+            contentDiv.appendChild(statusEl);
+            messageDiv.appendChild(contentDiv);
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+            let tokenCount = 0;
+            let sseBuffer = '';
+
+            try {
+                const response = await fetch('/api/gpt5/chat/stream', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message, sessionId })
+                });
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                loadingDiv.style.display = 'none';
+                statusEl.textContent = 'Streaming...';
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let streamDone = false;
+
+                function processSSEEvents(text) {
+                    sseBuffer += text;
+                    const events = sseBuffer.split('\n\n');
+                    sseBuffer = events.pop() || '';
+
+                    for (const event of events) {
+                        if (!event.trim()) continue;
+                        const lines = event.split('\n');
+                        let eventName = '';
+                        const dataLines = [];
+
+                        for (const line of lines) {
+                            if (line.startsWith('event:')) {
+                                eventName = line.substring(6).trim();
+                            } else if (line.startsWith('data:')) {
+                                dataLines.push(line.substring(5));
+                            }
+                        }
+
+                        const data = dataLines.join('\n');
+
+                        if (eventName === 'done' || data.trim() === '[DONE]') {
+                            statusEl.textContent = `\u2713 ${tokenCount} tokens`;
+                            submitBtn.disabled = false;
+                            streamDone = true;
+                            return;
+                        }
+
+                        if (eventName === 'error') {
+                            statusEl.textContent = 'Error: ' + data;
+                            submitBtn.disabled = false;
+                            streamDone = true;
+                            return;
+                        }
+
+                        if (eventName === 'token' && dataLines.length > 0) {
+                            outputEl.textContent += data;
+                            tokenCount++;
+                            container.scrollTop = container.scrollHeight;
+                        }
+                    }
+                }
+
+                function read() {
+                    reader.read().then(({ done, value }) => {
+                        if (done || streamDone) {
+                            if (!streamDone) {
+                                statusEl.textContent = `\u2713 ${tokenCount} tokens`;
+                                submitBtn.disabled = false;
+                            }
+                            return;
+                        }
+                        const text = decoder.decode(value, { stream: true });
+                        processSSEEvents(text);
+                        if (!streamDone) read();
+                    }).catch(err => {
+                        statusEl.textContent = 'Error: ' + err.message;
+                        submitBtn.disabled = false;
+                    });
+                }
+                read();
+            } catch (error) {
+                loadingDiv.style.display = 'none';
+                addMessage('assistant', 'Error: ' + error.message);
+                submitBtn.disabled = false;
+            }
+        }
+
+        async function sendMessage() {
+            const message = document.getElementById('message').value.trim();
+            if (!message) {
+                alert('Please enter a message');
+                return;
+            }
+
+            // Generate session ID if first message
+            if (!sessionId) {
+                sessionId = 'session-' + Date.now();
+                document.getElementById('session-id').textContent = sessionId;
+                document.getElementById('session-info').style.display = 'block';
+            }
+
+            // Add user message to chat
+            addMessage('user', message);
+            document.getElementById('message').value = '';
+
+            const loadingDiv = document.getElementById('loading');
+            const submitBtn = document.getElementById('submit-btn');
+
+            try {
+                loadingDiv.style.display = 'block';
+                submitBtn.disabled = true;
+
+                const response = await fetch('/api/gpt5/chat', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ message, sessionId })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                addMessage('assistant', data.result || data.response);
+
+            } catch (error) {
+                addMessage('assistant', 'Error: ' + error.message);
+            } finally {
+                loadingDiv.style.display = 'none';
+                submitBtn.disabled = false;
+            }
+        }
+
+        function addMessage(role, content) {
+            const container = document.getElementById('chat-container');
+            
+            // Remove empty state
+            if (container.querySelector('p')) {
+                container.innerHTML = '';
+            }
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${role}`;
+            messageDiv.innerHTML = `
+                <div class="message-content">${escapeHtml(content)}</div>
+            `;
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function clearChat() {
+            if (!sessionId) return;
+
+            if (confirm('Clear this conversation?')) {
+                try {
+                    await fetch(`/api/gpt5/chat/${sessionId}`, { method: 'DELETE' });
+                } catch (error) {
+                    console.error('Failed to clear session:', error);
+                }
+                
+                sessionId = null;
+                document.getElementById('session-info').style.display = 'none';
+                document.getElementById('chat-container').innerHTML = 
+                    '<p style="text-align: center; color: #9ca3af;">No messages yet. Start chatting below!</p>';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/refs/heads/main/schemas/v1.0/azure.yaml.json
+
+name: spring-ai-introduction
+metadata:
+  template: spring-ai-introduction@0.0.1
+
+infra:
+  provider: bicep
+
+# No services defined - all applications run locally
+# This configuration only deploys Azure OpenAI infrastructure
+
+hooks:
+  postprovision:
+    windows:
+      shell: pwsh
+      run: |
+        Write-Host "Generating .env file from azd environment..."
+        Set-Location ..
+        . .\.azd-env.ps1
+      continueOnError: false
+      interactive: false
+    posix:
+      shell: sh
+      run: |
+        echo "Generating .env file from azd environment..."
+        cd ..
+        bash .azd-env.sh
+      continueOnError: false
+      interactive: false

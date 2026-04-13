@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Low Eagerness - Fast & Focused</title>
+    <link rel="stylesheet" th:href="@{/css/prompt-demo.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="demo-page">
+            <a th:href="@{/}" class="back-link">← Back to Dashboard</a>
+            
+            <div class="demo-header">
+                <span class="icon">⚡</span>
+                <div class="demo-title">
+                    <h1>Low Eagerness</h1>
+                    <p>Quick, direct answers with minimal reasoning (max 2 steps)</p>
+                </div>
+            </div>
+
+            <div class="demo-section">
+                <h2>Try It Out</h2>
+                <div class="input-group">
+                    <label for="problem">Enter your problem:</label>
+                    <textarea id="problem" placeholder="What is 15% of 200?"></textarea>
+                </div>
+
+                <div class="examples">
+                    <button class="example-btn" onclick="setExample('What is 15% of 200?')">Calculate percentage</button>
+                    <button class="example-btn" onclick="setExample('Convert 50 USD to EUR')">Currency conversion</button>
+                    <button class="example-btn" onclick="setExample('What is the capital of France?')">Quick lookup</button>
+                </div>
+
+                <div class="button-group">
+                    <button id="submit-btn" class="btn" onclick="submitFocusedStreaming()">🔴 Stream Response (Live)</button>
+                    <button id="submit-btn-sync" class="btn" onclick="submitFocused()" style="margin-left:10px; opacity: 0.7;">Generate Response (Non-streaming)</button>
+                </div>
+            </div>
+
+            <div id="loading" class="loading">
+                <div class="loading-spinner"></div>
+                <p>Generating response...</p>
+            </div>
+
+            <div id="response"></div>
+
+            <div class="demo-section" style="margin-top: 40px;">
+                <h2>When to Use</h2>
+                <ul>
+                    <li>Simple calculations and conversions</li>
+                    <li>Quick fact lookups</li>
+                    <li>Straightforward questions with clear answers</li>
+                    <li>When speed is more important than depth</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/pattern-demo.js}"></script>
+    <script>
+        function submitFocusedStreaming() {
+            const problem = document.getElementById('problem').value.trim();
+            if (!problem) { alert('Please enter a problem'); return; }
+            callPatternStreaming('focused', { problem });
+        }
+
+        function submitFocused() {
+            const problem = document.getElementById('problem').value.trim();
+            if (!problem) {
+                alert('Please enter a problem');
+                return;
+            }
+            callPattern('focused', { problem });
+        }
+    </script>
+</body>
+</html>
