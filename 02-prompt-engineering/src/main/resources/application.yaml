@@ -32,6 +32,6 @@ management:
 logging:
   level:
     root: INFO
-    com.example.springai.prompts: DEBUG
-    org.springframework.ai: INFO
+    "[com.example.springai.prompts]": DEBUG
+    "[org.springframework.ai]": INFO
 

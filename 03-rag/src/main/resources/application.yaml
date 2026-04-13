@@ -26,6 +26,6 @@ management:
 # Logging
 logging:
   level:
-    com.example.springai: DEBUG
-    org.springframework.ai: DEBUG
-    org.springframework: INFO
+    "[com.example.springai]": DEBUG
+    "[org.springframework.ai]": DEBUG
+    "[org.springframework]": INFO

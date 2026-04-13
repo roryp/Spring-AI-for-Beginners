@@ -11,11 +11,6 @@ spring:
 
 server:
   port: 8084
-azure:
-  openai:
-    endpoint: ${AZURE_OPENAI_ENDPOINT:}
-    api-key: ${AZURE_OPENAI_API_KEY:}
-    deployment: ${AZURE_OPENAI_DEPLOYMENT:}
 
 # Spring Boot Actuator
 management:
@@ -29,6 +24,6 @@ management:
 
 logging:
   level:
-    com.example.springai: DEBUG
+    "[com.example.springai]": DEBUG
   pattern:
     console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"

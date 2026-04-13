@@ -22,7 +22,7 @@ management:
 # Logging configuration
 logging:
   level:
-    com.example.springai: INFO
-    org.springframework.ai: INFO
+    "[com.example.springai]": INFO
+    "[org.springframework.ai]": INFO
 
 # Values are read from environment variables (see .env.example)
