@@ -170,3 +170,7 @@ A generator LLM produces a solution, then an evaluator LLM grades it (PASS / NEE
 - [Building Effective Agents — Spring AI Documentation](https://docs.spring.io/spring-ai/reference/2.0/api/effective-agents.html)
 - [Spring AI Agentic Patterns Examples](https://github.com/spring-projects/spring-ai-examples/tree/main/agentic-patterns)
 - [Spring AI Documentation](https://docs.spring.io/spring-ai/reference/)
+
+---
+
+**Navigation:** [← Previous: Module 05 - MCP](../05-mcp/README.md) | [Back to Main](../README.md)

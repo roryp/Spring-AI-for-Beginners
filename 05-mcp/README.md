@@ -477,6 +477,8 @@ In practice, many production systems combine both approaches: `@Tool` for app-sp
 
 ## Next Steps
 
+**Next Module:** [06-agents - Agentic Patterns](../06-agents/README.md)
+
 - **Try modifying the AI prompt** in [`TicTacToeTools.java`](mcp-server/src/main/java/com/example/springai/mcp/server/TicTacToeTools.java) to change the AI's personality or strategy
 - **Add difficulty levels** — Make the AI sometimes pick random moves for "easy" mode
 - **Build your own MCP server** — Expose your own domain-specific tools for AI consumption
@@ -484,4 +486,4 @@ In practice, many production systems combine both approaches: `@Tool` for app-sp
 
 ---
 
-**Navigation:** [← Previous: Module 04 - Tools](../04-tools/README.md) | [Back to Main](../README.md)
+**Navigation:** [← Previous: Module 04 - Tools](../04-tools/README.md) | [Back to Main](../README.md) | [Next: Module 06 - Agents →](../06-agents/README.md)
