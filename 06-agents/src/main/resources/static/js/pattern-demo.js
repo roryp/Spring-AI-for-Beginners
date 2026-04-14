@@ -1,3 +1,53 @@
+// --- SSE-based Advisor Log Streaming ---
+
+let logEventSource = null;
+
+function connectLogStream() {
+    if (logEventSource) {
+        logEventSource.close();
+    }
+    const logPanel = document.getElementById('advisor-logs');
+    if (logPanel) {
+        logPanel.innerHTML = '';
+    }
+    logEventSource = new EventSource('/api/agents/logs');
+    logEventSource.addEventListener('advisor-log', function (event) {
+        const data = JSON.parse(event.data);
+        appendLogEntry(data);
+    });
+    logEventSource.onerror = function () {
+        // reconnect silently if the connection drops
+    };
+}
+
+function disconnectLogStream() {
+    if (logEventSource) {
+        logEventSource.close();
+        logEventSource = null;
+    }
+}
+
+function appendLogEntry(entry) {
+    const logPanel = document.getElementById('advisor-logs');
+    if (!logPanel) return;
+
+    const div = document.createElement('div');
+    div.className = 'log-entry log-' + entry.direction.toLowerCase();
+
+    const ts = new Date(entry.timestamp).toLocaleTimeString();
+    const badge = entry.direction === 'REQUEST' ? '⬆ REQUEST' : '⬇ RESPONSE';
+
+    div.innerHTML =
+        '<span class="log-badge">' + badge + '</span>' +
+        '<span class="log-time">' + ts + '</span>' +
+        '<pre class="log-message">' + escapeHtml(entry.message) + '</pre>';
+
+    logPanel.appendChild(div);
+    logPanel.scrollTop = logPanel.scrollHeight;
+}
+
+// --- Pattern API Call ---
+
 async function callPattern(endpoint, requestBody) {
     const responseDiv = document.getElementById('response');
     const loadingDiv = document.getElementById('loading');
@@ -7,6 +57,7 @@ async function callPattern(endpoint, requestBody) {
         loadingDiv.style.display = 'block';
         responseDiv.innerHTML = '';
         submitBtn.disabled = true;
+        connectLogStream();
 
         const response = await fetch('/api/agents/' + endpoint, {
             method: 'POST',
@@ -25,6 +76,7 @@ async function callPattern(endpoint, requestBody) {
     } finally {
         loadingDiv.style.display = 'none';
         submitBtn.disabled = false;
+        // keep the log stream open so late events still arrive
     }
 }
 

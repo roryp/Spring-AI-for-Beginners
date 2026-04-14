@@ -71,7 +71,7 @@ Tokens are how AI models measure and process text. Words, punctuation, and even 
 
 Chat memory solves the stateless problem by maintaining conversation history. Before sending your request to the model, the framework prepends relevant previous messages. When you ask "What's my name?", the system actually sends the entire conversation history, allowing the model to see you previously said "My name is John."
 
-Spring AI provides conversation management that you can build on top of the chat model. You choose how many messages to retain and manage the context window with a simple message list. The diagram below shows how a sliding window of messages maintains recent conversation context.
+Spring AI provides conversation management through its `ChatMemory` abstraction. `MessageWindowChatMemory` maintains a sliding window of recent messages per conversation, automatically dropping old ones when the window is full. The diagram below shows how a sliding window of messages maintains recent conversation context.
 
 <img src="images/memory-window.png" alt="Memory Window Concept" width="800"/>
 
@@ -110,24 +110,25 @@ public OpenAiSdkChatModel openAiSdkChatModel() {
 
 The builder reads credentials from environment variables set by `azd up`. Setting `.azure(true)` enables Azure OpenAI mode with the OpenAI SDK.
 
-**Conversation Memory** - Track chat history with a sliding message window ([ConversationService.java](src/main/java/com/example/springai/service/ConversationService.java)):
+**Conversation Memory** - Use Spring AI's `MessageWindowChatMemory` for automatic sliding-window memory management ([ConversationService.java](src/main/java/com/example/springai/service/ConversationService.java)):
 
 ```java
-List<Message> messages = new ArrayList<>();
+ChatMemory chatMemory = MessageWindowChatMemory.builder()
+        .maxMessages(10)
+        .build();
 
-messages.add(new UserMessage("My name is John"));
-messages.add(new AssistantMessage("Nice to meet you, John!"));
-
-messages.add(new UserMessage("What's my name?"));
-ChatResponse response = chatModel.call(new Prompt(messages));
-String answer = response.getResult().getOutput().getText();
-messages.add(new AssistantMessage(answer));
+String conversationId = "user-123";
+chatMemory.add(conversationId, new UserMessage("My name is John"));
+// send to model with full history
+List<Message> history = chatMemory.get(conversationId);
+ChatResponse response = chatModel.call(new Prompt(history));
+chatMemory.add(conversationId, response.getResult().getOutput());
 ```
 
-Maintain a `List<Message>` trimmed to the last 10 messages. Add user and AI messages with typed wrappers: `new UserMessage(text)` and `new AssistantMessage(text)`. Send the full list as a `Prompt` to the model. The service stores separate message lists per conversation ID, allowing multiple users to chat simultaneously.
+`MessageWindowChatMemory` keeps the last 10 messages per conversation ID, automatically trimming older messages. It stores separate histories per conversation ID, allowing multiple users to chat simultaneously. No manual list trimming needed — the framework handles the sliding window for you.
 
 > **🤖 Try with [GitHub Copilot](https://github.com/features/copilot) Chat:** Open [`ConversationService.java`](src/main/java/com/example/springai/service/ConversationService.java) and ask:
-> - "How does the sliding message window decide which messages to drop when it's full?"
+> - "How does MessageWindowChatMemory decide which messages to drop when it's full?"
 > - "Can I implement custom memory storage using a database instead of in-memory?"
 > - "How would I add summarization to compress old conversation history?"
 

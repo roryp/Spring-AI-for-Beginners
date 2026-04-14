@@ -2,9 +2,12 @@ package com.example.springai.agents.controller;
 
 import java.util.List;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.example.springai.agents.advisor.AdvisorLogSink;
 import com.example.springai.agents.service.AgentPatternsService;
 
 @RestController
@@ -13,9 +16,11 @@ import com.example.springai.agents.service.AgentPatternsService;
 public class AgentPatternsController {
 
     private final AgentPatternsService agentService;
+    private final AdvisorLogSink logSink;
 
-    public AgentPatternsController(AgentPatternsService agentService) {
+    public AgentPatternsController(AgentPatternsService agentService, AdvisorLogSink logSink) {
         this.agentService = agentService;
+        this.logSink = logSink;
     }
 
     // --- Request / Response DTOs ---
@@ -61,5 +66,10 @@ public class AgentPatternsController {
     public ResponseEntity<PatternResponse> evaluator(@RequestBody EvaluatorRequest request) {
         String result = agentService.runEvaluatorOptimizerWorkflow(request.task());
         return ResponseEntity.ok(new PatternResponse(result));
+    }
+
+    @GetMapping(value = "/logs", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter streamLogs() {
+        return logSink.subscribe();
     }
 }

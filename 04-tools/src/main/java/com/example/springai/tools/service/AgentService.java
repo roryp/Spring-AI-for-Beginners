@@ -6,7 +6,8 @@ import com.example.springai.tools.tools.TemperatureTool;
 import com.example.springai.tools.tools.WeatherTool;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
 
@@ -24,9 +25,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * Agent service using Spring AI ChatClient with @Tool-annotated tool classes.
  * Demonstrates best practices:
  * - ChatClient with .tools() for passing @Tool-annotated instances
- * - Manual conversation memory with ConcurrentHashMap
+ * - ChatMemory (MessageWindowChatMemory) for conversation context management
  * - Spring AI handles the tool execution loop automatically
- * - Sliding window memory management
+ * - Sliding window memory management via MessageWindowChatMemory
  *
  * 💡 Ask GitHub Copilot:
  * - "How does ChatClient.prompt().tools() discover @Tool-annotated methods?"
@@ -38,12 +39,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class AgentService {
 
     private static final Logger log = LoggerFactory.getLogger(AgentService.class);
-    private static final int MAX_MESSAGES = 20;
 
     private final ChatClient chatClient;
     private final WeatherTool weatherTool;
     private final TemperatureTool temperatureTool;
-    private final Map<String, List<Message>> sessionMemories;
+    private final ChatMemory chatMemory;
+    private final Set<String> activeSessions = ConcurrentHashMap.newKeySet();
 
     /**
      * Constructor with auto-wired ChatClient.Builder.
@@ -53,7 +54,9 @@ public class AgentService {
         this.chatClient = chatClientBuilder.build();
         this.weatherTool = new WeatherTool();
         this.temperatureTool = new TemperatureTool();
-        this.sessionMemories = new ConcurrentHashMap<>();
+        this.chatMemory = MessageWindowChatMemory.builder()
+                .maxMessages(20)
+                .build();
         log.info("Agent service initialized with Spring AI ChatClient");
     }
 
@@ -63,7 +66,7 @@ public class AgentService {
      */
     public String createAgentSession() {
         String sessionId = UUID.randomUUID().toString();
-        sessionMemories.put(sessionId, new ArrayList<>());
+        activeSessions.add(sessionId);
         log.info("Created new agent session: {}", sessionId);
         return sessionId;
     }
@@ -82,21 +85,13 @@ public class AgentService {
         }
 
         try {
-            List<Message> messages = sessionMemories.computeIfAbsent(
-                sessionId, id -> new ArrayList<>()
-            );
+            activeSessions.add(sessionId);
 
-            // Add user message to history
-            messages.add(new UserMessage(request.message()));
+            // Add user message to memory
+            chatMemory.add(sessionId, new UserMessage(request.message()));
 
-            // Trim to keep only the last MAX_MESSAGES
-            if (messages.size() > MAX_MESSAGES) {
-                List<Message> trimmed = new ArrayList<>(
-                    messages.subList(messages.size() - MAX_MESSAGES, messages.size())
-                );
-                messages.clear();
-                messages.addAll(trimmed);
-            }
+            // Get conversation history from ChatMemory
+            List<Message> messages = chatMemory.get(sessionId);
 
             // Call via ChatClient with tools — Spring AI handles tool execution loop
             String answer = chatClient.prompt()
@@ -105,8 +100,8 @@ public class AgentService {
                     .call()
                     .content();
 
-            // Add AI response to history
-            messages.add(new AssistantMessage(answer));
+            // Add AI response to memory
+            chatMemory.add(sessionId, new org.springframework.ai.chat.messages.AssistantMessage(answer));
 
             log.info("Agent completed task successfully");
 
@@ -165,7 +160,8 @@ public class AgentService {
      * Removes conversation history for the given session ID.
      */
     public void clearSession(String sessionId) {
-        sessionMemories.remove(sessionId);
+        chatMemory.clear(sessionId);
+        activeSessions.remove(sessionId);
         log.info("Cleared session: {}", sessionId);
     }
 }

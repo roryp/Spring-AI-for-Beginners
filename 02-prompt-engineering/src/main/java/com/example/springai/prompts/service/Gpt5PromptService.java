@@ -4,6 +4,8 @@ import com.openai.client.OpenAIClientAsync;
 import com.openai.models.chat.completions.ChatCompletionChunk;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import com.openai.models.chat.completions.ChatCompletionUserMessageParam;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
@@ -18,9 +20,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -61,8 +62,10 @@ public class Gpt5PromptService {
     @Value("${AZURE_OPENAI_DEPLOYMENT}")
     private String deploymentName;
 
-    private final Map<String, List<Message>> sessionMemories = new ConcurrentHashMap<>();
-    private static final int MAX_MESSAGES = 10;
+    private final ChatMemory chatMemory = MessageWindowChatMemory.builder()
+            .maxMessages(10)
+            .build();
+    private final Set<String> activeSessionIds = ConcurrentHashMap.newKeySet();
 
     // ==================== STREAMING HELPER ====================
 
@@ -425,27 +428,22 @@ public class Gpt5PromptService {
      * Maintains conversation context following GPT-5 patterns.
      */
     public String continueConversation(String userMessage, String sessionId) {
-        List<Message> messages = sessionMemories.computeIfAbsent(
-            sessionId,
-            k -> new ArrayList<>()
-        );
+        activeSessionIds.add(sessionId);
 
         // Add system message on first interaction
-        if (messages.isEmpty()) {
-            messages.add(CONVERSATION_SYSTEM_MESSAGE);
+        if (chatMemory.get(sessionId).isEmpty()) {
+            chatMemory.add(sessionId, CONVERSATION_SYSTEM_MESSAGE);
         }
 
         // Add user message
-        messages.add(new UserMessage(userMessage));
+        chatMemory.add(sessionId, new UserMessage(userMessage));
 
-        // Trim to keep only system message + last MAX_MESSAGES
-        trimMessages(messages);
-
-        // Generate response
-        String responseText = chatModel.call(new Prompt(messages)).getResult().getOutput().getText();
+        // Generate response using conversation history from ChatMemory
+        String responseText = chatModel.call(new Prompt(chatMemory.get(sessionId)))
+                .getResult().getOutput().getText();
 
         // Store assistant's response in memory
-        messages.add(new AssistantMessage(responseText));
+        chatMemory.add(sessionId, new AssistantMessage(responseText));
 
         return responseText;
     }
@@ -454,17 +452,15 @@ public class Gpt5PromptService {
      * Example 6b: Multi-Turn Conversation with Streaming
      */
     public Flux<String> continueConversationStreaming(String userMessage, String sessionId) {
-        List<Message> messages = sessionMemories.computeIfAbsent(
-            sessionId,
-            k -> new ArrayList<>()
-        );
+        activeSessionIds.add(sessionId);
 
-        if (messages.isEmpty()) {
-            messages.add(CONVERSATION_SYSTEM_MESSAGE);
+        if (chatMemory.get(sessionId).isEmpty()) {
+            chatMemory.add(sessionId, CONVERSATION_SYSTEM_MESSAGE);
         }
 
-        messages.add(new UserMessage(userMessage));
-        trimMessages(messages);
+        chatMemory.add(sessionId, new UserMessage(userMessage));
+
+        List<Message> messages = chatMemory.get(sessionId);
 
         log.info("[STREAM] Starting streaming chat, session: {}", sessionId);
 
@@ -484,29 +480,6 @@ public class Gpt5PromptService {
                 .doOnComplete(() -> {
                     log.info("[STREAM] Chat streaming completed for session: {}", sessionId);
                 });
-    }
-
-    /**
-     * Trim messages to keep system message + last MAX_MESSAGES user/assistant messages.
-     */
-    private void trimMessages(List<Message> messages) {
-        // Count non-system messages
-        long nonSystemCount = messages.stream()
-                .filter(m -> !(m instanceof SystemMessage))
-                .count();
-
-        if (nonSystemCount > MAX_MESSAGES) {
-            // Keep system message (first) and trim oldest non-system messages
-            Message systemMsg = messages.get(0);
-            List<Message> nonSystem = messages.stream()
-                    .filter(m -> !(m instanceof SystemMessage))
-                    .toList();
-            List<Message> trimmed = nonSystem.subList(
-                    (int)(nonSystemCount - MAX_MESSAGES), nonSystem.size());
-            messages.clear();
-            messages.add(systemMsg);
-            messages.addAll(trimmed);
-        }
     }
 
     // ==================== EXAMPLE 7: CONSTRAINED OUTPUT ====================
@@ -617,13 +590,15 @@ public class Gpt5PromptService {
      * Clear session memory for a specific session.
      */
     public void clearSession(String sessionId) {
-        sessionMemories.remove(sessionId);
+        chatMemory.clear(sessionId);
+        activeSessionIds.remove(sessionId);
     }
 
     /**
      * Clear all session memories.
      */
     public void clearAllSessions() {
-        sessionMemories.clear();
+        activeSessionIds.forEach(chatMemory::clear);
+        activeSessionIds.clear();
     }
 }

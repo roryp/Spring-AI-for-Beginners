@@ -400,3 +400,89 @@ body {
         gap: 10px;
     }
 }
+
+/* --- Advisor Log Panel --- */
+.log-panel-wrapper {
+    margin-top: 30px;
+}
+
+.log-panel-wrapper h2 {
+    font-size: 1.25rem;
+    color: #1f2937;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.log-panel-wrapper h2 .pulse {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #22c55e;
+    border-radius: 50%;
+    animation: pulse-dot 1.5s infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+#advisor-logs {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    border-radius: 8px;
+    padding: 16px;
+    max-height: 400px;
+    overflow-y: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
+#advisor-logs:empty::before {
+    content: 'Waiting for advisor events...';
+    color: #9399b2;
+    font-style: italic;
+}
+
+.log-entry {
+    padding: 8px 0;
+    border-bottom: 1px solid #313244;
+}
+
+.log-entry:last-child {
+    border-bottom: none;
+}
+
+.log-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-right: 8px;
+}
+
+.log-request .log-badge {
+    background: #1e40af;
+    color: #bfdbfe;
+}
+
+.log-response .log-badge {
+    background: #166534;
+    color: #bbf7d0;
+}
+
+.log-time {
+    color: #6c7086;
+    font-size: 0.75rem;
+}
+
+.log-message {
+    margin: 4px 0 0 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    color: #a6adc8;
+}

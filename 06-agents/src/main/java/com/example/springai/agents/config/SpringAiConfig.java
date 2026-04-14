@@ -7,9 +7,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.example.springai.agents.advisor.AdvisorLogSink;
+import com.example.springai.agents.advisor.MyLoggingAdvisor;
+
 /**
  * Configuration for Spring AI with Azure OpenAI using the OpenAI SDK.
- * Creates a ChatClient bean used by all agentic workflow patterns.
+ * Uses the advisor pattern to attach a logging advisor to the ChatClient,
+ * providing visibility into all LLM interactions.
  */
 @Configuration
 public class SpringAiConfig {
@@ -38,7 +42,14 @@ public class SpringAiConfig {
     }
 
     @Bean
-    public ChatClient chatClient(OpenAiSdkChatModel chatModel) {
-        return ChatClient.builder(chatModel).build();
+    public ChatClient chatClient(OpenAiSdkChatModel chatModel, AdvisorLogSink logSink) {
+        return ChatClient.builder(chatModel)
+                .defaultAdvisors(MyLoggingAdvisor.builder()
+                        .showSystemMessage(true)
+                        .showAvailableTools(true)
+                        .labelPrefix("[Agent] ")
+                        .logSink(logSink)
+                        .build())
+                .build();
     }
 }

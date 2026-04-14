@@ -1,6 +1,7 @@
 package com.example.springai.service;
 
-import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -9,9 +10,8 @@ import org.springframework.ai.openaisdk.OpenAiSdkChatModel;
 
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -27,10 +27,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * - With memory: A sliding window of messages maintains conversation history
  * 
  * Key Concepts:
- * - Manual message list management for conversation context
- * - Per-user conversation isolation with ConcurrentHashMap
+ * - ChatMemory abstraction for conversation context management
+ * - MessageWindowChatMemory with sliding window of recent messages
+ * - Per-user conversation isolation via conversation IDs
  * - Spring AI UserMessage and AssistantMessage type safety
- * - Automatic context window management with max message trimming
  * 
  * 💡 Ask GitHub Copilot:
  * - "How does the sliding window decide which messages to drop when it's full?"
@@ -42,12 +42,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ConversationService {
 
     private final OpenAiSdkChatModel chatModel;
-    private final Map<String, List<Message>> conversationMemories;
-    private static final int MAX_MESSAGES = 10;
+    private final ChatMemory chatMemory;
+    private final Set<String> activeConversations = ConcurrentHashMap.newKeySet();
 
     public ConversationService(OpenAiSdkChatModel chatModel) {
         this.chatModel = chatModel;
-        this.conversationMemories = new ConcurrentHashMap<>();
+        this.chatMemory = MessageWindowChatMemory.builder()
+                .maxMessages(10)
+                .build();
     }
 
     /**
@@ -57,7 +59,7 @@ public class ConversationService {
      */
     public String startConversation() {
         String conversationId = UUID.randomUUID().toString();
-        conversationMemories.put(conversationId, new ArrayList<>());
+        activeConversations.add(conversationId);
         return conversationId;
     }
 
@@ -69,27 +71,17 @@ public class ConversationService {
      * @return AI response
      */
     public String chat(String conversationId, String message) {
-        List<Message> messages = conversationMemories.computeIfAbsent(
-            conversationId,
-            id -> new ArrayList<>()
-        );
+        activeConversations.add(conversationId);
 
-        // Add user message to history
-        messages.add(new UserMessage(message));
+        // Add user message to memory
+        chatMemory.add(conversationId, new UserMessage(message));
 
-        // Trim to keep only the last MAX_MESSAGES
-        if (messages.size() > MAX_MESSAGES) {
-            List<Message> trimmed = new ArrayList<>(messages.subList(messages.size() - MAX_MESSAGES, messages.size()));
-            messages.clear();
-            messages.addAll(trimmed);
-        }
-
-        // Generate response
-        ChatResponse chatResponse = chatModel.call(new Prompt(messages));
+        // Generate response using conversation history from ChatMemory
+        ChatResponse chatResponse = chatModel.call(new Prompt(chatMemory.get(conversationId)));
         String responseText = chatResponse.getResult().getOutput().getText();
 
-        // Add AI response to history
-        messages.add(new AssistantMessage(responseText));
+        // Add AI response to memory
+        chatMemory.add(conversationId, chatResponse.getResult().getOutput());
 
         return responseText;
     }
@@ -101,8 +93,7 @@ public class ConversationService {
      * @return list of messages
      */
     public List<Message> getHistory(String conversationId) {
-        List<Message> messages = conversationMemories.get(conversationId);
-        return messages != null ? List.copyOf(messages) : List.of();
+        return chatMemory.get(conversationId);
     }
 
     /**
@@ -111,7 +102,8 @@ public class ConversationService {
      * @param conversationId the conversation ID
      */
     public void clearConversation(String conversationId) {
-        conversationMemories.remove(conversationId);
+        chatMemory.clear(conversationId);
+        activeConversations.remove(conversationId);
     }
 
     /**
@@ -121,6 +113,6 @@ public class ConversationService {
      * @return true if conversation exists
      */
     public boolean conversationExists(String conversationId) {
-        return conversationMemories.containsKey(conversationId);
+        return activeConversations.contains(conversationId);
     }
 }

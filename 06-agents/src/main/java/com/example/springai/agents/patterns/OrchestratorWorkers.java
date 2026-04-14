@@ -2,6 +2,7 @@ package com.example.springai.agents.patterns;
 
 import java.util.List;
 
+import org.springframework.ai.chat.client.AdvisorParams;
 import org.springframework.ai.chat.client.ChatClient;
 
 /**
@@ -79,6 +80,7 @@ public class OrchestratorWorkers {
         OrchestratorResponse orchestratorResponse = this.chatClient.prompt()
                 .user(u -> u.text(this.orchestratorPrompt)
                         .param("task", taskDescription))
+                .advisors(AdvisorParams.ENABLE_NATIVE_STRUCTURED_OUTPUT)
                 .call()
                 .entity(OrchestratorResponse.class);
 

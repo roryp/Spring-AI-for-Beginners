@@ -3,6 +3,7 @@ package com.example.springai.agents.patterns;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.ai.chat.client.AdvisorParams;
 import org.springframework.ai.chat.client.ChatClient;
 
 /**
@@ -117,6 +118,7 @@ public class EvaluatorOptimizer {
                         .param("prompt", this.generatorPrompt)
                         .param("context", context)
                         .param("task", task))
+                .advisors(AdvisorParams.ENABLE_NATIVE_STRUCTURED_OUTPUT)
                 .call()
                 .entity(Generation.class);
     }
@@ -128,6 +130,7 @@ public class EvaluatorOptimizer {
                         .param("prompt", this.evaluatorPrompt)
                         .param("task", task)
                         .param("content", content))
+                .advisors(AdvisorParams.ENABLE_NATIVE_STRUCTURED_OUTPUT)
                 .call()
                 .entity(EvaluationResponse.class);
     }

@@ -2,6 +2,7 @@ package com.example.springai.agents.patterns;
 
 import java.util.Map;
 
+import org.springframework.ai.chat.client.AdvisorParams;
 import org.springframework.ai.chat.client.ChatClient;
 
 /**
@@ -58,7 +59,10 @@ public class RoutingWorkflow {
 
                 Input: %s""", availableRoutes, input);
 
-        RoutingResponse routingResponse = chatClient.prompt(selectorPrompt).call().entity(RoutingResponse.class);
+        RoutingResponse routingResponse = chatClient.prompt(selectorPrompt)
+                .advisors(AdvisorParams.ENABLE_NATIVE_STRUCTURED_OUTPUT)
+                .call()
+                .entity(RoutingResponse.class);
         return routingResponse.selection();
     }
 }

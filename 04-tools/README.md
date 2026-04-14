@@ -158,11 +158,11 @@ Here's the full request lifecycle as a sequence diagram — from the HTTP reques
 Key benefits of this approach:
 
 - **Spring Boot auto-wiring** — ChatModel and tools automatically injected
-- **@MemoryId pattern** — Automatic session-based memory management
+- **MessageWindowChatMemory** — Automatic sliding-window session memory per conversation ID
 - **Single instance** — Assistant created once and reused for better performance
 - **Type-safe execution** — Java methods called directly with type conversion
 - **Multi-turn orchestration** — Handles tool chaining automatically
-- **Zero boilerplate** — No manual `AiServices.builder()` calls or memory HashMap
+- **Zero boilerplate** — No manual message list trimming or memory HashMap
 
 Alternative approaches (manual `AiServices.builder()`) require more code and miss Spring Boot integration benefits.
 
@@ -329,7 +329,7 @@ The quality of your tool descriptions directly affects how well the agent uses t
 
 ### Session Management
 
-The `@MemoryId` annotation enables automatic session-based memory management. Each session ID gets its own `ChatMemory` instance managed by the `ChatMemoryProvider` bean, so multiple users can interact with the agent simultaneously without their conversations mixing together. The following diagram shows how multiple users are routed to isolated memory stores based on their session IDs:
+The service uses Spring AI's `MessageWindowChatMemory` for automatic session-based memory management. Each session ID gets its own conversation history within the `ChatMemory` instance, so multiple users can interact with the agent simultaneously without their conversations mixing together. The following diagram shows how multiple users are routed to isolated memory stores based on their session IDs:
 
 <img src="images/session-management.png" alt="Session Management with @MemoryId" width="800"/>
 

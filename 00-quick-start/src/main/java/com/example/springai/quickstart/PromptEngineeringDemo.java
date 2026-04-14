@@ -1,5 +1,8 @@
 package com.example.springai.quickstart;
 
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
@@ -74,6 +77,9 @@ public class PromptEngineeringDemo {
 
         // Pattern 5: Prompt Templates - Reusable prompts with variables
         demonstratePromptTemplates(chatModel);
+
+        // Pattern 6: Conversational Memory - Maintaining context across turns
+        demonstrateConversationalMemory(chatModel);
     }
 
     /**
@@ -219,6 +225,53 @@ public class PromptEngineeringDemo {
 
         ChatResponse chatResponse2 = chatModel.call(prompt2);
         System.out.println("Response: " + chatResponse2.getResult().getOutput().getText());
+    }
+
+    /**
+     * Pattern 6: Conversational Memory
+     * Maintain context across multiple interactions using ChatMemory.
+     * This is the only pattern that requires memory — the follow-up question
+     * references information from the first turn.
+     */
+    private static void demonstrateConversationalMemory(OpenAiSdkChatModel chatModel) {
+        System.out.println("\n" + "=".repeat(60));
+        System.out.println("PATTERN 6: Conversational Memory");
+        System.out.println("=".repeat(60));
+        System.out.println("Maintaining context across multiple interactions");
+        System.out.println();
+
+        // Create a memory window that keeps the last 10 messages
+        ChatMemory chatMemory = MessageWindowChatMemory.builder()
+                .maxMessages(10)
+                .build();
+        String conversationId = "demo-session";
+
+        // First interaction
+        String question1 = "My name is Alex and I'm learning Spring AI. What are the key concepts I should focus on?";
+        System.out.println("User (Turn 1): " + question1);
+        System.out.println();
+
+        UserMessage userMessage1 = new UserMessage(question1);
+        chatMemory.add(conversationId, userMessage1);
+        ChatResponse response1 = chatModel.call(new Prompt(chatMemory.get(conversationId)));
+        chatMemory.add(conversationId, response1.getResult().getOutput());
+
+        System.out.println("Assistant: " + response1.getResult().getOutput().getText());
+        System.out.println();
+
+        // Second interaction — references the first turn
+        String question2 = "What's my name, and can you elaborate on the first concept you mentioned?";
+        System.out.println("User (Turn 2): " + question2);
+        System.out.println();
+
+        UserMessage userMessage2 = new UserMessage(question2);
+        chatMemory.add(conversationId, userMessage2);
+        ChatResponse response2 = chatModel.call(new Prompt(chatMemory.get(conversationId)));
+        chatMemory.add(conversationId, response2.getResult().getOutput());
+
+        System.out.println("Assistant: " + response2.getResult().getOutput().getText());
+        System.out.println();
+        System.out.println("[INFO] The model remembered your name and previous context using ChatMemory!");
     }
 
     private static void displayHeader(String title) {

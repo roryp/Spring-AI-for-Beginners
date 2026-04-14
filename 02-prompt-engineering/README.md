@@ -358,19 +358,23 @@ The following diagram shows how this structured framework organizes a code revie
 
 *Framework for consistent code reviews with severity levels*
 
-**Multi-Turn Chat** - For conversations that need context. The model remembers previous messages and builds on them. Use this for interactive help sessions or complex Q&A.
+**Multi-Turn Chat** - For conversations that need context. Spring AI's `MessageWindowChatMemory` automatically maintains a sliding window of recent messages per session, so the model remembers previous turns. Use this for interactive help sessions or complex Q&A.
 
 ```java
-List<Message> messages = new ArrayList<>();
-messages.add(new SystemMessage("You are a helpful assistant."));
+ChatMemory chatMemory = MessageWindowChatMemory.builder()
+        .maxMessages(10)
+        .build();
 
-messages.add(new UserMessage("What is Spring Boot?"));
-String response1 = chatModel.call(new Prompt(messages)).getResult().getOutput().getText();
-messages.add(new AssistantMessage(response1));
+String sessionId = "user-session-1";
+chatMemory.add(sessionId, new UserMessage("What is Spring Boot?"));
+List<Message> history = chatMemory.get(sessionId);
+String response1 = chatModel.call(new Prompt(history)).getResult().getOutput().getText();
+chatMemory.add(sessionId, new AssistantMessage(response1));
 
-messages.add(new UserMessage("Show me an example"));
-String response2 = chatModel.call(new Prompt(messages)).getResult().getOutput().getText();
-messages.add(new AssistantMessage(response2));
+chatMemory.add(sessionId, new UserMessage("Show me an example"));
+history = chatMemory.get(sessionId);
+String response2 = chatModel.call(new Prompt(history)).getResult().getOutput().getText();
+chatMemory.add(sessionId, new AssistantMessage(response2));
 ```
 
 The diagram below visualizes how conversation context accumulates with each turn and how it relates to the model's token limit.
@@ -585,7 +589,7 @@ The self-reflecting patterns work by making quality criteria explicit. Instead o
 
 **Context Is Finite**
 
-Multi-turn conversations work by including message history with each request. But there's a limit - every model has a maximum token count. As conversations grow, you'll need strategies to keep relevant context without hitting that ceiling. This module shows you how memory works; later you'll learn when to summarize, when to forget, and when to retrieve.
+Multi-turn conversations work by including message history with each request via `MessageWindowChatMemory`, which automatically trims old messages when the window is full. But there's still a limit — every model has a maximum token count. As conversations grow, the sliding window keeps the most recent context without hitting that ceiling. This module shows you how memory works; later you'll learn when to summarize, when to forget, and when to retrieve.
 
 ## Next Steps
 
