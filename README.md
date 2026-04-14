@@ -10,10 +10,11 @@ A course for building AI applications with Spring AI and Azure OpenAI, from basi
 4. [RAG (Retrieval-Augmented Generation)](03-rag/README.md) - Build intelligent knowledge-based systems
 5. [Tools](04-tools/README.md) - Integrate external tools
 6. [MCP (Model Context Protocol)](05-mcp/README.md) - Work with Model Context Protocol (MCP)
+7. [Agents](06-agents/README.md) - Build AI agents
 
 ---
 
-##  Learning Path
+## Learning Path
 
 > **Quick Start**
 
@@ -24,7 +25,7 @@ A course for building AI applications with Spring AI and Azure OpenAI, from basi
 5. Wait 5-10 minutes for the environment to be ready
 6. Jump straight to [Quick Start](./00-quick-start/README.md) to get started!
 
-> **Note:** This training uses both GitHub Models and Azure OpenAI. The [Quick Start](00-quick-start/README.md) module uses GitHub Models (no Azure subscription required), while modules 1-5 use Azure OpenAI. Get started with a [FREE Azure account](https://aka.ms/azure-free-account) if you don't have one.
+> **Note:** This training uses both GitHub Models and Azure OpenAI. The [Quick Start](00-quick-start/README.md) module uses GitHub Models (no Azure subscription required), while modules 1-6 use Azure OpenAI. Get started with a [FREE Azure account](https://aka.ms/azure-free-account) if you don't have one.
 
 
 ## Learning with GitHub Copilot
