@@ -164,7 +164,7 @@ When you ask a question, the `VectorStore` automatically embeds your question an
 SearchRequest searchRequest = SearchRequest.builder()
     .query(request.question())
     .topK(5)
-    .similarityThreshold(0.5)
+    .similarityThreshold(0.0)
     .build();
 
 List<Document> matches = vectorStore.similaritySearch(searchRequest);
@@ -395,7 +395,7 @@ public ChatClient chatClient(OpenAiSdkChatModel chatModel) {
 ```java
 QuestionAnswerAdvisor qaAdvisor = QuestionAnswerAdvisor.builder(vectorStore)
         .searchRequest(SearchRequest.builder()
-                .similarityThreshold(0.5)
+                .similarityThreshold(0.0)
                 .topK(5)
                 .build())
         .build();
@@ -431,14 +431,14 @@ Every retrieved chunk comes with a similarity score between 0 and 1 that indicat
 
 <img src="images/similarity-scores.png" alt="Similarity Scores" width="800"/>
 
-*This diagram shows score ranges from 0 to 1, with a minimum threshold of 0.5 that filters out irrelevant chunks.*
+*This diagram shows score ranges from 0 to 1, illustrating how similarity thresholds filter out irrelevant chunks.*
 
 Scores range from 0 to 1:
 - 0.7-1.0: Highly relevant, exact match
-- 0.5-0.7: Relevant, good context
-- Below 0.5: Filtered out, too dissimilar
+- 0.3-0.7: Relevant, good context
+- Below 0.3: Low relevance, may be noise
 
-The system only retrieves chunks above the minimum threshold to ensure quality.
+The default threshold is set to `0.0` so that `SimpleVectorStore` (in-memory) returns all matches — its cosine-similarity scores tend to be lower than production vector databases. In production, raise the threshold (e.g., 0.5-0.7) once you're using a dedicated vector store like Azure AI Search.
 
 Embeddings work well when meaning clusters cleanly, but they have blind spots. The diagram below shows the common failure modes — chunks that are too large produce muddy vectors, chunks that are too small lack context, ambiguous terms point to multiple clusters, and exact-match lookups (IDs, part numbers) don't work with embeddings at all:
 
@@ -448,7 +448,7 @@ Embeddings work well when meaning clusters cleanly, but they have blind spots. T
 
 ### In-Memory Storage
 
-This module uses in-memory storage for simplicity. When you restart the application, uploaded documents are lost. Production systems use persistent vector databases like Qdrant or Azure AI Search.
+This module uses in-memory storage for simplicity. When you restart the application, uploaded documents are lost. Production systems use persistent vector databases like Azure AI Search.
 
 ### Context Window Management
 
