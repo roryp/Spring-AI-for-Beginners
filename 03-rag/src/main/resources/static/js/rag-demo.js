@@ -136,7 +136,7 @@ async function askQuestion(question) {
     answerSection.style.display = 'none';
 
     try {
-        const response = await fetch('/api/rag/ask', {
+        const response = await fetch('/api/rag/advisor/ask', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

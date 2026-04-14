@@ -36,6 +36,18 @@
       <artifactId>spring-ai-openai-sdk</artifactId>
     </dependency>
 
+    <!-- Spring AI ChatClient for fluent API and advisor support -->
+    <dependency>
+      <groupId>org.springframework.ai</groupId>
+      <artifactId>spring-ai-client-chat</artifactId>
+    </dependency>
+
+    <!-- Spring AI Advisors for QuestionAnswerAdvisor (RAG via Advisor API) -->
+    <dependency>
+      <groupId>org.springframework.ai</groupId>
+      <artifactId>spring-ai-advisors-vector-store</artifactId>
+    </dependency>
+
     <!-- Spring AI Vector Store (SimpleVectorStore for in-memory) -->
     <dependency>
       <groupId>org.springframework.ai</groupId>

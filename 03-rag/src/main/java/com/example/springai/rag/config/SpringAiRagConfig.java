@@ -1,5 +1,6 @@
 package com.example.springai.rag.config;
 
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.openaisdk.OpenAiSdkChatModel;
 import org.springframework.ai.openaisdk.OpenAiSdkChatOptions;
@@ -47,6 +48,17 @@ public class SpringAiRagConfig {
         return OpenAiSdkChatModel.builder()
                 .options(chatOptions)
                 .build();
+    }
+
+    /**
+     * Creates a ChatClient for the advisor-based RAG approach.
+     * ChatClient provides a fluent API for building prompts with advisors.
+     *
+     * @return configured ChatClient
+     */
+    @Bean
+    public ChatClient chatClient(OpenAiSdkChatModel chatModel) {
+        return ChatClient.builder(chatModel).build();
     }
 
     /**

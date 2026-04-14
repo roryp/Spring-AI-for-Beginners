@@ -17,6 +17,7 @@
   - [Ask Questions](#ask-questions)
   - [Check Source References](#check-source-references)
   - [Experiment with Questions](#experiment-with-questions)
+- [Spring AI 2.0 Advisor-Based RAG](#spring-ai-20-advisor-based-rag)
 - [Key Concepts](#key-concepts)
   - [Chunking Strategy](#chunking-strategy)
   - [Similarity Scores](#similarity-scores)
@@ -71,10 +72,10 @@ Spring AI offers different ways to implement RAG, each with a different level of
 
 | Approach | What It Does | Trade-off |
 |---|---|---|
-| **Advisor-based RAG** | Uses Spring AI's `QuestionAnswerAdvisor` with a `VectorStore` to automatically retrieve relevant context and inject it into prompts. | Minimal code, but you don't see what's happening at each step. |
+| **Advisor-based RAG** | Uses Spring AI 2.0's `QuestionAnswerAdvisor` with `ChatClient` to automatically retrieve relevant context and inject it into prompts. | Minimal code — the recommended approach for production. |
 | **Native RAG** | You call the vector store search, build the prompt, and generate the answer yourself — one explicit step at a time. | More code, but every stage is visible and modifiable. |
 
-**This tutorial uses the Native approach.** Each step of the RAG pipeline — searching the vector store, assembling the context, and generating the answer — is written out explicitly in [`RagService.java`](src/main/java/com/example/springai/rag/service/RagService.java). This is intentional: as a learning resource, it's more important that you see and understand every stage than that the code is minimized. Once you're comfortable with how the pieces fit together, you can use the Advisor-based approach for quick prototypes.
+**This tutorial implements both approaches.** The Native approach in [`RagService.java`](src/main/java/com/example/springai/rag/service/RagService.java) writes out each RAG step explicitly — searching the vector store, assembling the context, and generating the answer — so you can see and understand every stage. The Advisor-based approach in [`AdvisorRagService.java`](src/main/java/com/example/springai/rag/service/AdvisorRagService.java) uses Spring AI 2.0's `QuestionAnswerAdvisor` with `ChatClient` to do the same thing in a single call. Both endpoints are available in the running application so you can compare them side-by-side.
 
 ## How It Works
 
@@ -357,6 +358,66 @@ Try different types of questions:
 - Summaries: "Summarize the key points about Z"
 
 Watch how the relevance scores change based on how well your question matches document content.
+
+## Spring AI 2.0 Advisor-Based RAG
+
+[AdvisorRagService.java](src/main/java/com/example/springai/rag/service/AdvisorRagService.java)
+
+Spring AI 2.0 provides a `QuestionAnswerAdvisor` that encapsulates the entire RAG pipeline — vector search, context injection, and prompt augmentation — into a single advisor you attach to a `ChatClient` call. This is the recommended approach for production applications.
+
+**Dependencies** — In addition to `spring-ai-openai-sdk` and `spring-ai-vector-store`, you need:
+
+```xml
+<!-- Spring AI ChatClient for fluent API and advisor support -->
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-client-chat</artifactId>
+</dependency>
+
+<!-- Spring AI Advisors for QuestionAnswerAdvisor -->
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-advisors-vector-store</artifactId>
+</dependency>
+```
+
+**ChatClient bean** — Create a `ChatClient` from the chat model:
+
+```java
+@Bean
+public ChatClient chatClient(OpenAiSdkChatModel chatModel) {
+    return ChatClient.builder(chatModel).build();
+}
+```
+
+**QuestionAnswerAdvisor** — Build the advisor with your `VectorStore` and search configuration, then use it with `ChatClient`:
+
+```java
+QuestionAnswerAdvisor qaAdvisor = QuestionAnswerAdvisor.builder(vectorStore)
+        .searchRequest(SearchRequest.builder()
+                .similarityThreshold(0.5)
+                .topK(5)
+                .build())
+        .build();
+
+ChatResponse response = chatClient.prompt()
+        .advisors(qaAdvisor)
+        .user("What are the key features?")
+        .call()
+        .chatResponse();
+```
+
+That's it — the advisor automatically queries the vector store, injects matching document chunks into the prompt, and the model generates a grounded answer. Compare this with the ~30 lines of manual pipeline code in `RagService.java`.
+
+> **🤖 Try with [GitHub Copilot](https://github.com/features/copilot) Chat:** Open [`AdvisorRagService.java`](src/main/java/com/example/springai/rag/service/AdvisorRagService.java) and ask:
+> - "How does QuestionAnswerAdvisor inject context into the prompt?"
+> - "What's the difference between QuestionAnswerAdvisor and RetrievalAugmentationAdvisor?"
+> - "How can I customize the prompt template used by the advisor?"
+> - "How do I add dynamic filter expressions at runtime?"
+
+The application exposes both endpoints so you can compare them:
+- **Native RAG:** `POST /api/rag/ask` — manual pipeline (educational)
+- **Advisor RAG:** `POST /api/rag/advisor/ask` — Spring AI 2.0 recommended approach
 
 ## Key Concepts
 

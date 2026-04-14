@@ -3,6 +3,7 @@ package com.example.springai.rag.app;
 import com.example.springai.rag.model.dto.RagRequest;
 import com.example.springai.rag.model.dto.RagResponse;
 import com.example.springai.rag.model.dto.SourceReference;
+import com.example.springai.rag.service.AdvisorRagService;
 import com.example.springai.rag.service.RagService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,9 @@ class RagControllerTest {
 
     @MockitoBean
     private RagService ragService;
+
+    @MockitoBean
+    private AdvisorRagService advisorRagService;
 
     @Test
     void testAskWithValidQuestion() throws Exception {
@@ -102,6 +106,45 @@ class RagControllerTest {
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.error").exists())
                 .andExpect(jsonPath("$.message").exists());
+    }
+
+    @Test
+    void testAdvisorAskWithValidQuestion() throws Exception {
+        // Given
+        RagRequest request = new RagRequest("What is Spring AI?", "conv-456", 5);
+
+        List<SourceReference> sources = new ArrayList<>();
+        sources.add(new SourceReference("doc.pdf", "Spring AI provides...", 0.92));
+
+        RagResponse response = new RagResponse(
+            "Spring AI is a framework for building AI applications...",
+            "conv-456",
+            sources
+        );
+
+        when(advisorRagService.ask(any(RagRequest.class))).thenReturn(response);
+
+        // When & Then
+        mockMvc.perform(post("/api/rag/advisor/ask")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.answer").value(response.answer()))
+                .andExpect(jsonPath("$.conversationId").value("conv-456"))
+                .andExpect(jsonPath("$.sources").isArray())
+                .andExpect(jsonPath("$.sources[0].filename").value("doc.pdf"));
+    }
+
+    @Test
+    void testAdvisorAskWithEmptyQuestion() throws Exception {
+        // Given
+        String requestJson = "{\"question\":\"\",\"conversationId\":\"conv-456\",\"maxResults\":5}";
+
+        // When & Then
+        mockMvc.perform(post("/api/rag/advisor/ask")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestJson))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

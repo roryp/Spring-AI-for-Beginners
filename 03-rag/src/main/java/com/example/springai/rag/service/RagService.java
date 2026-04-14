@@ -46,7 +46,7 @@ public class RagService {
     private static final Logger log = LoggerFactory.getLogger(RagService.class);
     
     private static final int MAX_RESULTS = 5;
-    private static final double MIN_SCORE = 0.5;
+    private static final double MIN_SCORE = 0.0;
 
     private final OpenAiSdkChatModel chatModel;
     private final VectorStore vectorStore;

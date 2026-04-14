@@ -86,6 +86,16 @@
             "projectName": "tools",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-RagApplication<spring-ai-rag>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.example.springai.rag.RagApplication",
+            "projectName": "spring-ai-rag",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }
