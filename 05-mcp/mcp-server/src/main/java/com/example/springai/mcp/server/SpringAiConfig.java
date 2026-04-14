@@ -1,4 +1,4 @@
-package com.example.springai.mcp.client;
+package com.example.springai.mcp.server;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
@@ -8,6 +8,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Configuration for Spring AI with Azure OpenAI using the OpenAI SDK.
+ * The ChatClient is used by TicTacToeTools to ask the LLM for strategic
+ * tic-tac-toe moves when the aiMove tool is invoked.
+ */
 @Configuration
 public class SpringAiConfig {
 

@@ -1,18 +1,22 @@
 spring:
   application:
-    name: mcp-client
+    name: tictactoe-client
   main:
-    web-application-type: none
+    web-application-type: servlet
   ai:
     mcp:
       client:
-        request-timeout: 120s
+        request-timeout: 30s
         streamable-http:
           connections:
-            weather-server:
+            tictactoe-server:
               url: http://localhost:8080
+
+server:
+  port: 8081
 
 logging:
   level:
+    "[com.example.springai]": INFO
     "[io.modelcontextprotocol.client]": WARN
     "[io.modelcontextprotocol.spec]": WARN

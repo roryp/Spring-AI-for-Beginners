@@ -10,12 +10,24 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>spring-ai-mcp-server</artifactId>
     <name>05-mcp-server</name>
-    <description>MCP Server - Weather tools with sampling support</description>
+    <description>MCP Server - Tic-Tac-Toe game engine with MCP tools</description>
 
     <dependencies>
         <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>
+        </dependency>
+
+        <!-- Azure OpenAI via OpenAI SDK -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-openai-sdk</artifactId>
+        </dependency>
+
+        <!-- Spring AI Chat Client -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-client-chat</artifactId>
         </dependency>
 
         <!-- Testing support -->

@@ -10,24 +10,25 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>spring-ai-mcp-client</artifactId>
     <name>05-mcp-client</name>
-    <description>MCP Client - Connects to MCP server with Azure OpenAI</description>
+    <description>MCP Client - Tic-Tac-Toe web frontend that discovers and invokes game tools on the MCP server</description>
 
     <dependencies>
+        <!-- MCP Client (uses WebClient to communicate with MCP server) -->
         <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-starter-mcp-client-webflux</artifactId>
         </dependency>
 
-        <!-- Azure OpenAI via OpenAI SDK -->
+        <!-- Spring MVC for REST endpoints and Thymeleaf -->
         <dependency>
-            <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-openai-sdk</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- Spring AI Chat Client -->
+        <!-- Thymeleaf for web UI -->
         <dependency>
-            <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-client-chat</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
 
         <!-- Testing support -->

@@ -11,7 +11,7 @@
     <artifactId>spring-ai-mcp</artifactId>
     <packaging>pom</packaging>
     <name>05-mcp</name>
-    <description>Model Context Protocol integration with Spring AI</description>
+    <description>Tic-Tac-Toe with AI using Model Context Protocol (MCP) and Spring AI</description>
 
     <modules>
         <module>mcp-server</module>

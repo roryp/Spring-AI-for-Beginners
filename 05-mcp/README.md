@@ -3,136 +3,187 @@
 ## Table of Contents
 
 - [What You'll Learn](#what-youll-learn)
-- [What is MCP?](#what-is-mcp)
+- [Prerequisites](#prerequisites)
+- [Understanding MCP](#understanding-mcp)
+  - [Why MCP?](#why-mcp)
+  - [Custom Tools vs MCP](#custom-tools-vs-mcp)
+  - [MCP Ecosystem](#mcp-ecosystem)
 - [How MCP Works](#how-mcp-works)
-- [Project Structure](#project-structure)
-- [Running the Examples](#running-the-examples)
-  - [Prerequisites](#prerequisites)
-  - [Quick Start](#quick-start)
-- [MCP Server](#mcp-server)
-  - [Defining Tools](#defining-tools)
-  - [MCP Sampling](#mcp-sampling)
-  - [Server Configuration](#server-configuration)
-- [MCP Client](#mcp-client)
-  - [Connecting to Tools](#connecting-to-tools)
-  - [Logging and Sampling Handlers](#logging-and-sampling-handlers)
-  - [Client Configuration](#client-configuration)
+  - [MCP Architecture](#mcp-architecture)
+  - [Tool Discovery](#tool-discovery)
+  - [Transport Mechanisms](#transport-mechanisms)
+- [How This Demo Works](#how-this-demo-works)
+  - [MCP Server — Game Engine + AI Strategy](#mcp-server--game-engine--ai-strategy)
+  - [MCP Client — Thin Web UI](#mcp-client--thin-web-ui)
+  - [Game Flow](#game-flow)
+- [Run the Application](#run-the-application)
+- [Using the Application](#using-the-application)
+  - [Start a New Game](#start-a-new-game)
+  - [Make Your Move](#make-your-move)
+  - [Watch the AI Respond](#watch-the-ai-respond)
+  - [Track Your Score](#track-your-score)
+- [Code Walkthrough](#code-walkthrough)
+  - [Server: @McpTool Definitions](#server-mcptool-definitions)
+  - [Server: AI Strategy via ChatClient](#server-ai-strategy-via-chatclient)
+  - [Server: Game Engine Logic](#server-game-engine-logic)
+  - [Client: Tool Discovery via ToolCallbackProvider](#client-tool-discovery-via-toolcallbackprovider)
+  - [Client: Direct MCP Tool Invocation](#client-direct-mcp-tool-invocation)
 - [Key Concepts](#key-concepts)
-- [Congratulations!](#congratulations)
+  - [MCP Streamable HTTP Protocol](#mcp-streamable-http-protocol)
+  - [Direct Tool Calls vs LLM-Orchestrated Calls](#direct-tool-calls-vs-llm-orchestrated-calls)
+  - [AI Strategy with ChatClient](#ai-strategy-with-chatclient)
+- [Spring AI 2 Features Demonstrated](#spring-ai-2-features-demonstrated)
+- [MCP vs Tools (Module 04)](#mcp-vs-tools-module-04)
+- [Next Steps](#next-steps)
 
 ## What You'll Learn
 
-You've built conversational AI, mastered prompts, grounded responses in documents, and created agents with tools. But all those tools were custom-built for your specific application. What if you could give your AI access to a standardized ecosystem of tools that anyone can create and share?
+In the previous modules, you learned about chat, prompt engineering, RAG, and tool calling. But all of those tools lived *inside* the same application. What if your tools live in a different service? What if you want a universal protocol for AI applications to discover and call tools across service boundaries?
 
-In this module, you'll learn how to build both an **MCP server** (that exposes tools) and an **MCP client** (that discovers and uses those tools) using Spring AI's MCP support. The server exposes weather forecast tools via the Streamable HTTP transport, and the client connects to it, discovers available tools, and lets Azure OpenAI call them automatically.
+That's what the **Model Context Protocol (MCP)** provides. MCP is an open protocol for connecting AI applications to external tool providers — a standard way for AI clients to discover and invoke tools hosted on remote servers.
 
-## What is MCP?
+<img src="images/mcp-architecture.png" alt="MCP Architecture Overview" width="800"/>
 
-The Model Context Protocol (MCP) provides a standard way for AI applications to discover and use external tools. Instead of writing custom integrations for each data source or service, you connect to MCP servers that expose their capabilities in a consistent format. Your AI agent can then discover and use these tools automatically.
+*MCP provides a universal protocol for AI applications to discover and invoke tools on remote servers — decoupling AI logic from tool implementations.*
 
-The diagram below shows the difference — without MCP, every integration requires custom point-to-point wiring; with MCP, a single protocol connects your app to any tool:
+In this module, you'll build a **Tic-Tac-Toe game** that demonstrates MCP in action:
+- An **MCP Server** exposes game-engine tools *and* an AI move tool powered by Azure OpenAI
+- An **MCP Client** provides a thin web UI that discovers and calls server tools — no LLM on the client
+- The AI strategy lives entirely on the server, using **Spring AI's ChatClient** to choose moves
+- All game operations flow through the **MCP Streamable HTTP protocol**
 
-<img src="images/mcp-comparison.png" alt="MCP Comparison" width="800"/>
+## Prerequisites
 
-*Before MCP: Complex point-to-point integrations. After MCP: One protocol, endless possibilities.*
+- Completed [Module 01 - Introduction](../01-introduction/README.md) (Azure OpenAI resources deployed)
+- Completed previous modules recommended (this module builds on [tool calling from Module 04](../04-tools/README.md))
+- `.env` file in root directory with Azure credentials (created by `azd up` in Module 01)
 
-MCP standardizes this. An MCP server exposes tools with clear descriptions and schemas. Any MCP client can connect, discover available tools, and use them. Build once, use everywhere.
+> **Note:** If you haven't completed Module 01, follow the deployment instructions there first.
 
-The diagram below illustrates this architecture — a single MCP client (your AI application) connects to multiple MCP servers, each exposing their own set of tools through the standard protocol:
+## Understanding MCP
 
-<img src="images/mcp-architecture.png" alt="MCP Architecture" width="800"/>
+### Why MCP?
 
-*Model Context Protocol architecture - standardized tool discovery and execution*
+In Module 04, you used `@Tool` annotations to define tools *inside* your application. That works well for tools that are tightly coupled to your app. But in practice, tools often live in separate services — microservices, third-party APIs, or shared infrastructure.
+
+MCP solves this by providing:
+- **Universal protocol** — A standard way for AI apps to discover and call tools
+- **Service separation** — Tools live in their own process, enabling independent deployment
+- **Auto-discovery** — Clients automatically learn what tools are available
+- **Cross-language support** — MCP servers and clients can be written in any language
+
+### Custom Tools vs MCP
+
+The following diagram compares the custom `@Tool` approach from Module 04 with the MCP approach in this module. Notice how MCP moves tools out of the application and behind a protocol boundary:
+
+<img src="images/custom-vs-mcp-tools.png" alt="Custom Tools vs MCP Tools" width="800"/>
+
+*Custom @Tool methods run in-process; MCP tools run on a separate server and are discovered over the network via a standard protocol.*
+
+### MCP Ecosystem
+
+MCP isn't just for your own tools. A growing ecosystem of MCP servers provides pre-built integrations for databases, APIs, cloud services, and more. Your AI application can connect to any MCP server — yours or third-party — using the same protocol:
+
+<img src="images/mcp-ecosystem.png" alt="MCP Ecosystem" width="800"/>
+
+*The MCP ecosystem — your AI application can connect to any MCP-compatible server, whether you built it or someone else did.*
 
 ## How MCP Works
 
-Under the hood, MCP uses a layered architecture. Your Java application (the MCP client) discovers available tools, sends JSON-RPC requests through a transport layer (Stdio or HTTP), and the MCP server executes operations and returns results. The following diagram breaks down each layer of this protocol:
+### MCP Architecture
+
+The protocol follows a client-server model. The **MCP client** (your AI application) discovers and invokes tools on one or more **MCP servers**. Each server exposes a set of tools with typed parameters and descriptions, and the client can call them over HTTP or stdio:
 
 <img src="images/mcp-protocol-detail.png" alt="MCP Protocol Detail" width="800"/>
 
-*How MCP works under the hood — clients discover tools, exchange JSON-RPC messages, and execute operations through a transport layer.*
+*The MCP protocol detail — clients send JSON-RPC requests to servers, which respond with structured results. Tool schemas are exchanged during the discovery phase.*
 
-**Server-Client Architecture**
+### Tool Discovery
 
-MCP uses a client-server model. Servers provide tools — reading files, querying databases, calling APIs. Clients (your AI application) connect to servers and use their tools.
+When an MCP client connects to a server, it first requests the list of available tools. The server responds with tool names, descriptions, and parameter schemas. Spring AI's `ToolCallbackProvider` handles this automatically — you get a collection of `ToolCallback` objects ready to invoke:
 
-**Tool Discovery**
+<img src="images/tool-discovery.png" alt="Tool Discovery Flow" width="800"/>
 
-When your client connects to an MCP server, it asks "What tools do you have?" The server responds with a list of available tools, each with descriptions and parameter schemas. Your AI agent can then decide which tools to use based on user requests:
+*Tool discovery — the client connects, requests the tool list, and receives typed schemas it can use to invoke tools or pass to an LLM.*
 
-<img src="images/tool-discovery.png" alt="MCP Tool Discovery" width="800"/>
+### Transport Mechanisms
 
-*The AI discovers available tools at startup — it now knows what capabilities are available and can decide which ones to use.*
+MCP supports multiple transport mechanisms. This module uses **Streamable HTTP**, the modern recommended transport:
 
-**Transport Mechanisms**
+<img src="images/transport-mechanisms.png" alt="MCP Transport Mechanisms" width="800"/>
 
-MCP supports different transport mechanisms. This module uses Streamable HTTP for client-server communication over the network:
+*MCP transport options — Streamable HTTP is the recommended choice for web-deployed servers; stdio is for local process-based servers.*
 
-<img src="images/transport-mechanisms.png" alt="Transport Mechanisms" width="800"/>
+## How This Demo Works
 
-*MCP transport mechanisms: HTTP for remote servers, Stdio for local processes*
+### MCP Server — Game Engine + AI Strategy
 
-## Project Structure
+[TicTacToeTools.java](mcp-server/src/main/java/com/example/springai/mcp/server/TicTacToeTools.java) | [GameEngine.java](mcp-server/src/main/java/com/example/springai/mcp/server/GameEngine.java) | [SpringAiConfig.java](mcp-server/src/main/java/com/example/springai/mcp/server/SpringAiConfig.java)
 
-This module is a multi-module Maven project with two Spring Boot applications:
+The MCP server is the game engine **and** the AI strategist. It connects to Azure OpenAI to power the `aiMove` tool. It exposes five tools via `@McpTool`:
 
-```
-05-mcp/
-├── pom.xml                    # Parent POM (multi-module)
-├── mcp-server/                # MCP Server - exposes tools
-│   ├── pom.xml
-│   └── src/main/
-│       ├── java/.../server/
-│       │   ├── McpServerApplication.java
-│       │   └── Tools.java     # Weather + greeting tools
-│       └── resources/
-│           └── application.yaml
-├── mcp-client/                # MCP Client - discovers and uses tools
-│   ├── pom.xml
-│   └── src/main/
-│       ├── java/.../client/
-│       │   ├── McpClientApplication.java
-│       │   ├── McpClientHandlers.java   # Logging + sampling
-│       │   └── SpringAiConfig.java      # Azure OpenAI config
-│       └── resources/
-│           └── application.yaml
-├── start-server.ps1 / .sh     # Start the MCP server
-└── start-client.ps1 / .sh     # Start the MCP client
-```
+| Tool | Description |
+|------|-------------|
+| `startNewGame()` | Creates a new game with an empty 3×3 board |
+| `makeMove(gameId, position, player)` | Places X or O at a position (0–8), validates the move, checks for wins |
+| `aiMove(gameId)` | **LLM-powered** — Analyzes the board via ChatClient, picks the best position, and executes the move as O |
+| `getBoardState(gameId)` | Returns the current board, status, and whose turn it is |
+| `getAvailableMoves(gameId)` | Returns the list of empty positions |
 
-**Data Flow:**
+### MCP Client — Thin Web UI
+
+[GameService.java](mcp-client/src/main/java/com/example/springai/mcp/client/GameService.java) | [GameController.java](mcp-client/src/main/java/com/example/springai/mcp/client/GameController.java)
+
+The MCP client is a **thin web frontend** with no LLM or AI logic. It discovers the server's tools at startup and calls them directly:
+
+1. **Direct MCP tool calls** — All operations (new game, human moves, AI moves, board state) are called via `ToolCallback.call()`. No LLM on the client.
+
+2. **AI delegation** — When it's the AI's turn, the client simply calls the server's `aiMove` MCP tool. The server handles LLM communication internally and returns the result.
+
+### Game Flow
 
 ```
-┌──────────────┐    Streamable HTTP    ┌──────────────┐
-│  MCP Client  │ ◄──────────────────► │  MCP Server  │
-│              │    (port 8080)        │              │
-│  Azure OpenAI│                      │  @McpTool    │
-│  ChatClient  │                      │  hello()     │
-│  Sampling    │  ◄── sampling ───    │  weather()   │
-│  Logging     │  ◄── logging ────    │              │
-└──────────────┘                      └──────────────┘
+1. Player clicks "New Game"
+   └──► Client calls MCP tool: startNewGame()
+        └──► Server creates game, returns board
+
+2. Player clicks a cell (e.g., position 4)
+   └──► Client calls MCP tool: makeMove(gameId, 4, "X")
+        └──► Server validates & executes move
+   └──► Client calls MCP tool: aiMove(gameId)
+        └──► Server fetches board state + available moves
+        └──► Server sends board to Azure OpenAI ChatClient
+             └──► LLM picks best position for O
+        └──► Server executes AI move, returns updated board
+
+3. Board updates in browser — repeat until win or draw
 ```
 
-## Running the Examples
+## Run the Application
 
-### Prerequisites
+**Verify deployment:**
 
-- Completed [Module 04 - Tools](../04-tools/README.md)
-- `.env` file in root directory with Azure credentials (created by `azd up` in Module 01)
-- Java 21+, Maven 3.9+
+Ensure the `.env` file exists in the root directory with Azure credentials (created during Module 01). Run this from the module directory (`05-mcp/`):
 
-> **Note:** If you haven't set up your environment variables yet, see [Module 01 - Introduction](../01-introduction/README.md) for deployment instructions (`azd up` creates the `.env` file automatically), or copy `.env.example` to `.env` in the root directory and fill in your values.
+**Bash:**
+```bash
+cat ../.env  # Should show AZURE_OPENAI_ENDPOINT, API_KEY, DEPLOYMENT
+```
 
-### Quick Start
+**PowerShell:**
+```powershell
+Get-Content ..\.env  # Should show AZURE_OPENAI_ENDPOINT, API_KEY, DEPLOYMENT
+```
 
-This demo requires two terminals — one for the server and one for the client.
+**Start the application:**
 
-**Step 1: Start the MCP Server**
+This module requires **two terminal windows** — one for the MCP server and one for the MCP client.
+
+### Terminal 1: Start the MCP Server
 
 **Bash:**
 ```bash
 cd 05-mcp
-chmod +x start-server.sh
 ./start-server.sh
 ```
 
@@ -142,19 +193,13 @@ cd 05-mcp
 .\start-server.ps1
 ```
 
-You should see output like:
-```
-Started McpServerApplication in 1.4 seconds
-Registered tools: 2
-Tomcat started on port 8080
-```
+The server starts on **http://localhost:8080**. It exposes the game engine and AI strategy as MCP tools via the Streamable HTTP protocol. The startup script loads Azure OpenAI credentials from the root `.env` file.
 
-**Step 2: Start the MCP Client (in a separate terminal)**
+### Terminal 2: Start the MCP Client
 
 **Bash:**
 ```bash
 cd 05-mcp
-chmod +x start-client.sh
 ./start-client.sh
 ```
 
@@ -164,216 +209,279 @@ cd 05-mcp
 .\start-client.ps1
 ```
 
-**Expected output:**
-```
-> USER: What is the weather in Amsterdam right now?
-> ASSISTANT: The current temperature in Amsterdam is 13.7°C...
-```
+The client starts on **http://localhost:8081**. It connects to the MCP server to discover available tools — no Azure credentials needed on the client.
 
-The client discovers the server's tools via Streamable HTTP, the LLM decides to call `poeticWeatherForecast`, the server executes it (including a sampling callback to the client for a poem), and the final response is returned.
+> **Note:** If you prefer to build both modules manually before starting:
+>
+> **Bash:**
+> ```bash
+> cd ..  # Go to root directory
+> mvn clean package -DskipTests
+> ```
+>
+> **PowerShell:**
+> ```powershell
+> cd ..  # Go to root directory
+> mvn clean package -DskipTests
+> ```
 
-## MCP Server
+Open http://localhost:8081 in your browser.
 
-The MCP server is a Spring Boot application that exposes tools via the Streamable HTTP transport. It uses `spring-ai-starter-mcp-server-webmvc` to auto-configure everything.
+## Using the Application
 
-### Defining Tools
+The application provides a Tic-Tac-Toe game where you play as **X** against an AI opponent playing as **O**. The AI uses Azure OpenAI to analyze the board and choose strategic moves — all game operations flow through MCP tools on the server.
 
-Tools are defined using the `@McpTool` annotation on Spring `@Service` methods. Spring AI automatically discovers, registers, and exposes them to MCP clients:
+### Start a New Game
+
+Click **New Game** to begin. The client calls the MCP `startNewGame()` tool on the server, which creates a fresh 3×3 board and returns a game ID. You'll see an empty board with the status "Your turn! Place your X."
+
+### Make Your Move
+
+Click any empty cell to place your **X**. The client calls the MCP `makeMove` tool directly — no LLM involved for human moves. The server validates the position, places your mark, checks for wins, and returns the updated board.
+
+### Watch the AI Respond
+
+After your move, the client calls the server's `aiMove` MCP tool. The server analyzes the board, consults Azure OpenAI through Spring AI's `ChatClient`, and picks the best strategic position — all server-side. The AI's **O** appears on the board moments later.
+
+### Track Your Score
+
+The scoreboard at the top tracks wins, draws, and losses across games. Scores persist in your browser's localStorage, so they survive page refreshes. Click **Reset Scores** to start fresh.
+
+## Code Walkthrough
+
+### Server: @McpTool Definitions
+
+[TicTacToeTools.java](mcp-server/src/main/java/com/example/springai/mcp/server/TicTacToeTools.java)
+
+The server uses `@McpTool` and `@McpToolParam` annotations to expose game operations. The MCP framework automatically registers these as tools that clients can discover and invoke:
 
 ```java
 @Service
-public class Tools {
+public class TicTacToeTools {
 
-    @McpTool(description = "Greeting response")
-    public String hello(String myName) {
-        return "Hello " + myName + "!";
+    private final ChatClient chatClient;
+
+    public TicTacToeTools(ChatClient.Builder chatClientBuilder) {
+        this.chatClient = chatClientBuilder.build();
     }
 
-    @McpTool(description = "Get the temperature (in celsius) for a specific location")
-    public String poeticWeatherForecast(McpSyncRequestContext context,
-            @McpToolParam(description = "The location latitude") double latitude,
-            @McpToolParam(description = "The location longitude") double longitude) {
-        // ... fetch weather, optionally request a poem via sampling
+    @McpTool(description = "Start a new tic-tac-toe game. "
+            + "Returns the game ID and an empty 3x3 board.")
+    public String startNewGame() {
+        return gameEngine.newGame();
+    }
+
+    @McpTool(description = "Make a move on the tic-tac-toe board.")
+    public String makeMove(
+            @McpToolParam(description = "The game ID") String gameId,
+            @McpToolParam(description = "Board position 0-8") int position,
+            @McpToolParam(description = "Player symbol: X or O") String player) {
+        return gameEngine.makeMove(gameId, position, player);
     }
 }
 ```
 
-Key points:
-- `@McpTool` — Marks a method as an MCP-exposed tool with a description the LLM can read
-- `@McpToolParam` — Describes each parameter so the LLM knows what to pass
-- `McpSyncRequestContext` — Provides access to MCP features like logging and sampling
+Notice how the descriptions are written for AI consumption — they explain not just *what* the tool does, but *what it returns* and *how to use it*. This matters because MCP clients (and LLMs) rely on these descriptions to understand tool capabilities.
 
-> **🤖 Try with [GitHub Copilot](https://github.com/features/copilot) Chat:** Open [`Tools.java`](mcp-server/src/main/java/com/example/springai/mcp/server/Tools.java) and ask:
-> - "How does the `@McpTool` annotation work?"
-> - "What is the `McpSyncRequestContext` used for?"
-> - "How could I add a new tool to this server?"
+> **🤖 Try with [GitHub Copilot](https://github.com/features/copilot) Chat:** Open [`TicTacToeTools.java`](mcp-server/src/main/java/com/example/springai/mcp/server/TicTacToeTools.java) and ask:
+> - "How do @McpTool annotations differ from @Tool annotations used in Module 04?"
+> - "What makes a good MCP tool description that helps AI clients use it correctly?"
+> - "How would I add a new tool like `undoMove` to this MCP server?"
 
-### MCP Sampling
+### Server: AI Strategy via ChatClient
 
-**Sampling** is one of MCP's most powerful features — it allows the server to request an LLM completion from the client. This enables creative workflows where the server orchestrates AI-generated content.
+[TicTacToeTools.java](mcp-server/src/main/java/com/example/springai/mcp/server/TicTacToeTools.java) | [SpringAiConfig.java](mcp-server/src/main/java/com/example/springai/mcp/server/SpringAiConfig.java)
 
-In our weather tool, the server fetches weather data, then asks the client's LLM to write a poem about it:
+The `aiMove` tool is where the LLM meets MCP. The server fetches the board state, asks Azure OpenAI for the best strategic move via `ChatClient`, and executes it — all inside a single MCP tool call:
 
 ```java
-if (context.sampleEnabled()) {
-    var sampleResponse = context.sample(spec -> spec
-        .systemPrompt("You are a poet!")
-        .message("Please write a poem about this weather forecast:\n" + weatherJson));
+@McpTool(description = "AI makes a strategic move as player O using LLM-powered analysis. "
+        + "Returns the updated board state after the AI's move.")
+public String aiMove(@McpToolParam(description = "The game ID") String gameId) {
+    String boardState = gameEngine.getBoardState(gameId);
+    String availableMoves = gameEngine.getAvailableMoves(gameId);
 
-    weatherPoem = ((TextContent) sampleResponse.content()).text();
+    // Ask the LLM for the best strategic move
+    String aiResponse = chatClient.prompt()
+            .system(AI_STRATEGY_PROMPT)
+            .user("Current board: " + boardState
+                    + "\nAvailable: " + availableMoves)
+            .call()
+            .content();
+
+    int position = parseAiPosition(aiResponse, availableMoves);
+    return gameEngine.makeMove(gameId, position, "O");
 }
 ```
 
-The sampling flow:
-1. **Server** calls `context.sample(...)` with a prompt
-2. **MCP protocol** sends a `sampling/createMessage` request back to the client
-3. **Client's** `@McpSampling` handler receives the request, calls its own LLM, and returns the result
-4. **Server** receives the poem and includes it in the tool response
+This pattern — **game logic + LLM reasoning inside the MCP server** — means the client stays thin. Any MCP client can call `aiMove` without needing its own LLM configuration.
 
-### Server Configuration
+> **🤖 Try with [GitHub Copilot](https://github.com/features/copilot) Chat:** Open [`TicTacToeTools.java`](mcp-server/src/main/java/com/example/springai/mcp/server/TicTacToeTools.java) and ask:
+> - "How does this tool combine MCP and ChatClient in a single method?"
+> - "What are the trade-offs of putting LLM logic on the server vs the client?"
+> - "How would I add difficulty levels that change the AI strategy prompt?"
 
-The server is configured in [`application.yaml`](mcp-server/src/main/resources/application.yaml):
+### Server: Game Engine Logic
+
+[GameEngine.java](mcp-server/src/main/java/com/example/springai/mcp/server/GameEngine.java)
+
+The game engine manages board state, validates moves, and detects wins. It stores games in `ConcurrentHashMap` for thread safety and returns JSON responses for easy MCP transport:
+
+```java
+private static final int[][] WIN_PATTERNS = {
+    {0, 1, 2}, {3, 4, 5}, {6, 7, 8},  // rows
+    {0, 3, 6}, {1, 4, 7}, {2, 5, 8},  // columns
+    {0, 4, 8}, {2, 4, 6}              // diagonals
+};
+
+private String checkWinner(String[] board) {
+    for (int[] pattern : WIN_PATTERNS) {
+        String a = board[pattern[0]], b = board[pattern[1]], c = board[pattern[2]];
+        if (!a.isEmpty() && a.equals(b) && b.equals(c)) return a;
+    }
+    return null;
+}
+```
+
+### Client: Tool Discovery via ToolCallbackProvider
+
+[GameService.java](mcp-client/src/main/java/com/example/springai/mcp/client/GameService.java)
+
+When the MCP client starts, Spring AI's `ToolCallbackProvider` connects to the server and discovers all available tools. The `GameService` stores them in a map for direct invocation:
+
+```java
+@Service
+public class GameService {
+
+    private final Map<String, ToolCallback> mcpTools;
+
+    public GameService(ToolCallbackProvider toolCallbackProvider) {
+        this.mcpTools = new HashMap<>();
+        // Auto-discover MCP tools from the server
+        for (ToolCallback cb : toolCallbackProvider.getToolCallbacks()) {
+            mcpTools.put(cb.getToolDefinition().name(), cb);
+        }
+    }
+}
+```
+
+This is a key Spring AI 2 pattern. The `ToolCallbackProvider` is injected automatically — Spring Boot discovers the MCP server connection from your `application.yaml` configuration and provides the callbacks at startup. Notice the client has **no LLM dependencies** — it just calls MCP tools.
+
+### Client: Direct MCP Tool Invocation
+
+[GameService.java](mcp-client/src/main/java/com/example/springai/mcp/client/GameService.java)
+
+For game operations where the outcome is deterministic, the client calls MCP tools directly — no LLM needed:
+
+```java
+public String playerMove(String gameId, int position) {
+    // Call MCP tool directly — no LLM involved
+    return callTool("makeMove",
+        String.format("{\"gameId\":\"%s\",\"position\":%d,\"player\":\"X\"}",
+                      gameId, position));
+}
+
+public String aiMove(String gameId) {
+    // Call the server's aiMove tool — the server handles LLM strategy internally
+    return callTool("aiMove",
+        String.format("{\"gameId\":\"%s\"}", gameId));
+}
+```
+
+Notice how the `aiMove` call is just another MCP tool invocation — the client doesn't know or care that the server uses an LLM internally. This is the power of MCP's abstraction: the AI complexity is hidden behind the tool interface.
+
+> **🤖 Try with [GitHub Copilot](https://github.com/features/copilot) Chat:** Open [`GameService.java`](mcp-client/src/main/java/com/example/springai/mcp/client/GameService.java) and ask:
+> - "How does ToolCallbackProvider auto-discover tools from the MCP server?"
+> - "What's the difference between calling ToolCallback.call() directly vs passing tools to ChatClient?"
+> - "How would I add error handling for network failures between client and server?"
+
+## Key Concepts
+
+### MCP Streamable HTTP Protocol
+
+The client and server communicate using MCP's **Streamable HTTP** transport — a modern replacement for the legacy Server-Sent Events (SSE) protocol. Configuration is minimal:
 
 ```yaml
+# Server (application.yaml)
 spring:
   ai:
     mcp:
       server:
-        name: mcp-weather-server
-        version: 0.0.1
-        protocol: STREAMABLE        # Use Streamable HTTP transport
-        request-timeout: 120s       # Allow time for sampling round-trips
-```
+        name: tictactoe-server
+        protocol: STREAMABLE
 
-## MCP Client
-
-The MCP client is a Spring Boot command-line application that connects to the MCP server, discovers its tools, and uses them through a `ChatClient` backed by Azure OpenAI.
-
-### Connecting to Tools
-
-The client uses `spring-ai-starter-mcp-client-webflux` which auto-configures MCP client connections and exposes discovered tools as `ToolCallbackProvider`:
-
-```java
-@Bean
-public CommandLineRunner predefinedQuestions(ChatClient.Builder chatClientBuilder,
-        ToolCallbackProvider toolCallbackProvider) {
-
-    return args -> {
-        ChatClient chatClient = chatClientBuilder
-            .defaultToolCallbacks(toolCallbackProvider) // MCP tools injected here
-            .build();
-
-        String response = chatClient.prompt("What is the weather in Amsterdam?")
-            .call().content();
-    };
-}
-```
-
-The `ToolCallbackProvider` is auto-configured by Spring AI — it connects to all configured MCP servers, discovers their tools, and makes them available to the `ChatClient`. No manual tool registration needed.
-
-> **🤖 Try with [GitHub Copilot](https://github.com/features/copilot) Chat:** Open [`McpClientApplication.java`](mcp-client/src/main/java/com/example/springai/mcp/client/McpClientApplication.java) and ask:
-> - "How does the client discover tools from the MCP server?"
-> - "What happens when the LLM decides to call a tool?"
-> - "How is `ToolCallbackProvider` auto-configured?"
-
-### Logging and Sampling Handlers
-
-The client registers handlers for MCP logging notifications and sampling requests using annotations:
-
-```java
-@Service
-public class McpClientHandlers {
-
-    @McpLogging(clients = "weather-server")
-    public void loggingHandler(LoggingMessageNotification loggingMessage) {
-        logger.info("MCP LOGGING: [{}] {}", loggingMessage.level(), loggingMessage.data());
-    }
-
-    @McpSampling(clients = "weather-server")
-    public CreateMessageResult samplingHandler(CreateMessageRequest llmRequest) {
-        // Forward the server's sampling request to our LLM
-        String response = chatClientBuilder.build()
-            .prompt()
-            .system(llmRequest.systemPrompt())
-            .user(userPrompt)
-            .call().content();
-
-        return CreateMessageResult.builder()
-            .content(new McpSchema.TextContent(response)).build();
-    }
-}
-```
-
-- `@McpLogging` — Receives log messages from the server (e.g., `context.info(...)` calls in tools)
-- `@McpSampling` — Handles LLM completion requests from the server, enabling the server to leverage the client's AI model
-
-### Client Configuration
-
-The client is configured in [`application.yaml`](mcp-client/src/main/resources/application.yaml):
-
-```yaml
+# Client (application.yaml)
 spring:
-  main:
-    web-application-type: none              # CLI app, no web server
   ai:
     mcp:
       client:
-        request-timeout: 120s               # Allow time for LLM calls
         streamable-http:
           connections:
-            weather-server:
-              url: http://localhost:8080     # MCP server URL
+            tictactoe-server:
+              url: http://localhost:8080
 ```
 
-The `weather-server` connection name is used in `@McpLogging(clients = "weather-server")` and `@McpSampling(clients = "weather-server")` to bind handlers to specific server connections.
+The server declares itself as a Streamable HTTP MCP server. The client specifies the server URL — Spring AI handles the connection, discovery, and invocation automatically.
 
-## Key Concepts
+### Direct Tool Calls vs LLM-Orchestrated Calls
 
-To help you decide between the custom `@Tool` methods from Module 04 and MCP tools from this module, here's a comparison of the key trade-offs:
+This demo shows **both** patterns side by side:
 
-<img src="images/custom-vs-mcp-tools.png" alt="Custom Tools vs MCP Tools" width="800"/>
+| Pattern | When to Use | Example in This Module |
+|---------|-------------|------------------------|
+| **Direct calls** (`ToolCallback.call()`) | Deterministic operations where the outcome is known | New game, player moves, board state |
+| **LLM-orchestrated calls** (`ChatClient.prompt().call()`) | Decisions requiring intelligence or reasoning | AI choosing the best tic-tac-toe move |
 
-*When to use custom @Tool methods vs MCP tools — custom tools for app-specific logic with full type safety, MCP tools for standardized integrations that work across applications.*
+In Module 04, all tool calls were LLM-orchestrated — the model decided when and how to call tools. This module shows that MCP tools can also be called directly from your code, giving you precise control over deterministic operations while reserving LLM reasoning for decisions that actually need intelligence.
 
-| Feature | Spring AI `@Tool` (Module 04) | Spring AI MCP (Module 05) |
-|---------|-------------------------------|---------------------------|
-| **Scope** | In-process, app-specific | Cross-process, standardized protocol |
-| **Transport** | Direct method call | Streamable HTTP or Stdio |
-| **Discovery** | Compile-time | Runtime via `tools/list` |
-| **Reusability** | Within one app | Any MCP-compatible client |
-| **Sampling** | N/A | Server can request LLM completions from client |
-| **Use when** | App-specific business logic | Shared tool ecosystems, multi-app integration |
+### AI Strategy with ChatClient
 
-**MCP** is ideal when you want to leverage existing tool ecosystems, build tools that multiple applications can share, integrate third-party services with standard protocols, or swap tool implementations without changing code.
+The AI opponent uses a priority-based strategy prompt:
+1. **Win** — Complete a line of three O's
+2. **Block** — Prevent the opponent from winning
+3. **Center** — Take position 4 if available
+4. **Corners** — Positions 0, 2, 6, 8
+5. **Edges** — Positions 1, 3, 5, 7
 
-One of MCP's biggest advantages is its growing ecosystem:
+The LLM evaluates the board state and returns a single position number, keeping the interaction fast and reliable. The system prompt constrains the response to a single digit — a prompt engineering technique from [Module 02](../02-prompt-engineering/README.md).
 
-<img src="images/mcp-ecosystem.png" alt="MCP Ecosystem" width="800"/>
+## Spring AI 2 Features Demonstrated
 
-*MCP creates a universal protocol ecosystem — any MCP-compatible server works with any MCP-compatible client, enabling tool sharing across applications.*
+| Feature | How It's Used | Where to Find It |
+|---------|---------------|------------------|
+| **@McpTool** | Server-side tool definitions with automatic MCP registration | [TicTacToeTools.java](mcp-server/src/main/java/com/example/springai/mcp/server/TicTacToeTools.java) |
+| **@McpToolParam** | Parameter descriptions for AI-friendly tool discovery | [TicTacToeTools.java](mcp-server/src/main/java/com/example/springai/mcp/server/TicTacToeTools.java) |
+| **Streamable HTTP** | Modern MCP transport protocol between client and server | [application.yaml (server)](mcp-server/src/main/resources/application.yaml) |
+| **ToolCallbackProvider** | Auto-discovery of remote MCP tools on the client | [GameService.java](mcp-client/src/main/java/com/example/springai/mcp/client/GameService.java) |
+| **ToolCallback.call()** | Direct invocation of MCP tools without LLM intermediation | [GameService.java](mcp-client/src/main/java/com/example/springai/mcp/client/GameService.java) |
+| **ChatClient** | Fluent API for LLM interactions — AI game strategy on the server | [TicTacToeTools.java](mcp-server/src/main/java/com/example/springai/mcp/server/TicTacToeTools.java) |
+| **OpenAiSdkChatModel** | Azure OpenAI integration via the official OpenAI Java SDK | [SpringAiConfig.java](mcp-server/src/main/java/com/example/springai/mcp/server/SpringAiConfig.java) |
 
-## Congratulations!
+## MCP vs Tools (Module 04)
 
-You've completed the Spring AI for Beginners course! Here's a look at the full learning journey:
+Modules 04 and 05 both give AI applications access to tools, but in fundamentally different ways. Module 04's `@Tool` methods run **in-process** — they're Java methods in the same application. Module 05's `@McpTool` methods run on a **separate server** and are accessed over the network via MCP:
 
-<img src="images/course-completion.png" alt="Course Completion" width="800"/>
+<img src="images/mcp-comparison.png" alt="MCP vs Custom Tools Comparison" width="800"/>
 
-You've learned:
+*@Tool methods run in-process with the AI; @McpTool methods run on a separate server and are accessed over the network. MCP enables service separation and tool sharing.*
 
-- How to build conversational AI with Spring AI (Module 01)
-- Prompt engineering patterns for different tasks (Module 02)
-- Grounding responses in your documents with RAG (Module 03)
-- Creating AI agents with custom tools (Module 04)
-- Building MCP servers and clients with Spring AI for standardized tool integration (Module 05)
+| Aspect | Module 04 (@Tool) | Module 05 (@McpTool) |
+|--------|-------------------|---------------------|
+| **Location** | In-process, same JVM | Separate server, different process |
+| **Discovery** | Spring Boot component scan | MCP protocol auto-discovery |
+| **Transport** | Direct method call | Streamable HTTP / stdio |
+| **Sharing** | App-specific | Any MCP-compatible client |
+| **Deployment** | Single deployment unit | Independent services |
 
-**Official Resources:**
-- [Spring AI Documentation](https://docs.spring.io/spring-ai/reference/) - Comprehensive guides and API reference
-- [Spring AI MCP Documentation](https://docs.spring.io/spring-ai/reference/api/mcp/) - MCP-specific guides
-- [MCP Specification](https://modelcontextprotocol.io/) - The Model Context Protocol specification
+In practice, many production systems combine both approaches: `@Tool` for app-specific logic and `@McpTool` for shared services.
 
-Thank you for completing this course!
+## Next Steps
+
+- **Try modifying the AI prompt** in [`TicTacToeTools.java`](mcp-server/src/main/java/com/example/springai/mcp/server/TicTacToeTools.java) to change the AI's personality or strategy
+- **Add difficulty levels** — Make the AI sometimes pick random moves for "easy" mode
+- **Build your own MCP server** — Expose your own domain-specific tools for AI consumption
+- **Explore the MCP ecosystem** — Connect to third-party MCP servers for database access, cloud APIs, or code execution
 
 ---
 
 **Navigation:** [← Previous: Module 04 - Tools](../04-tools/README.md) | [Back to Main](../README.md)
-
