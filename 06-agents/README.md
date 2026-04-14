@@ -40,20 +40,7 @@ An augmented LLM can:
 
 On its own, an augmented LLM handles single-turn tasks well. But when you need **multi-step reasoning** — where the output of one LLM call feeds into the next, or multiple calls run in parallel, or an evaluator reviews and refines output — you need to orchestrate multiple augmented LLMs together. That's what agentic patterns provide.
 
-### Workflows vs. Agents
-
-Anthropic's research, [Building Effective Agents](https://www.anthropic.com/research/building-effective-agents), makes an important architectural distinction between two types of agentic systems:
-
-| | **Workflows** | **Agents** |
-|---|---|---|
-| **Definition** | LLMs and tools orchestrated through **predefined code paths** | LLMs **dynamically direct** their own processes and tool usage |
-| **Control flow** | Deterministic, prescribed by the developer | Autonomous, decided by the LLM at runtime |
-| **Best for** | Well-defined tasks needing predictability | Open-ended tasks requiring flexibility |
-| **Trade-off** | More reliable and consistent | More adaptive but less predictable |
-
-> **Key takeaway:** While fully autonomous agents might seem appealing, **workflows often provide better predictability and consistency** for well-defined tasks. This aligns perfectly with enterprise requirements where reliability and maintainability are crucial. Start with workflows and only add autonomy when needed.
-
-This module implements **five workflow patterns** from the research, each serving specific use cases. These are the building blocks you'll combine when building production agentic systems.
+This module implements **five workflow patterns**, each serving specific use cases. These are the building blocks you'll combine when building production agentic systems.
 
 ## Patterns
 
