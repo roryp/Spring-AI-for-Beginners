@@ -52,19 +52,13 @@ Prompt engineering is about designing input text that consistently gets you the 
 
 Think of it like giving instructions to a colleague. "Fix the bug" is vague. "Fix the null pointer exception in UserService.java line 45 by adding a null check" is specific. Language models work the same way - specificity and structure matter.
 
-The diagram below shows how Spring AI fits into this picture — connecting your prompt patterns to the model through SystemMessage and UserMessage building blocks.
-
-<img src="images/how-springai-fits.png" alt="How Spring AI Fits" width="800"/>
-
-Spring AI provides the infrastructure — model connections, memory, and message types — while prompt patterns are just carefully structured text you send through that infrastructure. The key building blocks are `SystemMessage` (which sets the AI's behavior and role) and `UserMessage` (which carries your actual request).
-
 ## Prompt Engineering Fundamentals
 
 The five core techniques shown below form the foundation of effective prompt engineering. Each one addresses a different aspect of how you communicate with language models.
 
 <img src="images/five-patterns-overview.png" alt="Five Prompt Engineering Patterns Overview" width="800"/>
 
-Before diving into the advanced patterns in this module, let's review five foundational prompting techniques. These are the building blocks that every prompt engineer should know. If you've already worked through the [Quick Start module](../00-quick-start/README.md#2-prompt-patterns), you've seen these in action — here's the conceptual framework behind them.
+Before diving into the advanced patterns in this module, let's review five foundational prompting techniques. These are the building blocks that every prompt engineer should know. If you've already worked through the [Quick Start module](../00-quick-start/README.md#what-each-example-shows), you've seen these in action — here's the conceptual framework behind them.
 
 ### Zero-Shot Prompting
 
