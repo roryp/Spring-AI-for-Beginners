@@ -31,7 +31,7 @@ In [Module 01](../01-introduction/README.md) you built stateless and stateful ch
 
 The basic building block of any agentic system is an **augmented LLM** — a language model enhanced with capabilities like retrieval, tools, and memory:
 
-![Augmented LLM — the building block of agentic systems](images/agentic-systems-overview.jpg)
+![Augmented LLM — the building block of agentic systems](images/agentic-systems-overview.png)
 
 An augmented LLM can:
 - **Retrieve** information from external data sources (RAG — covered in [Module 03](../03-rag/README.md))

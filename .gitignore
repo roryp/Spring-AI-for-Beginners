@@ -97,3 +97,4 @@ loadusers.sh
 script.txt
 PROJECT_RECREATION_INSTRUCTIONS.md
 .vscode/mcp.json
+generate-agent-images.py
