@@ -208,7 +208,8 @@ System.out.println(response.getResult().getOutput().getText());
 
 **Prompt Engineering** - [PromptEngineeringDemo.java](src/main/java/com/example/springai/quickstart/PromptEngineeringDemo.java)
 
-Now that you know how to talk to a model, let's explore what you say to it. This demo uses the same model setup but shows six different prompting patterns. Try zero-shot prompts for direct instructions, few-shot prompts that learn from examples, chain-of-thought prompts that reveal reasoning steps, role-based prompts that set context, and prompt templates for reusable prompts with variables. The demo also includes a conversational memory pattern using Spring AI's `MessageWindowChatMemory` — showing how the model can remember context across multiple turns.
+Now that you know how to talk to a model, let's explore what you say to it. This demo uses the same model setup but shows six different prompting patterns. Try zero-shot prompts for direct instructions, few-shot prompts that learn from examples, chain-of-thought prompts that reveal reasoning steps, role-based prompts that set context, and prompt templates for reusable prompts with variables.
+
 The below example shows a prompt using Spring AI's `PromptTemplate` to fill in variables. The AI will answer based on the provided destination and activity.
 
 ```java
@@ -222,6 +223,24 @@ Prompt prompt = template.create(Map.of(
 ));
 
 ChatResponse response = chatModel.call(prompt);
+```
+
+The demo also includes a conversational memory pattern using Spring AI's `MessageWindowChatMemory` — showing how the model can remember context across multiple turns:
+
+```java
+ChatMemory chatMemory = MessageWindowChatMemory.builder()
+        .maxMessages(10)
+        .build();
+String conversationId = "demo-session";
+
+chatMemory.add(conversationId, new UserMessage("My name is Alex and I'm learning Spring AI."));
+ChatResponse response1 = chatModel.call(new Prompt(chatMemory.get(conversationId)));
+chatMemory.add(conversationId, response1.getResult().getOutput());
+
+// Second turn — the model remembers your name and previous context
+chatMemory.add(conversationId, new UserMessage("What's my name?"));
+ChatResponse response2 = chatModel.call(new Prompt(chatMemory.get(conversationId)));
+// response2 correctly recalls "Alex"
 ```
 
 > **🤖 Try with [GitHub Copilot](https://github.com/features/copilot) Chat:** Open [`PromptEngineeringDemo.java`](src/main/java/com/example/springai/quickstart/PromptEngineeringDemo.java) and ask:

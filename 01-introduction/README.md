@@ -16,12 +16,6 @@
   - [Stateful Chat (Right Panel)](#stateful-chat-right-panel)
 - [Next Steps](#next-steps)
 
-## Video Walkthrough
-
-Watch this live session that explains how to get started with this module:
-
-<a href="https://www.youtube.com/live/nl_troDm8rQ?si=6b85S8xGjWnT2fX9"><img src="https://img.youtube.com/vi/nl_troDm8rQ/maxresdefault.jpg" alt="Getting Started with Spring AI - Live Session" width="800"/></a>
-
 ## What You'll Learn
 
 In the quick start, you used GitHub Models to send prompts, call tools, build a RAG pipeline, and test guardrails. Those demos showed what's possible — now we switch to Azure OpenAI and GPT-5.2 and start building production-style applications. This module focuses on conversational AI that remembers context and maintains state — the concepts those quick start demos used behind the scenes but didn't explain.
@@ -32,7 +26,7 @@ You'll build one application that demonstrates both patterns:
 
 **Stateless Chat** - Each request is independent. The model has no memory of previous messages. This is the pattern you used in the quick start.
 
-**Stateful Conversation** - Each request includes conversation history. The model maintains context across multiple turns. This is what production applications require.
+**Stateful Conversation** - Each request includes conversation history managed by Spring AI's `MessageWindowChatMemory`. The model maintains context across multiple turns with automatic sliding-window trimming. This is what production applications require.
 
 ## Prerequisites
 
