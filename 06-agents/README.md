@@ -21,26 +21,28 @@ Think of it as a progression:
 | Level | What It Does | Example |
 |-------|-------------|---------|
 | **Single LLM call** | One prompt → one response | "Summarize this text" |
-| **Augmented LLM** | LLM enhanced with retrieval, tools, memory | "Search the docs and answer my question" (RAG, Module 03) |
+| **Enhanced LLM** | LLM enhanced with retrieval, tools, memory | "Search the docs and answer my question" (RAG, Module 03) |
 | **Workflow** | Multiple LLM calls orchestrated through **predefined code paths** | "Extract → standardize → sort → format" (this module) |
 | **Autonomous Agent** | LLM **dynamically decides** its own next steps and tool usage | "Figure out how to complete this task on your own" |
 
 In [Module 01](../01-introduction/README.md) you built stateless and stateful chat. In [Module 02](../02-prompt-engineering/README.md) you learned prompt engineering. In [Module 03](../03-rag/README.md) you added retrieval. In [Module 04](../04-tools/README.md) you gave the LLM tools. Each module added a new capability. **This module combines them into orchestrated workflows** — the final step before fully autonomous agents.
 
-### The Augmented LLM
+### The Enhanced LLM
 
-The basic building block of any agentic system is an **augmented LLM** — a language model enhanced with capabilities like retrieval, tools, and memory:
+Before we look at workflows, start with the core unit you'll orchestrate: an **enhanced LLM**.
 
-![Augmented LLM — the building block of agentic systems](images/agentic-systems-overview.png)
+An enhanced LLM is a normal LLM call with extra capabilities around it, such as retrieval, tool access, and memory:
 
-An augmented LLM can:
-- **Retrieve** information from external data sources (RAG — covered in [Module 03](../03-rag/README.md))
-- **Call tools** to take actions in the real world (APIs, databases, code execution — covered in [Module 04](../04-tools/README.md))
-- **Remember** context across conversations (chat memory — covered in [Module 01](../01-introduction/README.md))
+![Enhanced LLM — the building block of agentic systems](images/agentic-systems-overview.png)
 
-On its own, an augmented LLM handles single-turn tasks well. But when you need **multi-step reasoning** — where the output of one LLM call feeds into the next, or multiple calls run in parallel, or an evaluator reviews and refines output — you need to orchestrate multiple augmented LLMs together. That's what agentic patterns provide.
+In this course, augmentation means the model can:
+- **Retrieve** relevant context from external data (RAG from [Module 03](../03-rag/README.md))
+- **Call tools** to perform actions (APIs, databases, code execution from [Module 04](../04-tools/README.md))
+- **Remember** prior turns in a conversation (chat memory from [Module 01](../01-introduction/README.md))
 
-This module implements **five workflow patterns**, each serving specific use cases. These are the building blocks you'll combine when building production agentic systems.
+One enhanced LLM is enough for many single-step tasks. But real applications often need multi-step execution: one result feeds the next step, several steps run in parallel, or output is evaluated and refined before returning.
+
+That orchestration layer is what this module focuses on. The five patterns below show practical ways to combine enhanced LLM calls into reliable workflows.
 
 ## Patterns
 
