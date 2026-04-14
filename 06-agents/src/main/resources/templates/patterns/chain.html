@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chain Workflow</title>
+    <link rel="stylesheet" th:href="@{/css/agent-demo.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="demo-page">
+            <a th:href="@{/}" class="back-link">← Back to Dashboard</a>
+
+            <div class="demo-header">
+                <span class="icon">🔗</span>
+                <div class="demo-title">
+                    <h1>Chain Workflow</h1>
+                    <p>Sequential LLM calls — each step transforms the previous output</p>
+                </div>
+            </div>
+
+            <div class="demo-section">
+                <h2>Try It Out</h2>
+                <div class="input-group">
+                    <label for="input">Enter text with numerical data:</label>
+                    <textarea id="input" placeholder="Q3 Performance Summary:&#10;Customer satisfaction rose to 92 points..."></textarea>
+                </div>
+
+                <div class="examples">
+                    <button class="example-btn" onclick="setExample('Q3 Performance Summary:\nOur customer satisfaction score rose to 92 points this quarter.\nRevenue grew by 45% compared to last year.\nMarket share is now at 23% in our primary market.\nCustomer churn decreased to 5% from 8%.\nProduct adoption rate increased to 78%.\nEmployee satisfaction is at 87 points.\nOperating margin improved to 34%.')">Q3 Performance Report</button>
+                    <button class="example-btn" onclick="setExample('Annual Health Report:\nPatient satisfaction reached 88 points.\nWait times decreased by 15%.\nStaff retention is at 92%.\nBed occupancy rate is 76%.\nReadmission rate dropped to 4%.')">Health Report</button>
+                </div>
+
+                <div class="button-group">
+                    <button id="submit-btn" class="btn" onclick="submitChain()">Run Chain →</button>
+                </div>
+            </div>
+
+            <div id="loading" class="loading">
+                <div class="loading-spinner"></div>
+                <p>Running 4-step chain (extract → standardize → sort → format)...</p>
+            </div>
+
+            <div id="response"></div>
+
+            <div class="demo-section" style="margin-top: 40px;">
+                <h2>How It Works</h2>
+                <ol>
+                    <li><b>Extract</b> — Pull numerical values and metrics from text</li>
+                    <li><b>Standardize</b> — Convert all values to percentages</li>
+                    <li><b>Sort</b> — Order by value descending</li>
+                    <li><b>Format</b> — Render as a markdown table</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/pattern-demo.js}"></script>
+    <script>
+        function submitChain() {
+            const input = document.getElementById('input').value.trim();
+            if (!input) { alert('Please enter some text'); return; }
+            callPattern('chain', { input });
+        }
+    </script>
+</body>
+</html>

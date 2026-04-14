@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orchestrator-Workers</title>
+    <link rel="stylesheet" th:href="@{/css/agent-demo.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="demo-page">
+            <a th:href="@{/}" class="back-link">← Back to Dashboard</a>
+
+            <div class="demo-header">
+                <span class="icon">🎯</span>
+                <div class="demo-title">
+                    <h1>Orchestrator-Workers</h1>
+                    <p>Central LLM decomposes tasks and delegates to specialized workers</p>
+                </div>
+            </div>
+
+            <div class="demo-section">
+                <h2>Try It Out</h2>
+                <div class="input-group">
+                    <label for="task">Describe a complex task:</label>
+                    <textarea id="task" placeholder="Generate both technical and user-friendly documentation for a REST API endpoint..."></textarea>
+                </div>
+
+                <div class="examples">
+                    <button class="example-btn" onclick="setExample('Generate both technical and user-friendly documentation for a REST API endpoint that creates a new user account.')">API Documentation</button>
+                    <button class="example-btn" onclick="setExample('Write a product launch announcement for a new AI-powered code review tool, targeting both developers and engineering managers.')">Product Launch</button>
+                    <button class="example-btn" onclick="setExample('Create a comprehensive onboarding guide for new software engineers joining a microservices team.')">Onboarding Guide</button>
+                </div>
+
+                <div class="button-group">
+                    <button id="submit-btn" class="btn" onclick="submitOrchestrator()">Orchestrate →</button>
+                </div>
+            </div>
+
+            <div id="loading" class="loading">
+                <div class="loading-spinner"></div>
+                <p>Orchestrator is analyzing and delegating to workers...</p>
+            </div>
+
+            <div id="response"></div>
+
+            <div class="demo-section" style="margin-top: 40px;">
+                <h2>How It Works</h2>
+                <ol>
+                    <li><b>Orchestrator</b> analyzes the task and determines subtasks</li>
+                    <li><b>Workers</b> execute each subtask with specialized prompts</li>
+                    <li><b>Synthesizer</b> combines all worker outputs into a final result</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/pattern-demo.js}"></script>
+    <script>
+        function submitOrchestrator() {
+            const task = document.getElementById('task').value.trim();
+            if (!task) { alert('Please describe a task'); return; }
+            callPattern('orchestrator', { task });
+        }
+    </script>
+</body>
+</html>

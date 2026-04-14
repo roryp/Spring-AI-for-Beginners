@@ -16,6 +16,7 @@
     <module>03-rag</module>
     <module>04-tools</module>
     <module>05-mcp</module>
+    <module>06-agents</module>
   </modules>
 
   <properties>
