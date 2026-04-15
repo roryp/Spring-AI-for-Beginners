@@ -16,6 +16,8 @@ No single LLM call can reliably handle these. You need to **orchestrate multiple
 
 ### From Single Calls to Agentic Systems
 
+
+
 Think of it as a progression:
 
 | Level | What It Does | Example |
@@ -31,7 +33,7 @@ In [Module 01](../01-introduction/README.md) you built stateless and stateful ch
 
 Before we look at workflows, start with the core unit you'll orchestrate: an **enhanced LLM**.
 
-An enhanced LLM is a normal LLM call with extra capabilities around it, such as retrieval, tool access, and memory:
+An enhanced LLM is a normal LLM call with extra capabilities around it, such as retrieval, tool access, and memory. Unlike a plain LLM that only generates text from its training data, an enhanced LLM can reach outside itself — querying live data sources, invoking external tools, and maintaining conversational context — making it far more capable for real-world tasks:
 
 ![Enhanced LLM — the building block of agentic systems](images/agentic-systems-overview.png)
 
