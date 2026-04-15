@@ -289,11 +289,7 @@ From the Spring Boot Dashboard, you can:
 - View application logs in real-time
 - Monitor application status
 
-Simply click the play button next to "rag" to start this module, or start all modules at once.
-
-<img src="images/dashboard.png" alt="Spring Boot Dashboard" width="400"/>
-
-*This screenshot shows the Spring Boot Dashboard in VS Code, where you can start, stop, and monitor applications visually.*
+Simply click the play button next to "spring-ai-rag" to start this module, or start all modules at once.
 
 **Option 2: Using shell scripts**
 
