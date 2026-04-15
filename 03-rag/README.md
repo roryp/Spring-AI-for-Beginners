@@ -118,11 +118,31 @@ Spring AI offers different ways to implement RAG, each with a different level of
 | **Advisor-based RAG** | Uses Spring AI 2.0's `QuestionAnswerAdvisor` with `ChatClient` to automatically retrieve relevant context and inject it into prompts. | Minimal code — the recommended approach for production. |
 | **Native RAG** | You call the vector store search, build the prompt, and generate the answer yourself — one explicit step at a time. | More code, but every stage is visible and modifiable. |
 
+The diagram below compares these three levels of abstraction — from the fully manual Native approach, through the Advisor-based pipeline, to a full ETL pipeline — so you can see the trade-off between control and convenience at a glance.
+
+<img src="images/rag-approaches.png" alt="RAG Approaches" width="800"/>
+
+*This diagram compares three Spring AI RAG approaches side by side: Native RAG (manual vector search, context assembly, and prompt building), Advisor-based RAG (QuestionAnswerAdvisor handles retrieval and injection automatically), and full ETL pipeline (end-to-end document processing with minimal code).*
+
 **This tutorial implements both approaches.** The Native approach in [`RagService.java`](src/main/java/com/example/springai/rag/service/RagService.java) writes out each RAG step explicitly — searching the vector store, assembling the context, and generating the answer — so you can see and understand every stage. The Advisor-based approach in [`AdvisorRagService.java`](src/main/java/com/example/springai/rag/service/AdvisorRagService.java) uses Spring AI 2.0's `QuestionAnswerAdvisor` with `ChatClient` to do the same thing in a single call. Both endpoints are available in the running application so you can compare them side-by-side.
 
 ## How It Works
 
-The RAG pipeline in this module breaks down into four stages that run in sequence every time a user asks a question. First, an uploaded document is **parsed and chunked** into manageable pieces. Those chunks are then converted into **vector embeddings** and stored so they can be compared mathematically. When a query arrives, the system performs a **semantic search** to find the most relevant chunks, and finally passes them as context to the LLM for **answer generation**. The sections below walk through each stage with the actual code and diagrams. Let's look at the first step.
+The RAG pipeline in this module breaks down into four stages that run in sequence every time a user asks a question. First, an uploaded document is **parsed and chunked** into manageable pieces. Those chunks are then converted into **vector embeddings** and stored so they can be compared mathematically. When a query arrives, the system performs a **semantic search** to find the most relevant chunks, and finally passes them as context to the LLM for **answer generation**.
+
+Before diving into each stage, here's the Spring AI class hierarchy that powers this pipeline — from document ingestion through to answer generation:
+
+<img src="images/rag-spring-ai-classes.png" alt="Spring AI RAG Class Hierarchy" width="800"/>
+
+*This diagram shows the four-stage Spring AI RAG class hierarchy: INGEST (DocumentReader, TextReader, PagePdfDocumentReader), EMBED (EmbeddingModel, TokenTextSplitter), STORE & SEARCH (VectorStore, SimpleVectorStore, SearchRequest), and GENERATE (ChatClient, QuestionAnswerAdvisor, PromptTemplate). Each stage feeds into the next.*
+
+And here's how those classes connect in the ETL (Extract-Transform-Load) pipeline that runs end-to-end when a document is uploaded and queried:
+
+<img src="images/easy-rag-pipeline.png" alt="Spring AI ETL RAG Pipeline" width="800"/>
+
+*This diagram shows the Spring AI ETL RAG pipeline: DocumentReader extracts text, TokenTextSplitter chunks it, EmbeddingModel converts chunks to vectors, VectorStore stores them, and at query time QuestionAnswerAdvisor retrieves relevant chunks and ChatClient generates the answer.*
+
+The sections below walk through each stage with the actual code and diagrams. Let's look at the first step.
 
 ### Document Processing
 

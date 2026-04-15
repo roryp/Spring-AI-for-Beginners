@@ -62,6 +62,12 @@ spring:
 
 The difference in this module is how the prompts are constructed — the model configuration stays the same.
 
+The diagram below shows where Spring AI sits in the overall architecture — your application code uses Spring AI's `PromptTemplate` and `ChatClient` APIs, which handle serialization, HTTP calls, and response parsing against the Azure OpenAI endpoint behind the scenes.
+
+<img src="images/how-springai-fits.png" alt="How Spring AI Fits" width="800"/>
+
+*This diagram shows how Spring AI acts as the bridge between your Java application and Azure OpenAI — your code calls `PromptTemplate` and `ChatClient`, Spring AI handles the REST communication, authentication, and response mapping so you never work with raw HTTP.*
+
 ## Understanding Prompt Engineering
 
 At its core, prompt engineering is the difference between vague instructions and precise ones, as the comparison below illustrates.
@@ -168,11 +174,11 @@ String response = chatModel.call(new Prompt(prompt)).getResult().getOutput().get
 
 ### Prompt Templates
 
-Create reusable prompts with variable placeholders. Instead of writing a new prompt every time, define a template once and fill in different values. Spring AI's `PromptTemplate` class makes this easy with `{variable}` syntax.
+Create reusable prompts with variable placeholders. Instead of writing a new prompt every time, define a template once and fill in different values. Spring AI's `PromptTemplate` class makes this easy with `{variable}` syntax — single curly braces around variable names like `{destination}` and `{activity}`. You define the template string once, then call `template.create()` with a map of values to produce different prompts from the same structure.
 
 <img src="images/prompt-templates.png" alt="Prompt Templates" width="800"/>
 
-*Reusable prompts with variable placeholders — one template, many uses*
+*This diagram shows how a single Spring AI `PromptTemplate` with `{destination}` and `{activity}` placeholders produces different prompts by swapping in variable values — Set 1 fills in "Paris" and "sightseeing", Set 2 fills in "Tokyo" and "hiking", both from the same reusable template.*
 
 ```java
 PromptTemplate template = new PromptTemplate(
