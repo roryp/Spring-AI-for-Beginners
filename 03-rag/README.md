@@ -45,7 +45,6 @@ This grounds the model's responses in your actual data instead of relying on its
 
 ## Prerequisites
 
-- Completed [Module 00 - Quick Start](../00-quick-start/README.md) (for the Easy RAG example referenced later in this module)
 - Completed [Module 01 - Introduction](../01-introduction/README.md) (Azure OpenAI resources deployed, including the `text-embedding-3-small` embedding model)
 - `.env` file in root directory with Azure credentials (created by `azd up` in Module 01)
 
@@ -115,8 +114,9 @@ Spring AI offers different ways to implement RAG, each with a different level of
 
 | Approach | What It Does | Trade-off |
 |---|---|---|
-| **Advisor-based RAG** | Uses Spring AI 2.0's `QuestionAnswerAdvisor` with `ChatClient` to automatically retrieve relevant context and inject it into prompts. | Minimal code — the recommended approach for production. |
 | **Native RAG** | You call the vector store search, build the prompt, and generate the answer yourself — one explicit step at a time. | More code, but every stage is visible and modifiable. |
+| **Advisor-based RAG** | Uses Spring AI 2.0's `QuestionAnswerAdvisor` with `ChatClient` to automatically retrieve relevant context and inject it into prompts. | Minimal code — the recommended approach for production. |
+| **ETL Pipeline RAG** | Combines both — uses the ETL framework (`DocumentReader` → `TokenTextSplitter` → `VectorStore`) for ingestion and the `QuestionAnswerAdvisor` for querying. | Best of both worlds: structured ingestion with automated retrieval. |
 
 The diagram below compares these three levels of abstraction — from the fully manual Native approach, through the Advisor-based pipeline, to a full ETL pipeline — so you can see the trade-off between control and convenience at a glance.
 
@@ -124,25 +124,25 @@ The diagram below compares these three levels of abstraction — from the fully 
 
 *This diagram compares three Spring AI RAG approaches side by side: Native RAG (manual vector search, context assembly, and prompt building), Advisor-based RAG (QuestionAnswerAdvisor handles retrieval and injection automatically), and full ETL pipeline (end-to-end document processing with minimal code).*
 
-**This tutorial implements both approaches.** The Native approach in [`RagService.java`](src/main/java/com/example/springai/rag/service/RagService.java) writes out each RAG step explicitly — searching the vector store, assembling the context, and generating the answer — so you can see and understand every stage. The Advisor-based approach in [`AdvisorRagService.java`](src/main/java/com/example/springai/rag/service/AdvisorRagService.java) uses Spring AI 2.0's `QuestionAnswerAdvisor` with `ChatClient` to do the same thing in a single call. Both endpoints are available in the running application so you can compare them side-by-side.
+**This tutorial implements all three.** The Native approach in [`RagService.java`](src/main/java/com/example/springai/rag/service/RagService.java) writes out each RAG step explicitly — searching the vector store, assembling the context, and generating the answer — so you can see and understand every stage. The Advisor-based approach in [`AdvisorRagService.java`](src/main/java/com/example/springai/rag/service/AdvisorRagService.java) uses `QuestionAnswerAdvisor` with `ChatClient` to do the same thing in a single call. The ETL pipeline approach combines both — using the ETL framework for structured document ingestion and the advisor for automated query-time retrieval. All three endpoints are available in the running application so you can compare them.
 
 ## How It Works
 
-The RAG pipeline in this module breaks down into four stages that run in sequence every time a user asks a question. First, an uploaded document is **parsed and chunked** into manageable pieces. Those chunks are then converted into **vector embeddings** and stored so they can be compared mathematically. When a query arrives, the system performs a **semantic search** to find the most relevant chunks, and finally passes them as context to the LLM for **answer generation**.
+The RAG pipeline has four stages: **Ingest**, **Transform**, **Store & Search**, and **Generate**. Each stage hands off to the next — documents go in one end, grounded answers come out the other.
 
-Before diving into each stage, here's the Spring AI class hierarchy that powers this pipeline — from document ingestion through to answer generation:
+The class hierarchy below shows how Spring AI organizes these stages. Each stage has a core interface with swappable implementations, so you can change the vector database or document reader without rewriting the pipeline:
 
 <img src="images/rag-spring-ai-classes.png" alt="Spring AI RAG Class Hierarchy" width="800"/>
 
-*This diagram shows the four-stage Spring AI RAG class hierarchy: INGEST (DocumentReader, TextReader, PagePdfDocumentReader), EMBED (EmbeddingModel, TokenTextSplitter), STORE & SEARCH (VectorStore, SimpleVectorStore, SearchRequest), and GENERATE (ChatClient, QuestionAnswerAdvisor, PromptTemplate). Each stage feeds into the next.*
+*Spring AI's four-stage RAG class hierarchy — each stage has a core interface with pluggable implementations you can swap without changing the rest of the pipeline.*
 
-And here's how those classes connect in the ETL (Extract-Transform-Load) pipeline that runs end-to-end when a document is uploaded and queried:
+Here's how those classes connect at runtime. Documents flow left to right through the ETL pipeline — read, chunked, embedded, stored. Queries flow the same direction — the advisor searches the store, injects matching chunks into the prompt, and the chat client generates an answer:
 
-<img src="images/easy-rag-pipeline.png" alt="Spring AI ETL RAG Pipeline" width="800"/>
+<img src="images/rag-pipeline.png" alt="Spring AI ETL RAG Pipeline" width="800"/>
 
-*This diagram shows the Spring AI ETL RAG pipeline: DocumentReader extracts text, TokenTextSplitter chunks it, EmbeddingModel converts chunks to vectors, VectorStore stores them, and at query time QuestionAnswerAdvisor retrieves relevant chunks and ChatClient generates the answer.*
+*The ETL pipeline in action — documents are processed and stored once; queries retrieve relevant chunks on the fly and feed them to the LLM.*
 
-The sections below walk through each stage with the actual code and diagrams. Let's look at the first step.
+The sections below walk through each stage with the actual code and diagrams.
 
 ### Document Processing
 
@@ -203,11 +203,11 @@ Once embeddings are stored, similar content naturally clusters together in vecto
 
 *This visualization shows how related documents cluster together in 3D vector space, with topics like Technical Docs, Business Rules, and FAQs forming distinct groups.*
 
-When a user searches, the system follows four steps: embed the documents once, embed the query on each search, compare the query vector against all stored vectors using cosine similarity, and return the top-K highest-scoring chunks. The diagram below walks through each step:
+When a user searches, Spring AI's embedding search follows four steps. The diagram below walks through each one:
 
-<img src="images/embedding-search-steps.png" alt="Embedding Search Steps" width="800"/>
+<img src="images/embedding-search-steps.png" alt="How Spring AI Embedding Search Works" width="800"/>
 
-*This diagram shows the four-step embedding search process: embed documents, embed the query, compare vectors with cosine similarity, and return the top-K results.*
+*This diagram shows how Spring AI embedding search works in four steps: (A) document chunks are embedded once via `EmbeddingModel` and stored in a `VectorStore` (SimpleVectorStore), (B) each user query is embedded into a Query Vector, (C) cosine similarity compares the query vector against all stored vectors to produce relevance scores, and (D) the top-K matching chunks are returned as a `List<Document>` and fed into `ChatClient` for the final RAG answer.*
 
 ### Semantic Search
 
