@@ -24,10 +24,10 @@
       <artifactId>spring-boot-starter-actuator</artifactId>
     </dependency>
 
-    <!-- Spring AI OpenAI SDK (Official OpenAI Java SDK integration) -->
+    <!-- Spring AI OpenAI SDK Starter (Official OpenAI Java SDK integration with auto-configuration) -->
     <dependency>
       <groupId>org.springframework.ai</groupId>
-      <artifactId>spring-ai-openai-sdk</artifactId>
+      <artifactId>spring-ai-starter-model-openai-sdk</artifactId>
     </dependency>
 
     <!-- JSON binding (optional, helps with mapping) -->

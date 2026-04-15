@@ -1,45 +1,20 @@
 package com.example.springai.config;
 
-import org.springframework.ai.openaisdk.OpenAiSdkChatModel;
-import org.springframework.ai.openaisdk.OpenAiSdkChatOptions;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Configuration for Spring AI with Azure OpenAI using the OpenAI SDK.
- * 
- * The OpenAI SDK supports Azure OpenAI endpoints, providing a unified
- * interface for both OpenAI and Azure OpenAI services.
+ * Configuration for Spring AI with Azure OpenAI using the OpenAI SDK starter.
+ *
+ * The OpenAI SDK starter (spring-ai-starter-model-openai-sdk) auto-configures
+ * OpenAiSdkChatModel using properties from application.yaml:
+ *
+ *   spring.ai.openai-sdk.base-url  → AZURE_OPENAI_ENDPOINT
+ *   spring.ai.openai-sdk.api-key   → AZURE_OPENAI_API_KEY
+ *   spring.ai.openai-sdk.microsoft-deployment-name → AZURE_OPENAI_DEPLOYMENT
+ *
+ * Azure mode is detected automatically when the base URL contains openai.azure.com.
  */
 @Configuration
 public class SpringAiConfig {
-
-    @Value("${AZURE_OPENAI_ENDPOINT}")
-    private String azureEndpoint;
-
-    @Value("${AZURE_OPENAI_API_KEY}")
-    private String azureApiKey;
-
-    @Value("${AZURE_OPENAI_DEPLOYMENT}")
-    private String deploymentName;
-
-    /**
-     * Creates the OpenAI SDK chat model configured for Azure OpenAI.
-     * 
-     * @return configured OpenAiSdkChatModel
-     */
-    @Bean
-    public OpenAiSdkChatModel openAiSdkChatModel() {
-        var chatOptions = OpenAiSdkChatOptions.builder()
-                .baseUrl(azureEndpoint)
-                .apiKey(azureApiKey)
-                .model(deploymentName)
-                .azure(true)
-                .build();
-
-        return OpenAiSdkChatModel.builder()
-                .options(chatOptions)
-                .build();
-    }
+    // No manual bean needed — the starter auto-configures OpenAiSdkChatModel.
 }

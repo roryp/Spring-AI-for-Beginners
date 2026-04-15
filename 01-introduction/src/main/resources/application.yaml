@@ -4,10 +4,15 @@ server:
 spring:
   application:
     name: spring-ai-getting-started
-
-# Azure OpenAI configuration
-# These environment variables are set by 'azd up' deployment
-# Values are read from environment variables and injected into the SpringAiConfig bean
+  # Azure OpenAI configuration via spring-ai-starter-model-openai-sdk
+  # These environment variables are set by 'azd up' deployment
+  ai:
+    openai-sdk:
+      base-url: ${AZURE_OPENAI_ENDPOINT}
+      api-key: ${AZURE_OPENAI_API_KEY}
+      chat:
+        options:
+          model: ${AZURE_OPENAI_DEPLOYMENT}
 
 # Spring Boot Actuator
 management:
@@ -23,6 +28,6 @@ management:
 logging:
   level:
     "[com.example.springai]": INFO
-    "[org.springframework.ai]": INFO
+    "[org.springframework.ai]": DEBUG
 
 # Values are read from environment variables (see .env.example)
