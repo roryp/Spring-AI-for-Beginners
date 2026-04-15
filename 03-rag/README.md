@@ -4,6 +4,7 @@
 
 - [What You'll Learn](#what-youll-learn)
 - [Prerequisites](#prerequisites)
+- [How This Uses Spring AI](#how-this-uses-spring-ai)
 - [Understanding RAG](#understanding-rag)
   - [Which RAG Approach Does This Tutorial Use?](#which-rag-approach-does-this-tutorial-use)
 - [How It Works](#how-it-works)
@@ -49,6 +50,48 @@ This grounds the model's responses in your actual data instead of relying on its
 - `.env` file in root directory with Azure credentials (created by `azd up` in Module 01)
 
 > **Note:** If you haven't completed Module 01, follow the deployment instructions there first. The `azd up` command deploys both the GPT chat model and the embedding model used by this module.
+
+## How This Uses Spring AI
+
+This module reuses `spring-ai-starter-model-openai-sdk` from [Module 01](../01-introduction/README.md#how-this-uses-spring-ai) for the chat model and introduces three new Spring AI dependencies for the RAG pipeline ([pom.xml](pom.xml)):
+
+```xml
+<!-- Fluent ChatClient API with advisor support (used by AdvisorRagService) -->
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-client-chat</artifactId> <!-- Version managed by Spring AI BOM in root pom.xml -->
+</dependency>
+
+<!-- QuestionAnswerAdvisor — automatically retrieves relevant context and injects it into prompts -->
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-advisors-vector-store</artifactId>
+</dependency>
+
+<!-- SimpleVectorStore — in-memory vector store for document embeddings -->
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-vector-store</artifactId>
+</dependency>
+```
+
+The `application.yaml` extends Module 01's config with an **embedding model** for converting text to vectors ([application.yaml](src/main/resources/application.yaml)):
+
+```yaml
+spring:
+  ai:
+    openai-sdk:
+      base-url: ${AZURE_OPENAI_ENDPOINT}
+      api-key: ${AZURE_OPENAI_API_KEY}
+      chat:
+        options:
+          model: ${AZURE_OPENAI_DEPLOYMENT}
+      embedding:
+        options:
+          model: ${AZURE_OPENAI_EMBEDDING_DEPLOYMENT}
+```
+
+The `embedding.options.model` property configures the `text-embedding-3-small` model deployed by `azd up` in Module 01.
 
 ## Understanding RAG
 

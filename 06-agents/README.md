@@ -62,6 +62,25 @@ That orchestration layer is what this module focuses on. The five patterns below
 - Maven 3.6+
 - Azure OpenAI endpoint (or any OpenAI-compatible API)
 
+## How This Uses Spring AI
+
+This module reuses `spring-ai-starter-model-openai-sdk` from [Module 01](../01-introduction/README.md#how-this-uses-spring-ai) and `spring-ai-client-chat` introduced in [Module 03](../03-rag/README.md#how-this-uses-spring-ai). No new Spring AI dependencies are added — all five agentic patterns are orchestrated through `ChatClient` ([pom.xml](pom.xml)).
+
+The `application.yaml` is the same chat-model configuration as earlier modules ([application.yaml](src/main/resources/application.yaml)):
+
+```yaml
+spring:
+  ai:
+    openai-sdk:
+      base-url: ${AZURE_OPENAI_ENDPOINT}
+      api-key: ${AZURE_OPENAI_API_KEY}
+      chat:
+        options:
+          model: ${AZURE_OPENAI_DEPLOYMENT}
+```
+
+The difference in this module is how `ChatClient` calls are **orchestrated** — chained, parallelized, routed, delegated, or looped — rather than executed as single calls.
+
 ## Quick Start
 
 1. **Set environment variables** in the root `.env` file:

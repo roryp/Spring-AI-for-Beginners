@@ -4,6 +4,7 @@
 
 - [What You'll Learn](#what-youll-learn)
 - [Prerequisites](#prerequisites)
+- [How This Uses Spring AI](#how-this-uses-spring-ai)
 - [Understanding AI Agents with Tools](#understanding-ai-agents-with-tools)
 - [How Tool Calling Works](#how-tool-calling-works)
   - [Tool Definitions](#tool-definitions)
@@ -41,6 +42,25 @@ Tools change this. By giving the model access to functions it can call, you tran
 - `.env` file in root directory with Azure credentials (created by `azd up` in Module 01)
 
 > **Note:** If you haven't completed Module 01, follow the deployment instructions there first.
+
+## How This Uses Spring AI
+
+This module reuses `spring-ai-starter-model-openai-sdk` from [Module 01](../01-introduction/README.md#how-this-uses-spring-ai) and `spring-ai-client-chat` introduced in [Module 03](../03-rag/README.md#how-this-uses-spring-ai). No new Spring AI dependencies are added — tool calling is built into `ChatClient` via the `.tools()` method ([pom.xml](pom.xml)).
+
+The `application.yaml` is the same chat-model configuration as Module 01 ([application.yaml](src/main/resources/application.yaml)):
+
+```yaml
+spring:
+  ai:
+    openai-sdk:
+      base-url: ${AZURE_OPENAI_ENDPOINT}
+      api-key: ${AZURE_OPENAI_API_KEY}
+      chat:
+        options:
+          model: ${AZURE_OPENAI_DEPLOYMENT}
+```
+
+Tools are registered as Spring `@Bean` methods annotated with `@Tool` — Spring AI discovers them automatically and makes them available to `ChatClient`.
 
 ## Understanding AI Agents with Tools
 

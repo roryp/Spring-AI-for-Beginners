@@ -4,6 +4,7 @@
 
 - [What You'll Learn](#what-youll-learn)
 - [Prerequisites](#prerequisites)
+- [How This Uses Spring AI](#how-this-uses-spring-ai)
 - [Understanding Prompt Engineering](#understanding-prompt-engineering)
 - [Prompt Engineering Fundamentals](#prompt-engineering-fundamentals)
   - [Zero-Shot Prompting](#zero-shot-prompting)
@@ -41,6 +42,25 @@ We'll use GPT-5.2 because it introduces reasoning control - you can tell the mod
 - `.env` file in root directory with Azure credentials (created by `azd up` in Module 01)
 
 > **Note:** If you haven't completed Module 01, follow the deployment instructions there first.
+
+## How This Uses Spring AI
+
+This module uses the same Spring AI dependency introduced in [Module 01](../01-introduction/README.md#how-this-uses-spring-ai) — `spring-ai-starter-model-openai-sdk` — which auto-configures `OpenAiSdkChatModel` for Azure OpenAI. No additional Spring AI dependencies are needed.
+
+The `application.yaml` configuration is identical to Module 01 ([application.yaml](src/main/resources/application.yaml)):
+
+```yaml
+spring:
+  ai:
+    openai-sdk:
+      base-url: ${AZURE_OPENAI_ENDPOINT}
+      api-key: ${AZURE_OPENAI_API_KEY}
+      chat:
+        options:
+          model: ${AZURE_OPENAI_DEPLOYMENT}
+```
+
+The difference in this module is how the prompts are constructed — the model configuration stays the same.
 
 ## Understanding Prompt Engineering
 
