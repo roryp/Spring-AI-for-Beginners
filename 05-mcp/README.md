@@ -12,6 +12,7 @@
   - [MCP Architecture](#mcp-architecture)
   - [Tool Discovery](#tool-discovery)
   - [Transport Mechanisms](#transport-mechanisms)
+- [How This Uses Spring AI](#how-this-uses-spring-ai)
 - [How This Demo Works](#how-this-demo-works)
   - [MCP Server — Game Engine + AI Strategy](#mcp-server--game-engine--ai-strategy)
   - [MCP Client — Thin Web UI](#mcp-client--thin-web-ui)
@@ -113,6 +114,76 @@ MCP supports multiple transport mechanisms. This module uses **Streamable HTTP**
 <img src="images/transport-mechanisms.png" alt="MCP Transport Mechanisms" width="800"/>
 
 *MCP transport options — Streamable HTTP is the recommended choice for web-deployed servers; stdio is for local process-based servers.*
+
+## How This Uses Spring AI
+
+This module is split into two Spring Boot applications — an MCP server and an MCP client — each with its own dependencies and configuration.
+
+**Server Dependencies** ([mcp-server/pom.xml](mcp-server/pom.xml)) — The server needs the Web MVC MCP server starter to expose `@McpTool` endpoints over Streamable HTTP, the OpenAI SDK starter for Azure OpenAI access, and the chat client library:
+
+```xml
+<!-- Exposes @McpTool methods as MCP endpoints over Streamable HTTP (Spring MVC runtime) -->
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-starter-mcp-server-webmvc</artifactId> <!-- Version managed by Spring AI BOM in root pom.xml -->
+</dependency>
+
+<!-- Azure OpenAI via OpenAI SDK Starter (auto-configures OpenAiSdkChatModel) -->
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-starter-model-openai-sdk</artifactId>
+</dependency>
+
+<!-- Spring AI Chat Client for LLM-powered AI moves -->
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-client-chat</artifactId>
+</dependency>
+```
+
+**Client Dependencies** ([mcp-client/pom.xml](mcp-client/pom.xml)) — The client needs the WebFlux MCP client starter to discover and invoke remote MCP tools. It has **no AI model dependencies** — all LLM logic lives on the server:
+
+```xml
+<!-- MCP Client — discovers and invokes tools on the MCP server via Streamable HTTP -->
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-starter-mcp-client-webflux</artifactId> <!-- Version managed by Spring AI BOM in root pom.xml -->
+</dependency>
+```
+
+**Server Configuration** ([application.yaml](mcp-server/src/main/resources/application.yaml)) — The starter auto-configures the MCP server and the Azure OpenAI chat model from properties:
+
+```yaml
+spring:
+  ai:
+    openai-sdk:
+      base-url: ${AZURE_OPENAI_ENDPOINT}
+      api-key: ${AZURE_OPENAI_API_KEY}
+      chat:
+        options:
+          model: ${AZURE_OPENAI_DEPLOYMENT}
+    mcp:
+      server:
+        name: tictactoe-server
+        protocol: STREAMABLE
+```
+
+Credentials come from environment variables set by `azd up`. The `protocol: STREAMABLE` setting enables the modern Streamable HTTP transport.
+
+**Client Configuration** ([application.yaml](mcp-client/src/main/resources/application.yaml)) — The client points to the MCP server URL. Spring AI handles connection, tool discovery, and invocation automatically:
+
+```yaml
+spring:
+  ai:
+    mcp:
+      client:
+        streamable-http:
+          connections:
+            tictactoe-server:
+              url: http://localhost:8080
+```
+
+No Azure credentials on the client — it only talks to the MCP server.
 
 ## How This Demo Works
 
