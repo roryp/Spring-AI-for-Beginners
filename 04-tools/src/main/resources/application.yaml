@@ -6,8 +6,14 @@ spring:
   web:
     error:
       include-message: always
-      
-      # Azure OpenAI configuration
+  # Azure OpenAI configuration via spring-ai-starter-model-openai-sdk
+  ai:
+    openai-sdk:
+      base-url: ${AZURE_OPENAI_ENDPOINT}
+      api-key: ${AZURE_OPENAI_API_KEY}
+      chat:
+        options:
+          model: ${AZURE_OPENAI_DEPLOYMENT}
 
 server:
   port: 8084

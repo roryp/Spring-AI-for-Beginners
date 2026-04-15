@@ -5,13 +5,20 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
+  # Azure OpenAI configuration via spring-ai-starter-model-openai-sdk
+  ai:
+    openai-sdk:
+      base-url: ${AZURE_OPENAI_ENDPOINT}
+      api-key: ${AZURE_OPENAI_API_KEY}
+      chat:
+        options:
+          model: ${AZURE_OPENAI_DEPLOYMENT}
+      embedding:
+        options:
+          model: ${AZURE_OPENAI_EMBEDDING_DEPLOYMENT}
 
 server:
   port: 8081
-
-# Azure OpenAI Configuration
-# These environment variables are set by 'azd up' deployment or loaded from .env
-# Values are read from environment variables and injected into the SpringAiConfig bean
 
 # Spring Boot Actuator
 management:

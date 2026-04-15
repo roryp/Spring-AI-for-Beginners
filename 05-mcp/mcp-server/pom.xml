@@ -18,10 +18,10 @@
             <artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>
         </dependency>
 
-        <!-- Azure OpenAI via OpenAI SDK -->
+        <!-- Azure OpenAI via OpenAI SDK Starter (auto-configures OpenAiSdkChatModel) -->
         <dependency>
             <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-openai-sdk</artifactId>
+            <artifactId>spring-ai-starter-model-openai-sdk</artifactId>
         </dependency>
 
         <!-- Spring AI Chat Client -->

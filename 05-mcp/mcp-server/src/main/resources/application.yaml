@@ -2,6 +2,12 @@ spring:
   main:
     banner-mode: off
   ai:
+    openai-sdk:
+      base-url: ${AZURE_OPENAI_ENDPOINT}
+      api-key: ${AZURE_OPENAI_API_KEY}
+      chat:
+        options:
+          model: ${AZURE_OPENAI_DEPLOYMENT}
     mcp:
       server:
         name: tictactoe-server

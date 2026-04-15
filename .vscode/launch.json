@@ -106,6 +106,26 @@
             "projectName": "spring-ai-introduction",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-McpServerApplication<spring-ai-mcp-server>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.example.springai.mcp.server.McpServerApplication",
+            "projectName": "spring-ai-mcp-server",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-McpClientApplication<spring-ai-mcp-client>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.example.springai.mcp.client.McpClientApplication",
+            "projectName": "spring-ai-mcp-client",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }

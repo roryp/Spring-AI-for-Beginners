@@ -7,6 +7,14 @@ spring:
   mvc:
     async:
       request-timeout: -1
+  # Azure OpenAI configuration via spring-ai-starter-model-openai-sdk
+  ai:
+    openai-sdk:
+      base-url: ${AZURE_OPENAI_ENDPOINT}
+      api-key: ${AZURE_OPENAI_API_KEY}
+      chat:
+        options:
+          model: ${AZURE_OPENAI_DEPLOYMENT}
 
 # Spring Boot Actuator
 management:
