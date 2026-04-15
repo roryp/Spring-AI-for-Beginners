@@ -123,16 +123,8 @@ The diagram below visualizes this concept — text goes in, numerical vectors co
 *This diagram shows how an embedding model converts text into numerical vectors, placing similar meanings — like "car" and "automobile" — near each other in vector space.*
 
 ```java
-@Bean
-public EmbeddingModel embeddingModel() {
-    var embeddingOptions = OpenAiSdkEmbeddingOptions.builder()
-            .baseUrl(endpoint)
-            .apiKey(apiKey)
-            .model(embeddingDeployment)
-            .azure(true)
-            .build();
-    return new OpenAiSdkEmbeddingModel(embeddingOptions);
-}
+// Auto-configured by spring-ai-starter-model-openai-sdk via application.yaml:
+//   spring.ai.openai-sdk.embedding.options.model: ${AZURE_OPENAI_EMBEDDING_DEPLOYMENT}
 
 @Bean
 public VectorStore vectorStore(EmbeddingModel embeddingModel) {
@@ -365,7 +357,7 @@ Watch how the relevance scores change based on how well your question matches do
 
 Spring AI 2.0 provides a `QuestionAnswerAdvisor` that encapsulates the entire RAG pipeline — vector search, context injection, and prompt augmentation — into a single advisor you attach to a `ChatClient` call. This is the recommended approach for production applications.
 
-**Dependencies** — In addition to `spring-ai-openai-sdk` and `spring-ai-vector-store`, you need:
+**Dependencies** — In addition to `spring-ai-starter-model-openai-sdk` and `spring-ai-vector-store`, you need:
 
 ```xml
 <!-- Spring AI ChatClient for fluent API and advisor support -->

@@ -75,34 +75,29 @@ Spring AI provides conversation management through its `ChatMemory` abstraction.
 
 This module extends the quick start by integrating Spring Boot and adding conversation memory. Here's how the pieces fit together:
 
-**Dependencies** - Add the Spring AI OpenAI SDK library:
+**Dependencies** - Add the Spring AI OpenAI SDK starter for auto-configuration:
 
 ```xml
 <dependency>
     <groupId>org.springframework.ai</groupId>
-    <artifactId>spring-ai-openai-sdk</artifactId> <!-- Version managed by Spring AI BOM in root pom.xml -->
+    <artifactId>spring-ai-starter-model-openai-sdk</artifactId> <!-- Version managed by Spring AI BOM in root pom.xml -->
 </dependency>
 ```
 
-**Chat Model** - Configure Azure OpenAI as a Spring bean ([SpringAiConfig.java](src/main/java/com/example/springai/config/SpringAiConfig.java)):
+**Chat Model** - The starter auto-configures `OpenAiSdkChatModel` from properties in `application.yaml` — no manual `@Bean` needed ([SpringAiConfig.java](src/main/java/com/example/springai/config/SpringAiConfig.java)):
 
-```java
-@Bean
-public OpenAiSdkChatModel openAiSdkChatModel() {
-    var chatOptions = OpenAiSdkChatOptions.builder()
-            .baseUrl(azureEndpoint)
-            .apiKey(azureApiKey)
-            .model(deploymentName)
-            .azure(true)
-            .build();
-
-    return OpenAiSdkChatModel.builder()
-            .options(chatOptions)
-            .build();
-}
+```yaml
+spring:
+  ai:
+    openai-sdk:
+      base-url: ${AZURE_OPENAI_ENDPOINT}
+      api-key: ${AZURE_OPENAI_API_KEY}
+      chat:
+        options:
+          model: ${AZURE_OPENAI_DEPLOYMENT}
 ```
 
-The builder reads credentials from environment variables set by `azd up`. Setting `.azure(true)` enables Azure OpenAI mode with the OpenAI SDK.
+Credentials come from environment variables set by `azd up`. Azure OpenAI mode is detected automatically when the base URL contains `openai.azure.com`.
 
 **Conversation Memory** - Use Spring AI's `MessageWindowChatMemory` for automatic sliding-window memory management ([ConversationService.java](src/main/java/com/example/springai/service/ConversationService.java)):
 
