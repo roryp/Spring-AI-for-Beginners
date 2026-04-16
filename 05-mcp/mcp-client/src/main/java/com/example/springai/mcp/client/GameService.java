@@ -82,7 +82,7 @@ public class GameService {
             if (tree.isArray() && !tree.isEmpty()) {
                 var textNode = tree.get(0).get("text");
                 if (textNode != null) {
-                    return textNode.asText();
+                    return textNode.asString();
                 }
             }
         } catch (Exception e) {

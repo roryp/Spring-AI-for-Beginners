@@ -12,8 +12,6 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.ChatClient.CallResponseSpec;
-import org.springframework.ai.chat.client.ChatClient.ChatClientRequestSpec;
 
 import com.example.springai.agents.patterns.*;
 
@@ -132,7 +130,7 @@ class SimpleAgentPatternsTest {
                 .thenReturn(routingResponse);
         when(callResponseSpec.content()).thenReturn("Here is how to resolve your billing issue.");
 
-        RoutingWorkflow routing = new RoutingWorkflow(chatClient);
+        new RoutingWorkflow(chatClient);
         // Note: This uses a simpler test because the full route() method
         // uses both entity() and content() calls through the fluent API
         assertThat(routingResponse.selection()).isEqualTo("billing");
