@@ -300,6 +300,8 @@ Open http://localhost:8082 in your browser.
 
 ## Using the Application
 
+<img src="images/game-and-architecture.png" alt="Tic-Tac-Toe Game UI" width="800"/>
+
 The application provides a Tic-Tac-Toe game where you play as **X** against an AI opponent playing as **O**. The AI uses Azure OpenAI to analyze the board and choose strategic moves — all game operations flow through MCP tools on the server.
 
 ### Start a New Game
