@@ -101,3 +101,8 @@ generate-agent-images.py
 generate-fix-images.py
 generate-springai-fits-image.py
 generate-prompt-eng-image.py
+04-tools/images/tool-calling-sequence.puml
+04-tools/images/spring-boot-sequence.puml
+regen-tool-seq.py
+regen-boot-seq.py
+render-puml.py
