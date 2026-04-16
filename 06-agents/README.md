@@ -1,4 +1,4 @@
-# 06 - Agentic Patterns
+# Module 06: Agentic Patterns
 
 This module demonstrates five fundamental **agentic workflow patterns** for building effective LLM-based systems using Spring AI. Each pattern is implemented as an interactive demo you can run and explore in a web UI.
 
@@ -58,9 +58,10 @@ That orchestration layer is what this module focuses on. The five patterns below
 
 ## Prerequisites
 
+- Completed [Module 01 - Introduction](../01-introduction/README.md) (Azure OpenAI resources deployed)
 - Java 21+
 - Maven 3.6+
-- Azure OpenAI endpoint (or any OpenAI-compatible API)
+- `.env` file in root directory with Azure credentials (created by `azd up` in Module 01)
 
 ## How This Uses Spring AI
 
@@ -193,6 +194,12 @@ A generator LLM produces a solution, then an evaluator LLM grades it (PASS / NEE
 - [Building Effective Agents — Spring AI Documentation](https://docs.spring.io/spring-ai/reference/2.0/api/effective-agents.html)
 - [Spring AI Agentic Patterns Examples](https://github.com/spring-projects/spring-ai-examples/tree/main/agentic-patterns)
 - [Spring AI Documentation](https://docs.spring.io/spring-ai/reference/)
+
+## Next Steps
+
+Congratulations — you've completed the Spring AI for Beginners course! You now have hands-on experience with chat, memory, prompt engineering, RAG, tools, MCP, and agentic workflows.
+
+To go further, explore the [Spring AI Documentation](https://docs.spring.io/spring-ai/reference/) and the [Spring AI Examples Repository](https://github.com/spring-projects/spring-ai-examples).
 
 ---
 

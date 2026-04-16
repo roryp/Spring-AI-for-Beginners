@@ -180,7 +180,7 @@ spring:
         streamable-http:
           connections:
             tictactoe-server:
-              url: http://localhost:8080
+              url: http://localhost:8085
 ```
 
 No Azure credentials on the client — it only talks to the MCP server.
@@ -264,7 +264,7 @@ cd 05-mcp
 .\start-server.ps1
 ```
 
-The server starts on **http://localhost:8080**. It exposes the game engine and AI strategy as MCP tools via the Streamable HTTP protocol. The startup script loads Azure OpenAI credentials from the root `.env` file.
+The server starts on **http://localhost:8085**. It exposes the game engine and AI strategy as MCP tools via the Streamable HTTP protocol. The startup script loads Azure OpenAI credentials from the root `.env` file.
 
 ### Terminal 2: Start the MCP Client
 
@@ -280,7 +280,7 @@ cd 05-mcp
 .\start-client.ps1
 ```
 
-The client starts on **http://localhost:8081**. It connects to the MCP server to discover available tools — no Azure credentials needed on the client.
+The client starts on **http://localhost:8082**. It connects to the MCP server to discover available tools — no Azure credentials needed on the client.
 
 > **Note:** If you prefer to build both modules manually before starting:
 >
@@ -296,7 +296,7 @@ The client starts on **http://localhost:8081**. It connects to the MCP server to
 > mvn clean package -DskipTests
 > ```
 
-Open http://localhost:8081 in your browser.
+Open http://localhost:8082 in your browser.
 
 ## Using the Application
 
@@ -489,7 +489,7 @@ spring:
         streamable-http:
           connections:
             tictactoe-server:
-              url: http://localhost:8080
+              url: http://localhost:8085
 ```
 
 The server declares itself as a Streamable HTTP MCP server. The client specifies the server URL — Spring AI handles the connection, discovery, and invocation automatically.

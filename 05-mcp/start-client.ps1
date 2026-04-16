@@ -9,9 +9,9 @@ $ScriptDir = $PSScriptRoot
 Set-Location (Join-Path $ScriptDir "mcp-client")
 
 Write-Host ""
-Write-Host "Make sure the MCP Server is running on http://localhost:8080 (run start-server.ps1 first)"
+Write-Host "Make sure the MCP Server is running on http://localhost:8085 (run start-server.ps1 first)"
 Write-Host ""
-Write-Host "Starting Tic-Tac-Toe Web UI on http://localhost:8081 ..."
+Write-Host "Starting Tic-Tac-Toe Web UI on http://localhost:8082 ..."
 Write-Host "Press Ctrl+C to stop."
 Write-Host ""
 

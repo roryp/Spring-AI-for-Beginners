@@ -1,6 +1,6 @@
 #!/bin/bash
 # Start script for 05-mcp MCP Server (Tic-Tac-Toe Game Engine + AI via Azure OpenAI)
-# Loads environment variables and starts the server on port 8080
+# Loads environment variables and starts the server on port 8085
 
 set -e
 
@@ -30,7 +30,7 @@ if [ -z "$AZURE_OPENAI_ENDPOINT" ] || [ -z "$AZURE_OPENAI_API_KEY" ] || [ -z "$A
 fi
 
 echo ""
-echo "Starting Tic-Tac-Toe MCP Server on http://localhost:8080 ..."
+echo "Starting Tic-Tac-Toe MCP Server on http://localhost:8085 ..."
 echo "Press Ctrl+C to stop."
 echo ""
 

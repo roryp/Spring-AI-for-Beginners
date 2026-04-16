@@ -1,5 +1,5 @@
 # Start script for 05-mcp MCP Server (Tic-Tac-Toe Game Engine + AI via Azure OpenAI)
-# Loads environment variables and starts the server on port 8080
+# Loads environment variables and starts the server on port 8085
 
 $ErrorActionPreference = "Stop"
 
@@ -35,7 +35,7 @@ if (-not $endpoint -or -not $apiKey -or -not $deployment) {
 }
 
 Write-Host ""
-Write-Host "Starting Tic-Tac-Toe MCP Server on http://localhost:8080 ..."
+Write-Host "Starting Tic-Tac-Toe MCP Server on http://localhost:8085 ..."
 Write-Host "Press Ctrl+C to stop."
 Write-Host ""
 

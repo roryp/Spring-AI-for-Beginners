@@ -29,6 +29,7 @@ You'll build one application that demonstrates both patterns:
 
 ## Prerequisites
 
+- Completed [Module 00 - Quick Start](../00-quick-start/README.md)
 - Azure subscription with Azure OpenAI access
 - Java 21, Maven 3.9+ 
 - Azure CLI (https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
