@@ -150,7 +150,7 @@ If you ran the [ToolIntegrationDemo](../00-quick-start/src/main/java/com/example
 
 <img src="images/tool-calling-sequence.png" alt="Tool Calling Sequence Diagram" width="800"/>
 
-*The tool-calling loop from the Quick Start demo — `main()` asks ChatClient, which sends the message and tool schemas to the LLM. The LLM calls `Calculator.add(42, 58)`, gets the result, and returns the final answer.*
+*The tool-calling loop from the Quick Start demo — `main()` asks ChatClient, which sends the message and tool schemas to the LLM. The LLM requests `add(42, 58)`, ChatClient executes it on the Calculator, and the LLM uses the result to compose the final answer.*
 
 > **🤖 Try with [GitHub Copilot](https://github.com/features/copilot) Chat:** Open [`AgentService.java`](src/main/java/com/example/springai/tools/service/AgentService.java) and ask:
 > - "How does the ReAct pattern work and why is it effective for AI agents?"
@@ -169,7 +169,7 @@ This module uses Spring AI's `ChatClient` with tool instances passed via `.tools
 
 *ChatClient ties together the ChatModel and tool instances — Spring Boot auto-configures the builder, and you pass tools at call time via .tools().*
 
-Here's the full request lifecycle as a sequence diagram — from the HTTP request through the controller, service, and ChatClient, all the way to the tool execution and back:
+Here's the full request lifecycle as a sequence diagram — from the HTTP request through the controller and ChatClient, all the way to the tool execution and back:
 
 <img src="images/spring-boot-sequence.png" alt="Spring Boot Tool Calling Sequence" width="800"/>
 
