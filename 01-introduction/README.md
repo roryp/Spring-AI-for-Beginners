@@ -2,7 +2,6 @@
 
 ## Table of Contents
 
-- [Video Walkthrough](#video-walkthrough)
 - [What You'll Learn](#what-youll-learn)
 - [Prerequisites](#prerequisites)
 - [Understanding the Core Problem](#understanding-the-core-problem)
@@ -18,7 +17,7 @@
 
 ## What You'll Learn
 
-In the quick start, you used GitHub Models to send prompts, call tools, build a RAG pipeline, and test guardrails. Those demos showed what's possible — now we switch to Azure OpenAI and GPT-5.2 and start building production-style applications. This module focuses on conversational AI that remembers context and maintains state — the concepts those quick start demos used behind the scenes but didn't explain.
+In the quick start, you used GitHub Models to send prompts, call tools, ask questions about documents, and test guardrails. Those demos showed what's possible — now we switch to Azure OpenAI and GPT-5.2 and start building production-style applications. This module focuses on conversational AI that remembers context and maintains state.
 
 We'll use Azure OpenAI's GPT-5.2 throughout this guide because its advanced reasoning capabilities make the behavior of different patterns more apparent. When you add memory, you'll clearly see the difference. This makes it easier to understand what each component brings to your application.
 
@@ -73,7 +72,7 @@ Spring AI provides conversation management through its `ChatMemory` abstraction.
 
 ## How This Uses Spring AI
 
-This module uses two of those capabilities — **ChatModel** for sending prompts and **Chat Memory** for maintaining conversation history. Here's how the pieces fit together:
+This module uses two core Spring AI capabilities — **ChatModel** for sending prompts and **Chat Memory** for maintaining conversation history. Here's how the pieces fit together:
 
 **Dependencies** - Add the Spring AI OpenAI SDK starter for auto-configuration:
 
