@@ -64,7 +64,7 @@ Tools are registered as Spring `@Bean` methods annotated with `@Tool` — Spring
 
 ## Understanding AI Agents with Tools
 
-> **📝 Note:** The term "agents" in this module refers to AI assistants enhanced with tool-calling capabilities. This is different from the **Agentic AI** patterns (autonomous agents with planning, memory, and multi-step reasoning) that we'll cover in [Module 05: MCP](../05-mcp/README.md).
+> **📝 Note:** The term "agents" in this module refers to AI assistants enhanced with tool-calling capabilities. This is different from the **Agentic AI** patterns (autonomous agents with planning, memory, and multi-step reasoning) that we'll cover in [Module 06: Agents](../06-agents/README.md).
 
 Without tools, a language model can only generate text from its training data. Ask it for the current weather, and it has to guess. Give it tools, and it can call a weather API, perform calculations, or query a database — then weave those real results into its response.
 
@@ -94,32 +94,32 @@ This happens automatically. You define the tools and their descriptions. The mod
 You define functions with clear descriptions and parameter specifications. The model sees these descriptions in its system prompt and understands what each tool does.
 
 ```java
-@Component
 public class WeatherTool {
     
     @Tool("Get the current weather for a location")
-    public String getCurrentWeather(@P("Location name") String location) {
+    public String getCurrentWeather(@ToolParam("Location name") String location) {
         // Your weather lookup logic
         return "Weather in " + location + ": 22°C, cloudy";
     }
 }
 
-@AiService
-public interface Assistant {
-    String chat(@MemoryId String sessionId, @UserMessage String message);
-}
+// Tools are passed to ChatClient at call time:
+chatClient.prompt()
+    .tools(new WeatherTool())
+    .user(message)
+    .call()
+    .content();
 
-// Assistant is automatically wired by Spring Boot with:
-// - ChatModel bean
-// - All @Tool methods from @Component classes
-// - ChatMemoryProvider for session management
+// ChatClient is auto-configured by Spring Boot with:
+// - ChatModel bean (OpenAiSdkChatModel via starter)
+// - ChatMemory for session management
 ```
 
 The diagram below breaks down every annotation and shows how each piece helps the AI understand when to call the tool and what arguments to pass:
 
 <img src="images/tool-definitions-anatomy.png" alt="Anatomy of Tool Definitions" width="800"/>
 
-*Anatomy of a tool definition — @Tool tells the AI when to use it, @P describes each parameter, and @AiService wires everything together at startup.*
+*Anatomy of a tool definition — @Tool tells the AI when to use it, @ToolParam describes each parameter, and ChatClient wires everything together at call time.*
 
 > **🤖 Try with [GitHub Copilot](https://github.com/features/copilot) Chat:** Open [`WeatherTool.java`](src/main/java/com/example/springai/tools/tools/WeatherTool.java) and ask:
 > - "How would I integrate a real weather API like OpenWeatherMap instead of mock data?"
@@ -140,7 +140,7 @@ If no tool matches the user's request, the model falls back to answering from it
 
 [AgentService.java](src/main/java/com/example/springai/tools/service/AgentService.java)
 
-Spring Boot auto-wires the declarative `@AiService` interface with all registered tools, and Spring AI executes tool calls automatically. Behind the scenes, a complete tool call flows through six stages — from the user's natural language question all the way back to a natural language answer:
+Spring AI's `ChatClient` accepts tool instances via `.tools()` and executes tool calls automatically. Behind the scenes, a complete tool call flows through six stages — from the user's natural language question all the way back to a natural language answer:
 
 <img src="images/tool-calling-flow.png" alt="Tool Calling Flow" width="800"/>
 
@@ -150,7 +150,7 @@ If you ran the [ToolIntegrationDemo](../00-quick-start/src/main/java/com/example
 
 <img src="images/tool-calling-sequence.png" alt="Tool Calling Sequence Diagram" width="800"/>
 
-*The tool-calling loop from the Quick Start demo — `AiServices` sends your message and tool schemas to the LLM, the LLM replies with a function call like `add(42, 58)`, Spring AI executes the `Calculator` method locally, and feeds the result back for the final answer.*
+*The tool-calling loop from the Quick Start demo — `ChatClient` sends your message and tool schemas to the LLM, the LLM replies with a tool call like `add(42, 58)`, Spring AI executes the `Calculator` method locally, and feeds the result back for the final answer.*
 
 > **🤖 Try with [GitHub Copilot](https://github.com/features/copilot) Chat:** Open [`AgentService.java`](src/main/java/com/example/springai/tools/service/AgentService.java) and ask:
 > - "How does the ReAct pattern work and why is it effective for AI agents?"
@@ -163,17 +163,17 @@ The model receives the weather data and formats it into a natural language respo
 
 ### Architecture: Spring Boot Auto-Wiring
 
-This module uses Spring AI's Spring Boot integration with declarative `@AiService` interfaces. At startup Spring Boot discovers every `@Component` that contains `@Tool` methods, your `ChatModel` bean, and the `ChatMemoryProvider` — then wires them all into a single `Assistant` interface with zero boilerplate.
+This module uses Spring AI's `ChatClient` with tool instances passed via `.tools()`. Spring Boot auto-configures the `ChatClient.Builder` bean with your `ChatModel` — you create tool instances and pass them at call time.
 
 <img src="images/spring-boot-wiring.png" alt="Spring Boot Auto-Wiring Architecture" width="800"/>
 
-*The @AiService interface ties together the ChatModel, tool components, and memory provider — Spring Boot handles all the wiring automatically.*
+*ChatClient ties together the ChatModel and tool instances — Spring Boot auto-configures the builder, and you pass tools at call time via .tools().*
 
 Here's the full request lifecycle as a sequence diagram — from the HTTP request through the controller, service, and auto-wired proxy, all the way to the tool execution and back:
 
 <img src="images/spring-boot-sequence.png" alt="Spring Boot Tool Calling Sequence" width="800"/>
 
-*The complete Spring Boot request lifecycle — HTTP request flows through the controller and service to the auto-wired Assistant proxy, which orchestrates the LLM and tool calls automatically.*
+*The complete Spring Boot request lifecycle — HTTP request flows through the controller and AgentService to ChatClient, which orchestrates the LLM and tool calls automatically.*
 
 Key benefits of this approach:
 
@@ -184,7 +184,7 @@ Key benefits of this approach:
 - **Multi-turn orchestration** — Handles tool chaining automatically
 - **Zero boilerplate** — No manual message list trimming or memory HashMap
 
-Alternative approaches (manual `AiServices.builder()`) require more code and miss Spring Boot integration benefits.
+Alternative approaches (manual `ChatModel.call()` with tool handling) require more code and miss `ChatClient` integration benefits.
 
 ## Tool Chaining
 
@@ -345,7 +345,7 @@ The quality of your tool descriptions directly affects how well the agent uses t
 
 The service uses Spring AI's `MessageWindowChatMemory` for automatic session-based memory management. Each session ID gets its own conversation history within the `ChatMemory` instance, so multiple users can interact with the agent simultaneously without their conversations mixing together. The following diagram shows how multiple users are routed to isolated memory stores based on their session IDs:
 
-<img src="images/session-management.png" alt="Session Management with @MemoryId" width="800"/>
+<img src="images/session-management.png" alt="Session Management with ChatMemory" width="800"/>
 
 *Each session ID maps to an isolated conversation history — users never see each other's messages.*
 
