@@ -99,3 +99,5 @@ PROJECT_RECREATION_INSTRUCTIONS.md
 .vscode/mcp.json
 generate-agent-images.py
 generate-fix-images.py
+generate-springai-fits-image.py
+generate-prompt-eng-image.py

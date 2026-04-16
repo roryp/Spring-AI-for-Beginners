@@ -62,12 +62,6 @@ spring:
 
 The difference in this module is how the prompts are constructed — the model configuration stays the same.
 
-The diagram below shows where Spring AI sits in the overall architecture — your application code uses Spring AI's `PromptTemplate` and `ChatClient` APIs, which handle serialization, HTTP calls, and response parsing against the Azure OpenAI endpoint behind the scenes.
-
-<img src="images/how-springai-fits.png" alt="How Spring AI Fits" width="800"/>
-
-*This diagram shows how Spring AI acts as the bridge between your Java application and Azure OpenAI — your code calls `PromptTemplate` and `ChatClient`, Spring AI handles the REST communication, authentication, and response mapping so you never work with raw HTTP.*
-
 ## Understanding Prompt Engineering
 
 At its core, prompt engineering is the difference between vague instructions and precise ones, as the comparison below illustrates.

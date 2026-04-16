@@ -73,7 +73,7 @@ Spring AI provides conversation management through its `ChatMemory` abstraction.
 
 ## How This Uses Spring AI
 
-This module extends the quick start by integrating Spring Boot and adding conversation memory. Here's how the pieces fit together:
+This module uses two of those capabilities — **ChatModel** for sending prompts and **Chat Memory** for maintaining conversation history. Here's how the pieces fit together:
 
 **Dependencies** - Add the Spring AI OpenAI SDK starter for auto-configuration:
 

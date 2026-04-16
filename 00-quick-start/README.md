@@ -4,7 +4,6 @@
 
 - [Introduction](#introduction)
 - [What is Spring AI?](#what-is-spring-ai)
-- [Spring AI Dependencies](#spring-ai-dependencies)
 - [Prerequisites](#prerequisites)
 - [Setup](#setup)
   - [1. Get Your GitHub Token](#1-get-your-github-token)
@@ -25,31 +24,20 @@ This quickstart is meant to get you up and running with Spring AI as quickly as 
 
 ## What is Spring AI?
 
-Spring AI is a Java framework that simplifies building AI-powered applications. It provides a consistent API across different AI providers, leveraging the official OpenAI Java SDK for robust integration with OpenAI, Microsoft Foundry, and GitHub Models.
+Spring AI is a Java framework that simplifies building AI-powered applications. It provides a consistent API across different AI providers — so you can switch between OpenAI, Azure OpenAI, GitHub Models, and others without changing your application code.
 
-This quick start focuses on the fundamentals: sending prompts, using prompt templates, calling tools, grounding responses with documents, and applying safety guardrails.
+It includes features like:
+- Chat and prompt management
+- Tool and function calling
+- Document-grounded question answering
+- Responsible AI guardrails
+- And more...
 
-We'll use these core components:
+<img src="images/how-springai-fits.png" alt="How Spring AI Fits" width="800"/>
 
-**OpenAiSdkChatModel** - The chat model implementation built on the official OpenAI Java SDK. It auto-detects the provider (OpenAI, Azure, GitHub Models) based on the base URL.
+*Spring AI provides a unified API across AI providers — this course covers these capabilities one module at a time.*
 
-**Prompt & PromptTemplate** - Spring AI's prompt abstractions. `Prompt` wraps messages for the model, and `PromptTemplate` creates reusable prompts with `{variable}` placeholders.
-
-**FunctionToolCallback** - Registers Java functions as tools the AI can call. The model decides when to invoke them based on the user's request.
-
-## Spring AI Dependencies
-
-This quick start uses one main Maven dependency in the [`pom.xml`](pom.xml):
-
-```xml
-<!-- Spring AI OpenAI SDK (Official OpenAI Java SDK integration) -->
-<dependency>
-    <groupId>org.springframework.ai</groupId>
-    <artifactId>spring-ai-openai-sdk</artifactId> <!-- Version managed by Spring AI BOM in root pom.xml -->
-</dependency>
-```
-
-The `spring-ai-openai-sdk` module provides `OpenAiSdkChatModel` and `OpenAiSdkChatOptions` that connect to OpenAI-compatible APIs. GitHub Models uses the same API format, so no special adapter is needed - just point the base URL to `https://models.github.ai/inference` and set `.gitHubModels(true)`.
+In this quickstart you'll get hands-on with five fundamentals: chat, prompt templates, tool calling, document Q&A, and safety guardrails. Later modules will build on these basics to show you how to build real-world applications with Spring AI and Azure OpenAI.
 
 ## Prerequisites
 
