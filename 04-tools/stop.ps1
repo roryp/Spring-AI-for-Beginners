@@ -18,12 +18,12 @@ try {
         $pids = $connections | Select-Object -ExpandProperty OwningProcess -Unique
         Write-Host "Stopping processes on port $Port (PIDs: $($pids -join ', '))"
         
-        foreach ($pid in $pids) {
+        foreach ($procId in $pids) {
             try {
-                Stop-Process -Id $pid -Force -ErrorAction Stop
+                Stop-Process -Id $procId -Force -ErrorAction Stop
                 $stopped = $true
             } catch {
-                Write-Host "Warning: Could not stop process $pid"
+                Write-Host "Warning: Could not stop process $procId"
             }
         }
         

@@ -17,8 +17,8 @@ foreach ($port in @($ServerPort, $ClientPort)) {
         if ($connections) {
             $pids = $connections | Select-Object -ExpandProperty OwningProcess -Unique
             Write-Host "Stopping $label on port $port (PIDs: $($pids -join ', '))"
-            foreach ($pid in $pids) {
-                Stop-Process -Id $pid -Force -ErrorAction SilentlyContinue
+            foreach ($procId in $pids) {
+                Stop-Process -Id $procId -Force -ErrorAction SilentlyContinue
             }
             $stopped = $true
         }
