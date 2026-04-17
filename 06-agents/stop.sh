@@ -34,6 +34,17 @@ stop_on_port() {
             kill -15 $pids 2>/dev/null || kill -9 $pids 2>/dev/null
             stopped=true
         fi
+    else
+        # Windows Git Bash fallback via netstat + taskkill
+        local pids=$(netstat -ano | grep "LISTENING" | grep -w ":$port" | awk '{print $5}' | sort -u)
+        if [ ! -z "$pids" ]; then
+            echo "Stopping processes on port $port (PIDs: $pids)"
+            for pid in $pids; do
+                if [[ "$pid" =~ ^[0-9]+$ ]]; then
+                    taskkill //F //PID $pid 2>/dev/null && stopped=true
+                fi
+            done
+        fi
     fi
 
     if [ "$stopped" = false ]; then
