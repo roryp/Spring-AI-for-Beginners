@@ -5,7 +5,7 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PORT=8084
 MODULE_NAME="04-tools"
-JAR_NAME="spring-ai-tools-1.0.0.jar"
+JAR_NAME="tools-1.0.0.jar"
 
 echo "Stopping $MODULE_NAME..."
 
