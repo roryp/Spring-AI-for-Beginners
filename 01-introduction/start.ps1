@@ -36,7 +36,7 @@ if (-not $endpoint -or -not $apiKey -or -not $deployment) {
 
 Write-Host "Starting 01-introduction on port 8080..."
 
-$JarFile = Join-Path $ScriptDir "target\introduction-1.0.0.jar"
+$JarFile = Join-Path $ScriptDir "target\spring-ai-introduction-1.0.0.jar"
 
 if (-not (Test-Path $JarFile)) {
     Write-Host "JAR file not found. Building..."

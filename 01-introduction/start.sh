@@ -33,7 +33,7 @@ fi
 
 echo "Starting 01-introduction on port 8080..."
 
-JAR_FILE="$SCRIPT_DIR/target/introduction-1.0.0.jar"
+JAR_FILE="$SCRIPT_DIR/target/spring-ai-introduction-1.0.0.jar"
 
 if [ ! -f "$JAR_FILE" ]; then
     echo "JAR file not found. Building..."

@@ -33,7 +33,7 @@ fi
 
 echo "Starting 03-rag on port 8081..."
 
-JAR_FILE="$SCRIPT_DIR/target/rag-1.0.0.jar"
+JAR_FILE="$SCRIPT_DIR/target/spring-ai-rag-1.0.0.jar"
 
 if [ ! -f "$JAR_FILE" ]; then
     echo "JAR file not found. Building..."
