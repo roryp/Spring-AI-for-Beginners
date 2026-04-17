@@ -5,7 +5,7 @@ $ErrorActionPreference = "Continue"
 $ScriptDir = $PSScriptRoot
 $Port = 8080
 $ModuleName = "01-introduction"
-$JarName = "introduction-1.0.0.jar"
+$JarName = "spring-ai-introduction-1.0.0.jar"
 
 Write-Host "Stopping $ModuleName..."
 

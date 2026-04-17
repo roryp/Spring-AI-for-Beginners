@@ -5,7 +5,7 @@ $ErrorActionPreference = "Continue"
 $ScriptDir = $PSScriptRoot
 $Port = 8081
 $ModuleName = "03-rag"
-$JarName = "rag-1.0.0.jar"
+$JarName = "spring-ai-rag-1.0.0.jar"
 
 Write-Host "Stopping $ModuleName..."
 
