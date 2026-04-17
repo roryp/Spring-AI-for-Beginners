@@ -33,7 +33,7 @@ async function newGame() {
         updateStatus('Your turn! Place your <strong>X</strong>', '');
         enableBoard();
     } catch (error) {
-        updateStatus('Failed to start game. Is the MCP server running on port 8080?', '');
+        updateStatus('Failed to start game. Is the MCP server running on port 8085?', '');
     } finally {
         btn.disabled = false;
     }

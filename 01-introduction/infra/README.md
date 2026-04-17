@@ -42,6 +42,8 @@ All Spring Boot applications run locally on your machine:
 - 02-prompt-engineering (port 8083)
 - 03-rag (port 8081)
 - 04-tools (port 8084)
+- 05-mcp client (port 8082) / server (port 8085)
+- 06-agents (port 8086)
 
 ## Resources Created
 

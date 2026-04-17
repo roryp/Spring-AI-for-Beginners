@@ -49,5 +49,5 @@
     "JAVA_HOME": "/usr/lib/jvm/msopenjdk-current",
     "MAVEN_OPTS": "-Xmx2g"
   },
-  "forwardPorts": [8080, 8081, 8083, 8084, 3001]
+  "forwardPorts": [8080, 8081, 8082, 8083, 8084, 8085, 8086]
 }

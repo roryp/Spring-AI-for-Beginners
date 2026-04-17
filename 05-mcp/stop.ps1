@@ -2,8 +2,8 @@
 
 $ErrorActionPreference = "Continue"
 
-$ServerPort = 8080
-$ClientPort = 8081
+$ServerPort = 8085
+$ClientPort = 8082
 $ModuleName = "05-mcp"
 
 Write-Host "Stopping $ModuleName..."

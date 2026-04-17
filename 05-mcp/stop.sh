@@ -2,8 +2,8 @@
 
 # Stop script for 05-mcp module (stops both MCP Server and MCP Client)
 
-SERVER_PORT=8080
-CLIENT_PORT=8081
+SERVER_PORT=8085
+CLIENT_PORT=8082
 MODULE_NAME="05-mcp"
 
 echo "Stopping $MODULE_NAME..."
