@@ -12,6 +12,8 @@ A course for building AI applications with Spring AI and Azure OpenAI, from basi
 6. [MCP (Model Context Protocol)](05-mcp/README.md) - Work with Model Context Protocol (MCP)
 7. [Agents](06-agents/README.md) - Build AI agents
 
+📖 **Reference:** [Glossary](glossary.md) - Key terms and concepts used across all modules
+
 ---
 
 ## Learning Path
