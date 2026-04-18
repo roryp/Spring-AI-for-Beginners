@@ -100,46 +100,6 @@ The difference in this module is how `ChatClient` calls are **orchestrated** —
 
 3. **Open the dashboard:** [http://localhost:8086](http://localhost:8086)
 
-## Project Structure
-
-```
-06-agents/
-├── pom.xml
-├── start.sh / start.ps1
-├── stop.sh / stop.ps1
-├── src/main/java/com/example/springai/agents/
-│   ├── app/Application.java              # Spring Boot entry point
-│   ├── config/SpringAiConfig.java         # Azure OpenAI + ChatClient config
-│   ├── controller/
-│   │   ├── DemoWebController.java         # Thymeleaf web routes
-│   │   └── AgentPatternsController.java   # REST API endpoints
-│   ├── patterns/                          # Core workflow implementations
-│   │   ├── ChainWorkflow.java
-│   │   ├── ParallelizationWorkflow.java
-│   │   ├── RoutingWorkflow.java
-│   │   ├── OrchestratorWorkers.java
-│   │   └── EvaluatorOptimizer.java
-│   └── service/
-│       └── AgentPatternsService.java      # Orchestrates all patterns
-├── src/main/resources/
-│   ├── application.yaml
-│   ├── static/css/agent-demo.css
-│   ├── static/js/pattern-demo.js
-│   └── templates/
-│       ├── dashboard.html
-│       └── patterns/{chain,parallelization,routing,orchestrator,evaluator}.html
-└── src/test/java/.../SimpleAgentPatternsTest.java
-```
-
-## API Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/agents/chain` | Run chain workflow |
-| POST | `/api/agents/parallelization` | Run parallelization workflow |
-| POST | `/api/agents/routing` | Run routing workflow |
-| POST | `/api/agents/orchestrator` | Run orchestrator-workers workflow |
-| POST | `/api/agents/evaluator` | Run evaluator-optimizer workflow |
 
 ## How Each Pattern Works
 
@@ -151,6 +111,8 @@ Processes input through a 4-step pipeline: **Extract → Standardize → Sort �
 
 **When to use:** Tasks with clear sequential steps where you want to trade latency for higher accuracy, and each step builds on the previous step's output.
 
+![Chain Workflow demo page](images/chain-ui.png)
+
 ### 2. Parallelization Workflow
 
 ![Parallelization Workflow](images/parallelization-workflow.png)
@@ -158,6 +120,8 @@ Processes input through a 4-step pipeline: **Extract → Standardize → Sort �
 Sends the same prompt to multiple inputs concurrently using a thread pool. Results are returned in the same order as inputs.
 
 **When to use:** Processing large volumes of similar but independent items, tasks requiring multiple independent perspectives, or when processing time is critical and tasks are parallelizable.
+
+![Parallelization Workflow demo page](images/parallelization-ui.png)
 
 ### 3. Routing Workflow
 
@@ -167,6 +131,8 @@ An LLM classifier analyzes the input and selects the best route (billing, techni
 
 **When to use:** Complex tasks with distinct categories of input that require different handling or specialized processing.
 
+![Routing Workflow demo page](images/routing-ui.png)
+
 ### 4. Orchestrator-Workers
 
 ![Orchestrator-Workers](images/orchestrator-workers.png)
@@ -175,6 +141,8 @@ The orchestrator LLM analyzes a complex task and breaks it into subtasks with di
 
 **When to use:** Complex tasks where subtasks can't be predicted upfront and require adaptive problem-solving.
 
+![Orchestrator-Workers demo page](images/orchestrator-ui.png)
+
 ### 5. Evaluator-Optimizer
 
 ![Evaluator-Optimizer](images/evaluator-optimizer.png)
@@ -182,6 +150,8 @@ The orchestrator LLM analyzes a complex task and breaks it into subtasks with di
 A generator LLM produces a solution, then an evaluator LLM grades it (PASS / NEEDS_IMPROVEMENT / FAIL). If not passing, feedback is incorporated and the cycle repeats.
 
 **When to use:** Tasks with clear evaluation criteria where iterative refinement provides measurable value (e.g., code generation, translation, content creation).
+
+![Evaluator-Optimizer demo page](images/evaluator-ui.png)
 
 ## Best Practices
 
