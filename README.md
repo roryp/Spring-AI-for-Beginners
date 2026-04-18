@@ -1,6 +1,8 @@
+<img src="img/banner.png" alt="Spring AI for Beginners Banner">
+
 # Spring AI for Beginners
 
-A course for building AI applications with Spring AI and Azure OpenAI, from basic chat to AI agents.
+An end-to-end curriculum that takes a Java developer from "hello, LLM" to production-shaped AI patterns (RAG, tools, MCP, agents) on the Spring AI + Azure stack
 
 ## Table of Contents
 
