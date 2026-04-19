@@ -213,22 +213,21 @@ The MCP client is a **thin web frontend** with no LLM or AI logic. It discovers 
 
 ### Game Flow
 
-```
-1. Player clicks "New Game"
-   └──► Client calls MCP tool: startNewGame()
-        └──► Server creates game, returns board
+The sequence diagram below shows how a single turn flows through the system — from the browser click, through the MCP client, across the Streamable HTTP protocol to the MCP server, and (for the AI's turn) out to Azure OpenAI and back.
 
-2. Player clicks a cell (e.g., position 4)
-   └──► Client calls MCP tool: makeMove(gameId, 4, "X")
-        └──► Server validates & executes move
-   └──► Client calls MCP tool: aiMove(gameId)
-        └──► Server fetches board state + available moves
-        └──► Server sends board to Azure OpenAI ChatClient
-             └──► LLM picks best position for O
-        └──► Server executes AI move, returns updated board
+<img src="images/client-server-sequence.png" alt="MCP Tic-Tac-Toe client-server sequence diagram" width="800"/>
 
-3. Board updates in browser — repeat until win or draw
-```
+*Player turns call `makeMove` directly; AI turns call `aiMove`, which lets the server consult GPT-5.2 and execute the chosen move — the client never talks to the LLM.*
+
+**Step-by-step:**
+
+1. **Player clicks "New Game"** — Client calls the `startNewGame` MCP tool; the server creates a game and returns an empty board.
+2. **Player clicks a cell** (e.g., position 4) — Client calls `makeMove(gameId, 4, "X")`; the server validates and executes the move.
+3. **AI turn** — Client calls `aiMove(gameId)`:
+   - Server fetches board state and available moves from its `GameEngine`.
+   - Server prompts Azure OpenAI (GPT-5.2) via `ChatClient` to pick the best position.
+   - Server applies the LLM's chosen move as `O` and returns the updated board.
+4. **Board updates in the browser** — repeat until win or draw.
 
 ## Run the Application
 
