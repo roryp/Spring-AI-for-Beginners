@@ -109,6 +109,22 @@ The difference in this module is how `ChatClient` calls are **orchestrated** —
 
    **Option 2: Using shell scripts**
 
+   Start all web applications (all modules 01-06):
+
+   **Bash:**
+   ```bash
+   cd ..  # From root directory
+   ./start-all.sh
+   ```
+
+   **PowerShell:**
+   ```powershell
+   cd ..  # From root directory
+   .\start-all.ps1
+   ```
+
+   Or start just this module:
+
    ```bash
    # From this directory
    ./start.sh        # Linux/Mac

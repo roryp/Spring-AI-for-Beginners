@@ -315,7 +315,7 @@ Simply click the play button next to "spring-ai-rag" to start this module, or st
 
 **Option 2: Using shell scripts**
 
-Start all web applications (modules 01-04):
+Start all web applications (all modules 01-06):
 
 **Bash:**
 ```bash

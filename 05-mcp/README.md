@@ -265,7 +265,23 @@ Start **`mcp-server`** first, wait for it to be ready on port 8085, then start *
 
 **Option 2: Using shell scripts**
 
-You'll need **two terminal windows** — one for the MCP server and one for the MCP client.
+To start **all** modules at once (01-06, including both the MCP server and client in the correct order), run the root-level script from the repo root:
+
+**Bash:**
+```bash
+cd ..  # From root directory
+./start-all.sh
+```
+
+**PowerShell:**
+```powershell
+cd ..  # From root directory
+.\start-all.ps1
+```
+
+To stop everything, run `./stop-all.sh` (or `.\stop-all.ps1`) from the same root directory.
+
+If you prefer to run **only this module**, you'll need **two terminal windows** — one for the MCP server and one for the MCP client. The server must start before the client.
 
 ### Terminal 1: Start the MCP Server
 

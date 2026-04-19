@@ -479,7 +479,7 @@ Simply click the play button next to "spring-ai-prompt-engineering" to start thi
 
 **Option 2: Using shell scripts**
 
-Start all web applications (modules 01-04):
+Start all web applications (all modules 01-06):
 
 **Bash:**
 ```bash
