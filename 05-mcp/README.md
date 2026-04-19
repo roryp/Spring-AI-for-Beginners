@@ -248,7 +248,25 @@ Get-Content ..\.env  # Should show AZURE_OPENAI_ENDPOINT, API_KEY, DEPLOYMENT
 
 **Start the application:**
 
-This module requires **two terminal windows** — one for the MCP server and one for the MCP client.
+This module requires **two Spring Boot applications** — the MCP server and the MCP client — running simultaneously.
+
+**Option 1: Using Spring Boot Dashboard (Recommended for VS Code users)**
+
+The dev container includes the Spring Boot Dashboard extension, which provides a visual interface to manage all Spring Boot applications. You can find it in the Activity Bar on the left side of VS Code (look for the Spring Boot icon).
+
+From the Spring Boot Dashboard, you can:
+- See all available Spring Boot applications in the workspace
+- Start/stop applications with a single click
+- View application logs in real-time
+- Monitor application status
+
+Start **`mcp-server`** first, wait for it to be ready on port 8085, then start **`mcp-client`** on port 8082.
+
+<img src="images/dashboard.png" alt="Spring Boot Dashboard" width="800"/>
+
+**Option 2: Using shell scripts**
+
+You'll need **two terminal windows** — one for the MCP server and one for the MCP client.
 
 ### Terminal 1: Start the MCP Server
 

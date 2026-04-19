@@ -92,6 +92,23 @@ The difference in this module is how `ChatClient` calls are **orchestrated** —
    ```
 
 2. **Build and run:**
+
+   **Option 1: Using Spring Boot Dashboard (Recommended for VS Code users)**
+
+   The dev container includes the Spring Boot Dashboard extension, which provides a visual interface to manage all Spring Boot applications. You can find it in the Activity Bar on the left side of VS Code (look for the Spring Boot icon).
+
+   From the Spring Boot Dashboard, you can:
+   - See all available Spring Boot applications in the workspace
+   - Start/stop applications with a single click
+   - View application logs in real-time
+   - Monitor application status
+
+   Simply click the play button next to "spring-ai-agents" to start this module, or start all modules at once.
+
+   <img src="images/dashboard.png" alt="Spring Boot Dashboard" width="800"/>
+
+   **Option 2: Using shell scripts**
+
    ```bash
    # From this directory
    ./start.sh        # Linux/Mac
