@@ -559,29 +559,61 @@ The web interface lets you experiment with different prompting strategies. Each 
 
 Ask a simple question like "What is 15% of 200?" using Low Eagerness. You'll get an instant, direct answer. Now ask something complex like "Design a caching strategy for a high-traffic API" using High Eagerness. Click **🔴 Stream Response (Live)** and watch the model's detailed reasoning appear token-by-token. Same model, same question structure - but the prompt tells it how much thinking to do.
 
+<img src="images/low-eagerness-demo.png" alt="Low Eagerness demo" width="800"/>
+
+*Low Eagerness — a one-line calculation answered in two reasoning steps*
+
+<img src="images/high-eagerness-demo.png" alt="High Eagerness demo" width="800"/>
+
+*High Eagerness — the same model, streaming a thorough architectural analysis*
+
 ### Task Execution (Tool Preambles)
 
 Multi-step workflows benefit from upfront planning and progress narration. The model outlines what it will do, narrates each step, then summarizes results.
+
+<img src="images/task-execution-demo.png" alt="Task Execution demo" width="800"/>
+
+*Plan → Execute → Summarize in action for a REST endpoint task*
 
 ### Self-Reflecting Code
 
 Try "Create an email validation service". Instead of just generating code and stopping, the model generates, evaluates against quality criteria, identifies weaknesses, and improves. You'll see it iterate until the code meets production standards.
 
+<img src="images/self-reflecting-code-demo.png" alt="Self-Reflecting Code demo" width="800"/>
+
+*Streaming output showing the model generating, evaluating, and refining a validation service*
+
 ### Structured Analysis
 
 Code reviews need consistent evaluation frameworks. The model analyzes code using fixed categories (correctness, practices, performance, security) with severity levels.
+
+<img src="images/structured-analysis-demo.png" alt="Structured Analysis demo" width="800"/>
+
+*A code snippet reviewed across correctness, best practices, performance, security, and maintainability*
 
 ### Multi-Turn Chat
 
 Ask "What is Spring Boot?" then immediately follow up with "Show me an example". The model remembers your first question and gives you a Spring Boot example specifically. Without memory, that second question would be too vague.
 
+<img src="images/multi-turn-chat-demo.png" alt="Multi-Turn Chat demo" width="800"/>
+
+*Follow-up “Show me an example” is answered with a Spring Boot sample — context from the previous turn was preserved*
+
 ### Step-by-Step Reasoning
 
 Pick a math problem and try it with both Step-by-Step Reasoning and Low Eagerness. Low eagerness just gives you the answer - fast but opaque. Step-by-step shows you every calculation and decision.
 
+<img src="images/step-by-step-reasoning-demo.png" alt="Step-by-Step Reasoning demo" width="800"/>
+
+*Each calculation shown explicitly — distances, times, and the final average speed*
+
 ### Constrained Output
 
 When you need specific formats or word counts, this pattern enforces strict adherence. Try generating a summary with exactly 100 words in bullet point format.
+
+<img src="images/constrained-output-demo.png" alt="Constrained Output demo" width="800"/>
+
+*A 100-word, bullet-point summary of machine learning — format and length strictly enforced*
 
 ## What You're Really Learning
 
