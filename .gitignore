@@ -107,3 +107,4 @@ generate-prompt-eng-image.py
 regen-tool-seq.py
 regen-boot-seq.py
 render-puml.py
+.env copy
