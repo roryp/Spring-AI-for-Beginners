@@ -105,7 +105,7 @@ The difference in this module is how `ChatClient` calls are **orchestrated** —
 
    Simply click the play button next to "spring-ai-agents" to start this module, or start all modules at once.
 
-   <img src="images/dashboard.png" alt="Spring Boot Dashboard" width="800"/>
+   <img src="images/dashboard.png" alt="Spring Boot Dashboard" width="300"/>
 
    **Option 2: Using shell scripts**
 

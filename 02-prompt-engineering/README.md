@@ -475,7 +475,7 @@ From the Spring Boot Dashboard, you can:
 
 Simply click the play button next to "spring-ai-prompt-engineering" to start this module, or start all modules at once.
 
-<img src="images/dashboard.png" alt="Spring Boot Dashboard" width="800"/>
+<img src="images/dashboard.png" alt="Spring Boot Dashboard" width="300"/>
 
 **Option 2: Using shell scripts**
 

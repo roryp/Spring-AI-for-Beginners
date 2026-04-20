@@ -261,7 +261,7 @@ From the Spring Boot Dashboard, you can:
 
 Start **`mcp-server`** first, wait for it to be ready on port 8085, then start **`mcp-client`** on port 8082.
 
-<img src="images/dashboard.png" alt="Spring Boot Dashboard" width="800"/>
+<img src="images/dashboard.png" alt="Spring Boot Dashboard" width="300"/>
 
 **Option 2: Using shell scripts**
 
