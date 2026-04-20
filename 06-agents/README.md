@@ -136,67 +136,105 @@ The difference in this module is how `ChatClient` calls are **orchestrated** —
 
 ## How Each Pattern Works
 
+Each of the five patterns follows the same teaching flow: first you see **how the pattern is wired** (the architecture diagram), then you read the code that implements it, and finally you **try it live in the browser** using the built-in demo UI.
+
+Open [http://localhost:8086](http://localhost:8086) once the app is running and follow along.
+
 ### 1. Chain Workflow
 
-![Chain Workflow](images/chain-workflow.png)
+Some tasks are too complex for a single prompt. Asking one LLM call to "extract the numbers from this text, normalize them to percentages, sort them, and format the result as a table" often produces inconsistent output — the model tries to do everything at once and skips steps. The **Chain Workflow** breaks the job into a pipeline of focused LLM calls, where each step has a single responsibility and receives the previous step's output as input.
 
-Processes input through a 4-step pipeline: **Extract → Standardize → Sort → Format**. Each LLM call receives the previous step's output and transforms it further.
+<img src="images/chain-workflow.png" alt="Chain Workflow architecture" width="700"/>
+
+*The input flows through four specialized LLM calls — Extract → Standardize → Sort → Format — and each step transforms the output of the previous one.*
+
+Implementation: [ChainWorkflow.java](src/main/java/com/example/springai/agents/patterns/ChainWorkflow.java)
 
 **When to use:** Tasks with clear sequential steps where you want to trade latency for higher accuracy, and each step builds on the previous step's output.
 
-![Chain Workflow demo page](images/chain-ui.png)
+**Try it in the UI:** Click the **Q3 Performance Report** or **Health Report** example button on the Chain Workflow demo page (or paste your own metrics-heavy text), then click **Run Chain**. You'll see each step's intermediate output, so you can watch the raw text get extracted, standardized, sorted, and finally formatted as a markdown table.
+
+<img src="images/chain-ui.png" alt="Chain Workflow demo page" width="700"/>
+
+*The Chain Workflow demo page — enter your input, run the pipeline, and inspect the output of every step in the chain.*
 
 ### 2. Parallelization Workflow
 
-![Parallelization Workflow](images/parallelization-workflow.png)
+What if you need to run the same prompt against many inputs, or get several independent perspectives on one input? Running LLM calls sequentially wastes time when they don't depend on each other. The **Parallelization Workflow** fans out independent calls across a thread pool and gathers the results in order.
 
-Sends the same prompt to multiple inputs concurrently using a thread pool. Results are returned in the same order as inputs.
+<img src="images/parallelization-workflow.png" alt="Parallelization Workflow architecture" width="700"/>
+
+*The same prompt is dispatched to N workers concurrently; each worker processes one input, and results are returned in the original order.*
+
+Implementation: [ParallelizationWorkflow.java](src/main/java/com/example/springai/agents/patterns/ParallelizationWorkflow.java)
 
 **When to use:** Processing large volumes of similar but independent items, tasks requiring multiple independent perspectives, or when processing time is critical and tasks are parallelizable.
 
-![Parallelization Workflow demo page](images/parallelization-ui.png)
+**Try it in the UI:** Click **Stakeholder Analysis** or **Multi-Language Translation** to load a pre-filled batch, then click **Run in Parallel**. Notice how the total time is roughly the slowest single call, not the sum of all calls.
+
+<img src="images/parallelization-ui.png" alt="Parallelization Workflow demo page" width="700"/>
+
+*The Parallelization demo — submit a batch of inputs and watch them processed concurrently, with per-item results returned in order.*
 
 ### 3. Routing Workflow
 
-![Routing Workflow](images/routing-workflow.png)
+Not every request should go to the same handler. A customer support message about a billing issue needs very different handling from one asking a technical question. The **Routing Workflow** uses an LLM as a classifier: it reads the input, picks the best route, and forwards the request to a prompt that's specialized for that category.
 
-An LLM classifier analyzes the input and selects the best route (billing, technical, or general). The input is then processed by a specialized prompt for that route.
+<img src="images/routing-workflow.png" alt="Routing Workflow architecture" width="700"/>
+
+*A classifier LLM labels the input (e.g., billing / technical / general), then the request is dispatched to the specialized prompt for that label.*
+
+Implementation: [RoutingWorkflow.java](src/main/java/com/example/springai/agents/patterns/RoutingWorkflow.java)
 
 **When to use:** Complex tasks with distinct categories of input that require different handling or specialized processing.
 
-![Routing Workflow demo page](images/routing-ui.png)
+**Try it in the UI:** Click the **Billing Issue**, **Technical Issue**, or **General Inquiry** example, then click **Route Request**. The demo shows which route the classifier picked and the response generated by that route's dedicated prompt.
+
+<img src="images/routing-ui.png" alt="Routing Workflow demo page" width="700"/>
+
+*The Routing demo — see the chosen route alongside the specialized response, so you can verify the classifier is picking correctly.*
 
 ### 4. Orchestrator-Workers
 
-![Orchestrator-Workers](images/orchestrator-workers.png)
+Some tasks can't be broken down in advance — the subtasks depend on the input itself. Writing a product description in "formal," "conversational," and "technical" voices sounds straightforward, but the actual angles worth exploring vary per product. The **Orchestrator-Workers** pattern uses a central LLM to **plan** the subtasks dynamically, then dispatches each one to a worker LLM.
 
-The orchestrator LLM analyzes a complex task and breaks it into subtasks with different approaches (e.g., formal vs. conversational). Workers execute each subtask independently.
+<img src="images/orchestrator-workers.png" alt="Orchestrator-Workers architecture" width="700"/>
+
+*The orchestrator LLM decides what subtasks are needed, spawns a worker per subtask, and then synthesizes their outputs into a final result.*
+
+Implementation: [OrchestratorWorkers.java](src/main/java/com/example/springai/agents/patterns/OrchestratorWorkers.java)
 
 **When to use:** Complex tasks where subtasks can't be predicted upfront and require adaptive problem-solving.
 
-![Orchestrator-Workers demo page](images/orchestrator-ui.png)
+**Try it in the UI:** Click **API Documentation**, **Product Launch**, or **Onboarding Guide** to load a sample task, then click **Orchestrate**. You'll see the orchestrator's plan, each worker's output, and how the pattern adapts per input.
+
+<img src="images/orchestrator-ui.png" alt="Orchestrator-Workers demo page" width="700"/>
+
+*The Orchestrator-Workers demo — inspect the plan the orchestrator produces and the independent worker responses that back it.*
 
 ### 5. Evaluator-Optimizer
 
-![Evaluator-Optimizer](images/evaluator-optimizer.png)
+The first output of an LLM is rarely its best. Instead of hoping the initial answer is good enough, the **Evaluator-Optimizer** pattern pairs a **generator** LLM with an **evaluator** LLM: the generator proposes an answer, the evaluator grades it (PASS / NEEDS_IMPROVEMENT / FAIL), and any feedback is looped back into the next generation attempt until the answer is good enough or a max-iterations cap is reached.
 
-A generator LLM produces a solution, then an evaluator LLM grades it (PASS / NEEDS_IMPROVEMENT / FAIL). If not passing, feedback is incorporated and the cycle repeats.
+<img src="images/evaluator-optimizer.png" alt="Evaluator-Optimizer architecture" width="700"/>
+
+*Generate → evaluate → refine — the loop continues until the evaluator returns PASS or the iteration limit is hit.*
+
+Implementation: [EvaluatorOptimizer.java](src/main/java/com/example/springai/agents/patterns/EvaluatorOptimizer.java)
 
 **When to use:** Tasks with clear evaluation criteria where iterative refinement provides measurable value (e.g., code generation, translation, content creation).
 
-![Evaluator-Optimizer demo page](images/evaluator-ui.png)
+**Try it in the UI:** Click **Thread-Safe Counter**, **Email Validator**, or **Creative Writing** to load a sample prompt, then click **Generate & Evaluate**. Watch each iteration's draft, the evaluator's feedback, and how the output improves.
+
+<img src="images/evaluator-ui.png" alt="Evaluator-Optimizer demo page" width="700"/>
+
+*The Evaluator-Optimizer demo — every iteration shows the generator's draft and the evaluator's verdict, so you can see the refinement loop in action.*
 
 ## Best Practices
 
 - **Start simple** — begin with basic workflows before adding complexity. Use the simplest pattern that meets your requirements.
 - **Design for reliability** — implement clear error handling, use type-safe responses where possible, and build in validation at each step.
 - **Consider trade-offs** — balance latency vs. accuracy, evaluate when to use parallel processing, and choose between fixed workflows and dynamic agents.
-
-## References
-
-- [Building Effective Agents — Spring AI Documentation](https://docs.spring.io/spring-ai/reference/2.0/api/effective-agents.html)
-- [Spring AI Agentic Patterns Examples](https://github.com/spring-projects/spring-ai-examples/tree/main/agentic-patterns)
-- [Spring AI Documentation](https://docs.spring.io/spring-ai/reference/)
 
 ## Next Steps
 

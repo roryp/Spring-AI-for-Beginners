@@ -126,6 +126,16 @@
             "projectName": "spring-ai-mcp-client",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-Application<spring-ai-agents>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.example.springai.agents.app.Application",
+            "projectName": "spring-ai-agents",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }
