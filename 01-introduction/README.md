@@ -8,7 +8,7 @@
 - [Understanding Tokens](#understanding-tokens)
 - [How Memory Works](#how-memory-works)
 - [How This Uses Spring AI](#how-this-uses-spring-ai)
-- [Deploy Microsoft Foundry Infrastructure](#deploy-azure-openai-infrastructure)
+- [Deploy Microsoft Foundry Infrastructure](#deploy-microsoft-foundry-infrastructure)
 - [Run the Application Locally](#run-the-application-locally)
 - [Using the Application](#using-the-application)
   - [Stateless Chat (Left Panel)](#stateless-chat-left-panel)
