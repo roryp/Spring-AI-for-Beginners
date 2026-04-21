@@ -108,3 +108,4 @@ regen-tool-seq.py
 regen-boot-seq.py
 render-puml.py
 .env copy
+tools/
