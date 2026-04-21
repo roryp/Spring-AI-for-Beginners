@@ -45,7 +45,7 @@ This grounds the model's responses in your actual data instead of relying on its
 
 ## Prerequisites
 
-- Completed [Module 01 - Introduction](../01-introduction/README.md) (Azure OpenAI resources deployed, including the `text-embedding-3-small` embedding model)
+- Completed [Module 01 - Introduction](../01-introduction/README.md) (Microsoft Foundry resources deployed, including the `text-embedding-3-small` embedding model)
 - `.env` file in root directory with Azure credentials (created by `azd up` in Module 01)
 
 > **Note:** If you haven't completed Module 01, follow the deployment instructions there first. The `azd up` command deploys both the GPT chat model and the embedding model used by this module.

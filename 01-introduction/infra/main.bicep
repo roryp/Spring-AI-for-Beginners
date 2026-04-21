@@ -10,13 +10,13 @@ param environmentName string
 param location string
 
 // OpenAI parameters
-@description('Location for Azure OpenAI resource')
+@description('Location for Microsoft Foundry resource')
 param openAiLocation string = 'eastus2'
 
-@description('SKU name for Azure OpenAI')
+@description('SKU name for Microsoft Foundry')
 param openAiSkuName string = 'S0'
 
-@description('Model deployments for Azure OpenAI')
+@description('Model deployments for Microsoft Foundry')
 param openAiDeployments array = [
   {
     name: 'gpt-5.2'
@@ -59,7 +59,7 @@ resource rg 'Microsoft.Resources/resourceGroups@2024-03-01' = {
   tags: tags
 }
 
-// Azure OpenAI
+// Microsoft Foundry
 module openAi 'core/ai/cognitiveservices.bicep' = {
   name: 'openai'
   scope: rg

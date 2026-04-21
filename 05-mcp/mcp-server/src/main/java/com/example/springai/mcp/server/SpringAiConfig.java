@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Configuration for Spring AI with Azure OpenAI using the OpenAI SDK starter.
+ * Configuration for Spring AI with Microsoft Foundry using the OpenAI SDK starter.
  * The starter (spring-ai-starter-model-openai-sdk) auto-configures OpenAiSdkChatModel
  * using properties from application.yaml.
  * The ChatClient is used by TicTacToeTools to ask the LLM for strategic

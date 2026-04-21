@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Configuration for Spring AI with Azure OpenAI using the OpenAI SDK starter.
+ * Configuration for Spring AI with Microsoft Foundry using the OpenAI SDK starter.
  * 
  * The starter (spring-ai-starter-model-openai-sdk) auto-configures OpenAiSdkChatModel
  * using properties from application.yaml. Azure mode is detected automatically
@@ -21,7 +21,7 @@ import org.springframework.context.annotation.Configuration;
  * - "Why is reasoning_effort set via prompts here instead of as an API parameter?"
  * - "When does it make sense to expose multiple chat model beans with different configurations?"
  * - "How would I inject Azure AD (managed identity) credentials here instead of an API key?"
- * - "How do I test this configuration without making real Azure OpenAI calls?"
+ * - "How do I test this configuration without making real Microsoft Foundry calls?"
  */
 @Configuration
 public class SpringAiConfig {

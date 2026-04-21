@@ -4,7 +4,7 @@ server:
 spring:
   application:
     name: spring-ai-getting-started
-  # Azure OpenAI configuration via spring-ai-starter-model-openai-sdk
+  # Microsoft Foundry configuration via spring-ai-starter-model-openai-sdk
   # These environment variables are set by 'azd up' deployment
   ai:
     openai-sdk:

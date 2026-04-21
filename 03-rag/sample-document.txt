@@ -4,7 +4,7 @@ Spring AI is a Java framework that simplifies the development of AI-powered appl
 
 Key Features
 
-1. Chat Models - Spring AI supports multiple LLM providers including Azure OpenAI, OpenAI, Anthropic, Ollama, and more. The ChatModel and StreamingChatModel interfaces provide a unified API regardless of the provider you choose.
+1. Chat Models - Spring AI supports multiple LLM providers including Microsoft Foundry, OpenAI, Anthropic, Ollama, and more. The ChatModel and StreamingChatModel interfaces provide a unified API regardless of the provider you choose.
 
 2. Prompt Engineering - The framework includes Prompt and PromptTemplate classes for structured prompt construction. SystemMessage, UserMessage, and AssistantMessage types map to conversational roles.
 

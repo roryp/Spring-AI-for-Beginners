@@ -19,7 +19,7 @@ import org.springframework.ai.openaisdk.OpenAiSdkChatOptions;
  * - Environment-based authentication
  * 
  * 💡 Ask GitHub Copilot:
- * - "How would I switch from GitHub Models to Azure OpenAI in this code?"
+ * - "How would I switch from GitHub Models to Microsoft Foundry in this code?"
  * - "What other parameters can I configure in OpenAiSdkChatOptions.builder()?"
  * - "How do I add streaming responses instead of waiting for the complete response?"
  * - "What builder methods are available for configuring the OpenAI SDK client?"

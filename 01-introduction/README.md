@@ -8,7 +8,7 @@
 - [Understanding Tokens](#understanding-tokens)
 - [How Memory Works](#how-memory-works)
 - [How This Uses Spring AI](#how-this-uses-spring-ai)
-- [Deploy Azure OpenAI Infrastructure](#deploy-azure-openai-infrastructure)
+- [Deploy Microsoft Foundry Infrastructure](#deploy-azure-openai-infrastructure)
 - [Run the Application Locally](#run-the-application-locally)
 - [Using the Application](#using-the-application)
   - [Stateless Chat (Left Panel)](#stateless-chat-left-panel)
@@ -17,9 +17,9 @@
 
 ## What You'll Learn
 
-In the quick start, you used GitHub Models to send prompts, call tools, ask questions about documents, and test guardrails. Those demos showed what's possible — now we switch to Azure OpenAI and GPT-5.2 and start building production-style applications. This module focuses on conversational AI that remembers context and maintains state.
+In the quick start, you used GitHub Models to send prompts, call tools, ask questions about documents, and test guardrails. Those demos showed what's possible — now we switch to Microsoft Foundry and GPT-5.2 and start building production-style applications. This module focuses on conversational AI that remembers context and maintains state.
 
-We'll use Azure OpenAI's GPT-5.2 throughout this guide because its advanced reasoning capabilities make the behavior of different patterns more apparent. When you add memory, you'll clearly see the difference. This makes it easier to understand what each component brings to your application.
+We'll use Microsoft Foundry's GPT-5.2 throughout this guide because its advanced reasoning capabilities make the behavior of different patterns more apparent. When you add memory, you'll clearly see the difference. This makes it easier to understand what each component brings to your application.
 
 You'll build one application that demonstrates both patterns:
 
@@ -30,14 +30,14 @@ You'll build one application that demonstrates both patterns:
 ## Prerequisites
 
 - Completed [Module 00 - Quick Start](../00-quick-start/README.md)
-- Azure subscription with Azure OpenAI access
+- Azure subscription with Microsoft Foundry access
 - Java 21, Maven 3.9+ 
 - Azure CLI (https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
 - Azure Developer CLI (azd) (https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/install-azd)
 
 > **Note:** Java, Maven, Azure CLI and Azure Developer CLI (azd) are pre-installed in the provided devcontainer.
 
-> **Note:** This module uses GPT-5.2 on Azure OpenAI. The deployment is configured automatically via `azd up` - do not modify the model name in the code.
+> **Note:** This module uses GPT-5.2 on Microsoft Foundry. The deployment is configured automatically via `azd up` - do not modify the model name in the code.
 
 ## Understanding the Core Problem
 
@@ -97,7 +97,7 @@ spring:
           model: ${AZURE_OPENAI_DEPLOYMENT}
 ```
 
-Credentials come from environment variables set by `azd up`. Azure OpenAI mode is detected automatically when the base URL contains `openai.azure.com`.
+Credentials come from environment variables set by `azd up`. Microsoft Foundry mode is detected automatically when the base URL contains `openai.azure.com`.
 
 **Conversation Memory** - Use Spring AI's `MessageWindowChatMemory` for automatic sliding-window memory management ([ConversationService.java](src/main/java/com/example/springai/service/ConversationService.java)):
 
@@ -128,7 +128,7 @@ The stateless chat endpoint skips memory entirely — just `chatModel.call(new P
 > - "How would I stream responses back to the client instead of waiting for the full completion?"
 > - "What's the benefit of using OpenAiSdkChatModel directly vs wrapping it with ChatClient?"
 
-## Deploy Azure OpenAI Infrastructure
+## Deploy Microsoft Foundry Infrastructure
 
 **Bash:**
 ```bash
@@ -145,7 +145,7 @@ azd up  # Select subscription and location (eastus2 recommended)
 > **Note:** If you encounter a timeout error (`RequestConflict: Cannot modify resource ... provisioning state is not terminal`), simply run `azd up` again. Azure resources may still be provisioning in the background, and retrying allows the deployment to complete once resources reach a terminal state.
 
 This will:
-1. Deploy Azure OpenAI resource with GPT-5.2 and text-embedding-3-small models
+1. Deploy Microsoft Foundry resource with GPT-5.2 and text-embedding-3-small models
 2. Automatically generate `.env` file in project root with credentials
 3. Set up all required environment variables
 

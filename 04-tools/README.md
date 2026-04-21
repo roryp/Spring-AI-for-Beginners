@@ -37,7 +37,7 @@ Tools change this. By giving the model access to functions it can call, you tran
 
 ## Prerequisites
 
-- Completed [Module 01 - Introduction](../01-introduction/README.md) (Azure OpenAI resources deployed)
+- Completed [Module 01 - Introduction](../01-introduction/README.md) (Microsoft Foundry resources deployed)
 - Completed previous modules recommended (this module references [RAG concepts from Module 03](../03-rag/README.md) in the Tools vs RAG comparison)
 - `.env` file in root directory with Azure credentials (created by `azd up` in Module 01)
 
@@ -173,7 +173,7 @@ Here's the full request lifecycle as a sequence diagram — from the HTTP reques
 
 <img src="images/spring-boot-sequence.png" alt="Spring Boot Tool Calling Sequence" width="800"/>
 
-*The complete Spring Boot request lifecycle — HTTP Client → Controller → AgentService → ChatClient → Azure OpenAI → WeatherTool and back. The LLM decides to call the tool, gets the result, and returns a natural language answer.*
+*The complete Spring Boot request lifecycle — HTTP Client → Controller → AgentService → ChatClient → Microsoft Foundry → WeatherTool and back. The LLM decides to call the tool, gets the result, and returns a natural language answer.*
 
 Key benefits of this approach:
 

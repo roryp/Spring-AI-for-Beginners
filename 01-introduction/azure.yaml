@@ -8,7 +8,7 @@ infra:
   provider: bicep
 
 # No services defined - all applications run locally
-# This configuration only deploys Azure OpenAI infrastructure
+# This configuration only deploys Microsoft Foundry infrastructure
 
 hooks:
   postprovision:

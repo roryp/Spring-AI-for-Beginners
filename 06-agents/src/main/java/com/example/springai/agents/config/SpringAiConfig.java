@@ -9,7 +9,7 @@ import com.example.springai.agents.advisor.AdvisorLogSink;
 import com.example.springai.agents.advisor.MyLoggingAdvisor;
 
 /**
- * Configuration for Spring AI with Azure OpenAI using the OpenAI SDK starter.
+ * Configuration for Spring AI with Microsoft Foundry using the OpenAI SDK starter.
  * The starter (spring-ai-starter-model-openai-sdk) auto-configures OpenAiSdkChatModel
  * using properties from application.yaml.
  * Uses the advisor pattern to attach a logging advisor to the ChatClient,
