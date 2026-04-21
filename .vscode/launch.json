@@ -79,11 +79,41 @@
         },
         {
             "type": "java",
-            "name": "Spring Boot: Agents & Tools",
+            "name": "Spring Boot: Tools",
             "request": "launch",
             "cwd": "${workspaceFolder}/04-tools",
-            "mainClass": "com.example.springai.agents.AgentsApplication",
-            "projectName": "tools",
+            "mainClass": "com.example.springai.tools.ToolsApplication",
+            "projectName": "spring-ai-tools",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot: MCP Server",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/05-mcp/mcp-server",
+            "mainClass": "com.example.springai.mcp.server.McpServerApplication",
+            "projectName": "spring-ai-mcp-server",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot: MCP Client",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/05-mcp/mcp-client",
+            "mainClass": "com.example.springai.mcp.client.McpClientApplication",
+            "projectName": "spring-ai-mcp-client",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot: Agents",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/06-agents",
+            "mainClass": "com.example.springai.agents.app.Application",
+            "projectName": "spring-ai-agents",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
         },
@@ -134,6 +164,16 @@
             "cwd": "${workspaceFolder}",
             "mainClass": "com.example.springai.agents.app.Application",
             "projectName": "spring-ai-agents",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-Application<spring-ai-prompt-engineering>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.example.springai.prompts.app.Application",
+            "projectName": "spring-ai-prompt-engineering",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
         }
