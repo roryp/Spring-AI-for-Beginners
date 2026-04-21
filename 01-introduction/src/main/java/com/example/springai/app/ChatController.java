@@ -14,6 +14,12 @@ import java.util.Map;
  * 
  * This controller demonstrates basic stateless chat completion without memory.
  * For conversational chat with history, see {@link ConversationController}.
+ *
+ * 💡 Ask GitHub Copilot:
+ * - "Why is this controller stateless — what would change if I added ChatMemory here?"
+ * - "How would I stream responses back to the client instead of waiting for the full completion?"
+ * - "How could I add a system prompt to shape the assistant's persona for every request?"
+ * - "What's the benefit of using OpenAiSdkChatModel directly vs wrapping it with ChatClient?"
  */
 @RestController
 @RequestMapping("/api/chat")

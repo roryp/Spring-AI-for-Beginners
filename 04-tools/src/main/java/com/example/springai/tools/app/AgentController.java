@@ -17,6 +17,12 @@ import java.util.Map;
 /**
  * REST controller for AI agent interactions with tool calling.
  * Follows the REST API design pattern from coding instructions.
+ *
+ * 💡 Ask GitHub Copilot:
+ * - "How does the AgentService decide when to invoke a tool vs answer directly?"
+ * - "What's a good strategy for limiting tool-call loops so the agent doesn't run away?"
+ * - "How would I stream partial results and tool invocations back to the UI as they happen?"
+ * - "How should I authorize the caller — each tool may have different required permissions?"
  */
 @RestController
 @RequestMapping("/api/agent")

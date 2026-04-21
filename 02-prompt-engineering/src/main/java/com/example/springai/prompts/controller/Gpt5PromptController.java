@@ -11,6 +11,12 @@ import reactor.core.publisher.Flux;
  * REST Controller demonstrating GPT-5 prompting patterns.
  * 
  * Test these endpoints to see different GPT-5 prompting techniques in action.
+ *
+ * 💡 Ask GitHub Copilot:
+ * - "How do the eight endpoints map to the prompting patterns — which one should I call when?"
+ * - "How would I stream a pattern's response as SSE so the UI can display tokens as they arrive?"
+ * - "Which of these endpoints would benefit from structured output (JSON schema) instead of free text?"
+ * - "How do I add validation on the request body so malformed prompts fail fast?"
  */
 @RestController
 @RequestMapping("/api/gpt5")

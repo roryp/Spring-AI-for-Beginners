@@ -9,6 +9,11 @@ import org.springframework.ai.chat.client.ChatClient;
  * <p>When to use: Tasks that can be cleanly decomposed into fixed subtasks.
  * Trades latency for higher accuracy by making each LLM call an easier task.</p>
  *
+ * 💡 Ask GitHub Copilot:
+ * - "Why is prompt chaining more accurate than one big prompt for multi-step tasks?"
+ * - "How would I add a validation/gate step between two chain steps to catch bad output early?"
+ * - "What's the latency trade-off and how could I parallelize independent steps?"
+ * - "How do I handle errors or empty output from an intermediate step in the chain?"
  */
 public class ChainWorkflow {
 

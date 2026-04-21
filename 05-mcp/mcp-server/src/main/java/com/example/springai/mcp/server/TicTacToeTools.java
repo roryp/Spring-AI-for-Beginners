@@ -20,6 +20,12 @@ import org.springframework.stereotype.Service;
  * - Tools return JSON strings with game state
  * - The aiMove tool uses the LLM to choose the best strategic move
  * - Stateful game management via in-memory GameEngine
+ *
+ * 💡 Ask GitHub Copilot:
+ * - "How does @McpTool expose a method over the MCP protocol — what does the starter auto-register?"
+ * - "Why do these tools return JSON strings instead of typed objects?"
+ * - "How would I add a new tool (e.g. undoMove) and have the client pick it up without any client changes?"
+ * - "How do I keep the AI_STRATEGY_PROMPT robust when the model occasionally returns invalid positions?"
  */
 @Service
 public class TicTacToeTools {

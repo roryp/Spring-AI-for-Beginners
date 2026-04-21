@@ -13,6 +13,11 @@ import org.springframework.ai.chat.client.ChatClient;
  * <p>When to use: Complex tasks where subtasks can't be predicted upfront and
  * require adaptive problem-solving.</p>
  *
+ * 💡 Ask GitHub Copilot:
+ * - "How is orchestrator-workers different from a fixed chain — when does the dynamic split pay off?"
+ * - "How do I keep the orchestrator's JSON plan reliable and avoid parsing errors?"
+ * - "Could workers run in parallel once the orchestrator has decomposed the task?"
+ * - "How would I add a synthesis step that merges worker outputs into one coherent answer?"
  */
 public class OrchestratorWorkers {
 

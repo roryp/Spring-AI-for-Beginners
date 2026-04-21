@@ -13,6 +13,11 @@ import org.springframework.ai.chat.client.ChatClient;
  * <p>When to use: Tasks with clear evaluation criteria where iterative refinement
  * provides measurable value (e.g., code generation, translation, content creation).</p>
  *
+ * 💡 Ask GitHub Copilot:
+ * - "What makes a good evaluator prompt — how do I avoid it being too lenient or too strict?"
+ * - "How do I decide a max iteration count and stop conditions to avoid infinite refinement loops?"
+ * - "Why is the evaluator a separate LLM call instead of self-critique in the generator?"
+ * - "How would I plug in a non-LLM evaluator (unit tests, schema validation) for deterministic checks?"
  */
 public class EvaluatorOptimizer {
 

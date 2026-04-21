@@ -16,6 +16,12 @@ import org.springframework.context.annotation.Configuration;
  * Note: For GPT-5 reasoning effort is controlled through prompt engineering
  * rather than model configuration parameters. See Gpt5PromptService for examples of how to
  * use prompts like "<reasoning_effort>low</reasoning_effort>" to control model behavior.
+ *
+ * 💡 Ask GitHub Copilot:
+ * - "Why is reasoning_effort set via prompts here instead of as an API parameter?"
+ * - "When does it make sense to expose multiple chat model beans with different configurations?"
+ * - "How would I inject Azure AD (managed identity) credentials here instead of an API key?"
+ * - "How do I test this configuration without making real Azure OpenAI calls?"
  */
 @Configuration
 public class SpringAiConfig {

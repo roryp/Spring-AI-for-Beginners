@@ -17,6 +17,11 @@ import org.springframework.ai.chat.client.ChatClient;
  * <li><b>Voting</b>: Executes identical prompts multiple times in parallel for diverse perspectives.</li>
  * </ul>
  *
+ * 💡 Ask GitHub Copilot:
+ * - "When should I use sectioning vs voting, and what problems does each solve?"
+ * - "How do I choose the right nWorkers value to balance throughput against rate limits?"
+ * - "How would I aggregate voting results — majority vote, weighted, or LLM judge?"
+ * - "What happens if one parallel call fails, and how do I add retries without blocking the rest?"
  */
 public class ParallelizationWorkflow {
 

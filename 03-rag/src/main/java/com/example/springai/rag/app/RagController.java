@@ -16,6 +16,12 @@ import org.springframework.web.bind.annotation.*;
  * Provides two endpoints:
  * - /api/rag/ask — Native RAG (manual pipeline, educational)
  * - /api/rag/advisor/ask — Advisor-based RAG (Spring AI 2.0 recommended approach)
+ *
+ * 💡 Ask GitHub Copilot:
+ * - "Walk me through the difference between the native and advisor endpoints — what does each control?"
+ * - "When would I prefer the native pipeline over the advisor approach in production?"
+ * - "How would I stream the generated answer token-by-token back to the browser?"
+ * - "How do I return source citations alongside the answer so users can verify claims?"
  */
 @RestController
 @RequestMapping("/api/rag")

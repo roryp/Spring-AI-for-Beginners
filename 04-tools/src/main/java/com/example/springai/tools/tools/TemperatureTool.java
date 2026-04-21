@@ -9,6 +9,12 @@ import org.springframework.ai.tool.annotation.ToolParam;
  * Temperature conversion tool.
  * Demonstrates tool parameter handling with Spring AI @Tool and @ToolParam annotations.
  * Each conversion method is automatically discoverable by the AI model.
+ *
+ * 💡 Ask GitHub Copilot:
+ * - "Why is each conversion its own @Tool method instead of one tool with a 'direction' parameter?"
+ * - "Could the AI chain these tools (e.g., Fahrenheit → Celsius → Kelvin) — how does that work?"
+ * - "How would I add input validation (e.g., reject temperatures below absolute zero)?"
+ * - "How do I keep the @ToolParam descriptions tight so the model picks the right method first try?"
  */
 public class TemperatureTool {
 

@@ -16,6 +16,12 @@ import java.io.InputStream;
 
 /**
  * REST controller for document upload and management.
+ *
+ * 💡 Ask GitHub Copilot:
+ * - "How do I safely validate uploaded files (size, MIME type, malicious content) before chunking?"
+ * - "How would I add a delete endpoint that removes a document's chunks from the vector store?"
+ * - "How could I accept a URL or other remote source instead of only multipart uploads?"
+ * - "What is a sensible chunk size and overlap, and how would I make them configurable per request?"
  */
 @RestController
 @RequestMapping("/api/documents")
