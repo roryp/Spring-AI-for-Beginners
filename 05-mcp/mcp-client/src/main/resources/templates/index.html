@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe with AI - Spring AI MCP Demo</title>
+    <link rel="stylesheet" th:href="@{/css/tictactoe.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 Tic-Tac-Toe with AI</h1>
+            <p>Play against an AI opponent powered by Azure OpenAI via MCP</p>
+            <div class="stats">
+                <div class="stat">🧠 LLM Strategy</div>
+                <div class="stat">🔗 MCP Protocol</div>
+                <div class="stat">⚡ Spring AI 2</div>
+            </div>
+        </div>
+
+        <!-- Game Section -->
+        <div class="section-card">
+            <div class="section-header">
+                <span class="section-icon">🏆</span>
+                <h2>Game Board</h2>
+            </div>
+            <div class="section-body game-area">
+                <!-- Scoreboard -->
+                <div class="scoreboard">
+                    <div class="score-item player-score">
+                        <span class="score-label">You (X)</span>
+                        <span class="score-value" id="playerScore">0</span>
+                    </div>
+                    <div class="score-item draw-score">
+                        <span class="score-label">Draws</span>
+                        <span class="score-value" id="drawScore">0</span>
+                    </div>
+                    <div class="score-item ai-score">
+                        <span class="score-label">AI (O)</span>
+                        <span class="score-value" id="aiScore">0</span>
+                    </div>
+                </div>
+
+                <!-- Status -->
+                <div class="game-status" id="gameStatus">
+                    Click <strong>New Game</strong> to start!
+                </div>
+
+                <!-- Board -->
+                <div class="game-board" id="gameBoard">
+                    <div class="cell" data-pos="0" onclick="makeMove(0)"></div>
+                    <div class="cell" data-pos="1" onclick="makeMove(1)"></div>
+                    <div class="cell" data-pos="2" onclick="makeMove(2)"></div>
+                    <div class="cell" data-pos="3" onclick="makeMove(3)"></div>
+                    <div class="cell" data-pos="4" onclick="makeMove(4)"></div>
+                    <div class="cell" data-pos="5" onclick="makeMove(5)"></div>
+                    <div class="cell" data-pos="6" onclick="makeMove(6)"></div>
+                    <div class="cell" data-pos="7" onclick="makeMove(7)"></div>
+                    <div class="cell" data-pos="8" onclick="makeMove(8)"></div>
+                </div>
+
+                <!-- Controls -->
+                <div class="game-controls">
+                    <button id="newGameBtn" class="btn btn-primary" onclick="newGame()">
+                        <span class="btn-icon">🎮</span> New Game
+                    </button>
+                    <button id="resetScoresBtn" class="btn btn-secondary" onclick="resetScores()">
+                        <span class="btn-icon">🔄</span> Reset Scores
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- How It Works -->
+        <div class="section-card">
+            <div class="section-header">
+                <span class="section-icon">⚙️</span>
+                <h2>How It Works — MCP Architecture</h2>
+            </div>
+            <div class="section-body">
+                <div class="architecture-diagram">
+                    <div class="arch-box client-box">
+                        <div class="arch-icon">🌐</div>
+                        <h3>MCP Client</h3>
+                        <p>Thin Web UI + ToolCallbackProvider</p>
+                        <ul>
+                            <li>Thymeleaf frontend</li>
+                            <li>REST API (GameController)</li>
+                            <li>MCP ToolCallbackProvider</li>
+                            <li>No LLM — just calls tools</li>
+                        </ul>
+                    </div>
+                    <div class="arch-arrow">
+                        <div class="arrow-line"></div>
+                        <div class="arrow-label">MCP Streamable HTTP</div>
+                        <div class="arrow-line"></div>
+                    </div>
+                    <div class="arch-box server-box">
+                        <div class="arch-icon">🎯</div>
+                        <h3>MCP Server</h3>
+                        <p>Game Engine + AI + @McpTool</p>
+                        <ul>
+                            <li>startNewGame()</li>
+                            <li>makeMove(id, pos, player)</li>
+                            <li>aiMove(id) — LLM-powered</li>
+                            <li>getBoardState(id)</li>
+                            <li>getAvailableMoves(id)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-card">
+                        <span class="info-number">1</span>
+                        <h4>You Click a Cell</h4>
+                        <p>Your move is sent to the MCP server's <code>makeMove</code> tool via the client's ToolCallbackProvider</p>
+                    </div>
+                    <div class="info-card">
+                        <span class="info-number">2</span>
+                        <h4>AI Thinks</h4>
+                        <p>The client calls the server's <code>aiMove</code> tool — the server queries Azure OpenAI via ChatClient to pick the best position</p>
+                    </div>
+                    <div class="info-card">
+                        <span class="info-number">3</span>
+                        <h4>AI Moves</h4>
+                        <p>The server executes the AI's chosen move internally and returns the updated board via MCP</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Spring AI 2 Features -->
+        <div class="section-card">
+            <div class="section-header">
+                <span class="section-icon">🍃</span>
+                <h2>Spring AI 2 Features Demonstrated</h2>
+            </div>
+            <div class="section-body">
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🔧</div>
+                        <h3>@McpTool</h3>
+                        <p>Server-side tool definitions with automatic MCP protocol registration</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔌</div>
+                        <h3>ToolCallbackProvider</h3>
+                        <p>Auto-discovery and invocation of remote MCP tools on the client</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">💬</div>
+                        <h3>ChatClient</h3>
+                        <p>Fluent API for LLM interactions — used on the server for AI game strategy</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🌊</div>
+                        <h3>Streamable HTTP</h3>
+                        <p>Modern MCP transport protocol replacing legacy SSE connections</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/tictactoe.js}"></script>
+</body>
+</html>

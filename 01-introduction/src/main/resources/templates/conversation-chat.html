@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversational Chat - Spring AI</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="/" class="back-link">← Back</a>
+            <h1>🧠 Conversational Chat</h1>
+            <p id="status">Click "Start Conversation" to begin</p>
+        </header>
+
+        <main class="chat-container">
+            <div class="chat-controls">
+                <button id="start-btn" class="btn btn-secondary">Start Conversation</button>
+                <button id="clear-btn" class="btn btn-danger" style="display: none;">Clear History</button>
+            </div>
+
+            <div id="messages" class="messages"></div>
+
+            <form id="chat-form" class="chat-form" style="display: none;">
+                <input 
+                    type="text" 
+                    id="message-input" 
+                    placeholder="Type your message..." 
+                    required
+                    autocomplete="off">
+                <button type="submit" id="send-btn">Send</button>
+            </form>
+        </main>
+    </div>
+
+    <script src="/js/conversation-chat.js"></script>
+</body>
+</html>

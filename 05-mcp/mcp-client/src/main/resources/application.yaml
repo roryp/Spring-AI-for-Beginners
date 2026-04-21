@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: tictactoe-client
+  main:
+    web-application-type: servlet
+  ai:
+    mcp:
+      client:
+        request-timeout: 30s
+        streamable-http:
+          connections:
+            tictactoe-server:
+              url: http://localhost:8085
+
+server:
+  port: 8082
+
+logging:
+  level:
+    "[com.example.springai]": INFO
+    "[io.modelcontextprotocol.client]": WARN
+    "[io.modelcontextprotocol.spec]": WARN

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic Patterns Showcase</title>
+    <link rel="stylesheet" th:href="@{/css/agent-demo.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Agentic Patterns Showcase</h1>
+            <p>5 Workflow Patterns for Building Effective LLM-Based Systems</p>
+            <div class="stats">
+                <div class="stat">5 Patterns</div>
+                <div class="stat">Spring AI</div>
+                <div class="stat">Live Examples</div>
+            </div>
+        </div>
+
+        <div class="pattern-grid">
+            <!-- Chain Workflow -->
+            <div class="pattern-card">
+                <div class="card-header">
+                    <span class="pattern-icon">🔗</span>
+                    <h3>Chain Workflow</h3>
+                </div>
+                <div class="card-body">
+                    <p>Decomposes tasks into a sequence of LLM calls where each step processes the output of the previous one.</p>
+                    <div class="metrics">
+                        <span class="badge badge-slow">Sequential</span>
+                        <span class="badge badge-quality">High Accuracy</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a th:href="@{/patterns/chain}" class="btn">Try It →</a>
+                </div>
+            </div>
+
+            <!-- Parallelization Workflow -->
+            <div class="pattern-card">
+                <div class="card-header">
+                    <span class="pattern-icon">⚡</span>
+                    <h3>Parallelization</h3>
+                </div>
+                <div class="card-body">
+                    <p>Concurrent processing of multiple LLM operations — sectioning or voting — for improved throughput.</p>
+                    <div class="metrics">
+                        <span class="badge badge-fast">Fast</span>
+                        <span class="badge badge-quality">Multi-Perspective</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a th:href="@{/patterns/parallelization}" class="btn">Try It →</a>
+                </div>
+            </div>
+
+            <!-- Routing Workflow -->
+            <div class="pattern-card">
+                <div class="card-header">
+                    <span class="pattern-icon">🔀</span>
+                    <h3>Routing Workflow</h3>
+                </div>
+                <div class="card-body">
+                    <p>Classifies input and directs it to specialized handlers optimized for different types of requests.</p>
+                    <div class="metrics">
+                        <span class="badge badge-medium">Smart Routing</span>
+                        <span class="badge badge-quality">Specialized</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a th:href="@{/patterns/routing}" class="btn">Try It →</a>
+                </div>
+            </div>
+
+            <!-- Orchestrator-Workers -->
+            <div class="pattern-card">
+                <div class="card-header">
+                    <span class="pattern-icon">🎯</span>
+                    <h3>Orchestrator-Workers</h3>
+                </div>
+                <div class="card-body">
+                    <p>A central LLM dynamically decomposes tasks and delegates to specialized worker LLMs.</p>
+                    <div class="metrics">
+                        <span class="badge badge-slow">Adaptive</span>
+                        <span class="badge badge-quality">High Quality</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a th:href="@{/patterns/orchestrator}" class="btn">Try It →</a>
+                </div>
+            </div>
+
+            <!-- Evaluator-Optimizer -->
+            <div class="pattern-card">
+                <div class="card-header">
+                    <span class="pattern-icon">🔄</span>
+                    <h3>Evaluator-Optimizer</h3>
+                </div>
+                <div class="card-body">
+                    <p>Iterative refinement where one LLM generates solutions and another evaluates and provides feedback.</p>
+                    <div class="metrics">
+                        <span class="badge badge-slow">Iterative</span>
+                        <span class="badge badge-quality">Best Quality</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a th:href="@{/patterns/evaluator}" class="btn">Try It →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

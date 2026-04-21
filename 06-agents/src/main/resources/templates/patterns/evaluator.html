@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluator-Optimizer</title>
+    <link rel="stylesheet" th:href="@{/css/agent-demo.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="demo-page">
+            <a th:href="@{/}" class="back-link">← Back to Dashboard</a>
+
+            <div class="demo-header">
+                <span class="icon">🔄</span>
+                <div class="demo-title">
+                    <h1>Evaluator-Optimizer</h1>
+                    <p>Iterative generate → evaluate → refine loop until quality criteria are met</p>
+                </div>
+            </div>
+
+            <div class="demo-section">
+                <h2>Try It Out</h2>
+                <div class="input-group">
+                    <label for="task">Describe a task to iteratively refine:</label>
+                    <textarea id="task" placeholder="Create a Java class implementing a thread-safe counter with increment, decrement, and reset methods."></textarea>
+                </div>
+
+                <div class="examples">
+                    <button class="example-btn" onclick="setExample('Create a Java class implementing a thread-safe counter with increment, decrement, and reset methods.')">Thread-Safe Counter</button>
+                    <button class="example-btn" onclick="setExample('Write a Python function that validates email addresses using regex, handling edge cases like subdomains and plus addressing.')">Email Validator</button>
+                    <button class="example-btn" onclick="setExample('Create a haiku about artificial intelligence that captures both its promise and its limitations.')">Creative Writing</button>
+                </div>
+
+                <div class="button-group">
+                    <button id="submit-btn" class="btn" onclick="submitEvaluator()">Generate &amp; Evaluate →</button>
+                </div>
+            </div>
+
+            <div id="loading" class="loading">
+                <div class="loading-spinner"></div>
+                <p>Generating, evaluating, and refining (may take multiple iterations)...</p>
+            </div>
+
+            <div id="response"></div>
+
+            <div class="log-panel-wrapper">
+                <h2><span class="pulse"></span> Advisor Logs (live)</h2>
+                <div id="advisor-logs"></div>
+            </div>
+
+            <div class="demo-section" style="margin-top: 40px;">
+                <h2>How It Works</h2>
+                <ol>
+                    <li><b>Generator</b> produces an initial solution</li>
+                    <li><b>Evaluator</b> assesses against quality criteria</li>
+                    <li>If PASS → return final solution</li>
+                    <li>If NEEDS_IMPROVEMENT → feedback is incorporated, loop back to step 1</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/pattern-demo.js}"></script>
+    <script>
+        function submitEvaluator() {
+            const task = document.getElementById('task').value.trim();
+            if (!task) { alert('Please describe a task'); return; }
+            callPattern('evaluator', { task });
+        }
+    </script>
+</body>
+</html>

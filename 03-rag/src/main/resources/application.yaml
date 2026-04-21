@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: spring-ai-rag
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  # Azure OpenAI configuration via spring-ai-starter-model-openai-sdk
+  ai:
+    openai-sdk:
+      base-url: ${AZURE_OPENAI_ENDPOINT}
+      api-key: ${AZURE_OPENAI_API_KEY}
+      chat:
+        options:
+          model: ${AZURE_OPENAI_DEPLOYMENT}
+      embedding:
+        options:
+          model: ${AZURE_OPENAI_EMBEDDING_DEPLOYMENT}
+
+server:
+  port: 8081
+
+# Spring Boot Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# Logging
+logging:
+  level:
+    "[com.example.springai]": DEBUG
+    "[org.springframework.ai]": DEBUG
+    "[org.springframework]": INFO
