@@ -17,7 +17,7 @@
 - [Security Recommendations](#security-recommendations)
 - [Additional Resources](#additional-resources)
 
-This directory contains the Azure infrastructure as code (IaC) using Bicep and Azure Developer CLI (azd) for deploying Azure OpenAI resources.
+This directory contains the Azure infrastructure as code (IaC) using Bicep and Azure Developer CLI (azd) for deploying Microsoft Foundry resources.
 
 ## Prerequisites
 
@@ -27,12 +27,12 @@ This directory contains the Azure infrastructure as code (IaC) using Bicep and A
 
 ## Architecture
 
-**Simplified Local Development Setup** - Deploy Azure OpenAI only, run all apps locally.
+**Simplified Local Development Setup** - Deploy Microsoft Foundry only, run all apps locally.
 
 The infrastructure deploys the following Azure resources:
 
 ### AI Services
-- **Azure OpenAI**: Cognitive Services with two model deployments:
+- **Microsoft Foundry**: Cognitive Services with two model deployments:
   - **gpt-5.2**: Chat completion model (20K TPM capacity)
   - **text-embedding-3-small**: Embedding model for RAG (20K TPM capacity)
 
@@ -50,13 +50,13 @@ All Spring Boot applications run locally on your machine:
 | Resource Type | Resource Name Pattern | Purpose |
 |--------------|----------------------|---------|
 | Resource Group | `rg-{environmentName}` | Contains all resources |
-| Azure OpenAI | `aoai-{resourceToken}` | AI model hosting |
+| Microsoft Foundry | `aoai-{resourceToken}` | AI model hosting |
 
 > **Note:** `{resourceToken}` is a unique string generated from subscription ID, environment name, and location
 
 ## Quick Start
 
-### 1. Deploy Azure OpenAI
+### 1. Deploy Microsoft Foundry
 
 **Bash:**
 ```bash
@@ -76,7 +76,7 @@ When prompted:
 - Confirm the environment name (default: `spring-ai-dev`)
 
 This will create:
-- Azure OpenAI resource with GPT-5.2 and text-embedding-3-small
+- Microsoft Foundry resource with GPT-5.2 and text-embedding-3-small
 - Output connection details
 
 ### 2. Get Connection Details
@@ -92,7 +92,7 @@ azd env get-values
 ```
 
 This displays:
-- `AZURE_OPENAI_ENDPOINT`: Your Azure OpenAI endpoint URL
+- `AZURE_OPENAI_ENDPOINT`: Your Microsoft Foundry endpoint URL
 - `AZURE_OPENAI_KEY`: API key for authentication
 - `AZURE_OPENAI_DEPLOYMENT`: Chat model name (gpt-5.2)
 - `AZURE_OPENAI_EMBEDDING_DEPLOYMENT`: Embedding model name
@@ -227,7 +227,7 @@ azd down --purge
 
 ### Development/Testing
 For dev/test environments, you can reduce costs:
-- Use Standard tier (S0) for Azure OpenAI
+- Use Standard tier (S0) for Microsoft Foundry
 - Set lower capacity (10K TPM instead of 20K) in `infra/core/ai/cognitiveservices.bicep`
 - Delete resources when not in use: `azd down`
 
@@ -238,7 +238,7 @@ For production:
 - Implement proper monitoring and cost alerts
 
 ### Cost Estimation
-- Azure OpenAI: Pay-per-token (input + output)
+- Microsoft Foundry: Pay-per-token (input + output)
 - GPT-5.2: ~$3-5 per 1M tokens (check current pricing)
 - text-embedding-3-small: ~$0.02 per 1M tokens
 
@@ -246,7 +246,7 @@ Pricing calculator: https://azure.microsoft.com/pricing/calculator/
 
 ## Monitoring
 
-### View Azure OpenAI Metrics
+### View Microsoft Foundry Metrics
 
 Go to Azure Portal → Your OpenAI resource → Metrics:
 - Token-Based Utilization
@@ -256,7 +256,7 @@ Go to Azure Portal → Your OpenAI resource → Metrics:
 
 ## Troubleshooting
 
-### Issue: Azure OpenAI subdomain name conflict
+### Issue: Microsoft Foundry subdomain name conflict
 
 **Error Message:**
 ```
@@ -284,7 +284,7 @@ The subdomain name generated from your subscription/environment is already in us
    ```
 
 2. **Option 2 - Manual deployment via Azure Portal:**
-   - Go to Azure Portal → Create a resource → Azure OpenAI
+   - Go to Azure Portal → Create a resource → Microsoft Foundry
    - Choose a unique name for your resource
    - Deploy the following models:
      - **GPT-5.2**
@@ -340,7 +340,7 @@ The subdomain name generated from your subscription/environment is already in us
 
 **Solution**: 
 1. Try a different region - See [Changing Azure Regions](#changing-azure-regions) section for how to configure regions
-2. Check your subscription has Azure OpenAI quota:
+2. Check your subscription has Microsoft Foundry quota:
    
    **Bash:**
    ```bash
@@ -374,7 +374,7 @@ The subdomain name generated from your subscription/environment is already in us
 2. Check endpoint format is correct (should be `https://xxx.openai.azure.com`)
 3. Verify API key is the primary or secondary key from Azure Portal
 
-**Issue**: 401 Unauthorized from Azure OpenAI
+**Issue**: 401 Unauthorized from Microsoft Foundry
 
 **Solution**:
 1. Get a fresh API key from Azure Portal → Keys and Endpoint
@@ -400,7 +400,7 @@ infra/
 ├── README.md                        # This file
 └── core/
     └── ai/
-        └── cognitiveservices.bicep  # Azure OpenAI module
+        └── cognitiveservices.bicep  # Microsoft Foundry module
 ```
 
 ## Security Recommendations
@@ -413,7 +413,7 @@ infra/
 
 ## Additional Resources
 
-- [Azure OpenAI Service Documentation](https://learn.microsoft.com/azure/ai-services/openai/)
+- [Microsoft Foundry Service Documentation](https://learn.microsoft.com/azure/ai-services/openai/)
 - [GPT-5.2 Model Documentation](https://learn.microsoft.com/azure/ai-services/openai/concepts/models#gpt-5)
 - [Azure Developer CLI Documentation](https://learn.microsoft.com/azure/developer/azure-developer-cli/)
 - [Bicep Documentation](https://learn.microsoft.com/azure/azure-resource-manager/bicep/)
@@ -423,7 +423,7 @@ infra/
 
 For issues:
 1. Check the [troubleshooting section](#troubleshooting) above
-2. Review Azure OpenAI service health in Azure Portal
+2. Review Microsoft Foundry service health in Azure Portal
 3. Open an issue in the repository
 
 ## License

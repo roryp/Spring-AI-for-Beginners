@@ -20,11 +20,11 @@
 
 ## Introduction
 
-This quickstart is meant to get you up and running with Spring AI as quickly as possible. It covers the absolute basics of building AI applications with Spring AI and GitHub Models. In the next modules you'll switch to Azure OpenAI and GPT-5.2 and dive deeper into each concept.
+This quickstart is meant to get you up and running with Spring AI as quickly as possible. It covers the absolute basics of building AI applications with Spring AI and GitHub Models. In the next modules you'll switch to Microsoft Foundry and GPT-5.2 and dive deeper into each concept.
 
 ## What is Spring AI?
 
-Spring AI is a Java framework that simplifies building AI-powered applications. It provides a consistent API across different AI providers — so you can switch between OpenAI, Azure OpenAI, GitHub Models, and others without changing your application code.
+Spring AI is a Java framework that simplifies building AI-powered applications. It provides a consistent API across different AI providers — so you can switch between OpenAI, Microsoft Foundry, GitHub Models, and others without changing your application code.
 
 It includes features like:
 - Chat and prompt management
@@ -37,7 +37,7 @@ It includes features like:
 
 *Spring AI provides a unified API across AI providers — this course covers these capabilities one module at a time.*
 
-In this quickstart you'll get hands-on with five fundamentals: chat, prompt templates, tool calling, document Q&A, and safety guardrails. Later modules will build on these basics to show you how to build real-world applications with Spring AI and Azure OpenAI.
+In this quickstart you'll get hands-on with five fundamentals: chat, prompt templates, tool calling, document Q&A, and safety guardrails. Later modules will build on these basics to show you how to build real-world applications with Spring AI and Microsoft Foundry.
 
 ## Prerequisites
 
@@ -190,7 +190,7 @@ System.out.println(response.getResult().getOutput().getText());
 ```
 
 > **🤖 Try with [GitHub Copilot](https://github.com/features/copilot) Chat:** Open [`BasicChatDemo.java`](src/main/java/com/example/springai/quickstart/BasicChatDemo.java) and ask:
-> - "How would I switch from GitHub Models to Azure OpenAI in this code?"
+> - "How would I switch from GitHub Models to Microsoft Foundry in this code?"
 > - "What other parameters can I configure in OpenAiSdkChatOptions.builder()?"
 > - "How do I add streaming responses instead of waiting for the complete response?"
 

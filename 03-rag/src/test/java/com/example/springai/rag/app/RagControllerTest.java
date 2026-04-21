@@ -44,13 +44,13 @@ class RagControllerTest {
     @Test
     void testAskWithValidQuestion() throws Exception {
         // Given
-        RagRequest request = new RagRequest("What is Azure OpenAI?", "conv-123", 5);
+        RagRequest request = new RagRequest("What is Microsoft Foundry?", "conv-123", 5);
         
         List<SourceReference> sources = new ArrayList<>();
-        sources.add(new SourceReference("doc.pdf", "Azure OpenAI provides...", 0.95));
+        sources.add(new SourceReference("doc.pdf", "Microsoft Foundry provides...", 0.95));
         
         RagResponse response = new RagResponse(
-            "Azure OpenAI is a cloud service...",
+            "Microsoft Foundry is a cloud service...",
             "conv-123",
             sources
         );
@@ -95,7 +95,7 @@ class RagControllerTest {
     @Test
     void testAskWithServiceException() throws Exception {
         // Given
-        RagRequest request = new RagRequest("What is Azure OpenAI?", "conv-123", 5);
+        RagRequest request = new RagRequest("What is Microsoft Foundry?", "conv-123", 5);
         when(ragService.ask(any(RagRequest.class)))
             .thenThrow(new RuntimeException("Service error"));
 

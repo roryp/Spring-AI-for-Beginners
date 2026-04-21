@@ -17,10 +17,10 @@ A reference of the key terms, Spring AI abstractions, and AI/ML concepts used th
 
 ## Module 00: Quick Start
 
-- **Spring AI** — A Java framework that provides a consistent API across AI providers (OpenAI, Azure OpenAI, GitHub Models, etc.) so you can swap providers without rewriting application code.
+- **Spring AI** — A Java framework that provides a consistent API across AI providers (OpenAI, Microsoft Foundry, GitHub Models, etc.) so you can swap providers without rewriting application code.
 - **GitHub Models** — GitHub's hosted catalog of language models (e.g., `gpt-4.1-nano`) accessed via a Personal Access Token; used in this module so you can try Spring AI without an Azure subscription.
 - **ChatModel** — Spring AI's core abstraction for a chat-capable language model. You send it a `Prompt` and receive a `ChatResponse`.
-- **OpenAiSdkChatModel** — Spring AI's concrete `ChatModel` implementation built on the OpenAI Java SDK; works with both GitHub Models and Azure OpenAI by configuring the base URL and API key.
+- **OpenAiSdkChatModel** — Spring AI's concrete `ChatModel` implementation built on the OpenAI Java SDK; works with both GitHub Models and Microsoft Foundry by configuring the base URL and API key.
 - **OpenAiSdkChatOptions** — Builder-style configuration for `OpenAiSdkChatModel` (model name, base URL, API key, tool callbacks, etc.).
 - **Prompt** — The structured request sent to a `ChatModel`, made up of one or more `Message` objects.
 - **ChatResponse** — The structured result returned by a `ChatModel`, containing the generated text, token usage, and metadata.
@@ -36,8 +36,8 @@ A reference of the key terms, Spring AI abstractions, and AI/ML concepts used th
 
 ## Module 01: Introduction
 
-- **Azure OpenAI** — Microsoft's enterprise hosting of OpenAI models on Azure, used by modules 1–6. You configure a custom endpoint, deployment name, and API key.
-- **gpt-5.2** — The Azure OpenAI model used by the introduction and later modules.
+- **Microsoft Foundry** — Microsoft's enterprise hosting of OpenAI models on Azure, used by modules 1–6. You configure a custom endpoint, deployment name, and API key.
+- **gpt-5.2** — The Microsoft Foundry model used by the introduction and later modules.
 - **Spring Boot Auto-configuration** — Spring Boot's mechanism for creating beans (such as `OpenAiSdkChatModel`) automatically from `application.yaml` properties when the matching starter is on the classpath.
 - **`spring-ai-starter-model-openai-sdk`** — The Spring AI starter that auto-configures the OpenAI SDK–based `ChatModel`.
 - **Stateless Chat** — A chat pattern where each request is independent and the model has no memory of prior turns.
@@ -126,8 +126,8 @@ A reference of the key terms, Spring AI abstractions, and AI/ML concepts used th
 These terms appear in multiple modules and are worth knowing throughout the course.
 
 - **LLM (Large Language Model)** — A neural network trained on large amounts of text that can generate and reason about natural language.
-- **Provider** — The service that hosts the LLM (GitHub Models, Azure OpenAI, etc.); Spring AI lets you switch providers without changing application code.
+- **Provider** — The service that hosts the LLM (GitHub Models, Microsoft Foundry, etc.); Spring AI lets you switch providers without changing application code.
 - **Dev Container / Codespaces** — The pre-configured development environment for this course (Java 21, Maven 3.9+, Copilot) that you can launch as a GitHub Codespace.
 - **Maven** — The Java build tool used to compile and run every example (`mvn compile exec:java -Dexec.mainClass=...`).
 - **`.env` / `GITHUB_TOKEN`** — The environment file and variable used by the quick start to authenticate against GitHub Models.
-- **`application.yaml`** — The Spring Boot configuration file used by modules 1–6 to wire up Azure OpenAI credentials, model names, and other settings.
+- **`application.yaml`** — The Spring Boot configuration file used by modules 1–6 to wire up Microsoft Foundry credentials, model names, and other settings.

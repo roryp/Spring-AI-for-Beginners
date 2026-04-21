@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * SpringAiConfig - Configuration for Spring AI with Azure OpenAI and Tool Calling
+ * SpringAiConfig - Configuration for Spring AI with Microsoft Foundry and Tool Calling
  * Run: ./start.sh (from module directory, after deploying Azure resources with azd up)
  * 
  * The OpenAI SDK starter (spring-ai-starter-model-openai-sdk) auto-configures

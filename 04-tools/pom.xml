@@ -15,7 +15,7 @@
     <artifactId>spring-ai-tools</artifactId>
     <packaging>jar</packaging>
     <name>04-tools</name>
-    <description>Spring AI Tools with Azure OpenAI</description>
+    <description>Spring AI Tools with Microsoft Foundry</description>
 
     <dependencies>
         <!-- Spring Boot -->

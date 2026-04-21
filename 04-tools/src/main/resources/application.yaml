@@ -6,7 +6,7 @@ spring:
   web:
     error:
       include-message: always
-  # Azure OpenAI configuration via spring-ai-starter-model-openai-sdk
+  # Microsoft Foundry configuration via spring-ai-starter-model-openai-sdk
   ai:
     openai-sdk:
       base-url: ${AZURE_OPENAI_ENDPOINT}

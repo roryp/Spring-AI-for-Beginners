@@ -3,7 +3,7 @@ package com.example.springai.config;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Configuration for Spring AI with Azure OpenAI using the OpenAI SDK starter.
+ * Configuration for Spring AI with Microsoft Foundry using the OpenAI SDK starter.
  *
  * The OpenAI SDK starter (spring-ai-starter-model-openai-sdk) auto-configures
  * OpenAiSdkChatModel using properties from application.yaml:
@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
  *
  * 💡 Ask GitHub Copilot:
  * - "What exactly does the spring-ai-starter-model-openai-sdk auto-configure for me?"
- * - "How would I switch this app from Azure OpenAI to OpenAI.com or a local model?"
+ * - "How would I switch this app from Microsoft Foundry to OpenAI.com or a local model?"
  * - "When would I need to define an OpenAiSdkChatModel bean manually instead of using the starter?"
  * - "How do I configure timeouts, retries, or a proxy for outbound model calls?"
  */

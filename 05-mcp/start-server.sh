@@ -1,5 +1,5 @@
 #!/bin/bash
-# Start script for 05-mcp MCP Server (Tic-Tac-Toe Game Engine + AI via Azure OpenAI)
+# Start script for 05-mcp MCP Server (Tic-Tac-Toe Game Engine + AI via Microsoft Foundry)
 # Loads environment variables and starts the server on port 8085
 
 set -e

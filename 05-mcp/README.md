@@ -48,14 +48,14 @@ That's what the **Model Context Protocol (MCP)** provides. MCP is an open protoc
 *MCP provides a universal protocol for AI applications to discover and invoke tools on remote servers — decoupling AI logic from tool implementations.*
 
 In this module, you'll build a **Tic-Tac-Toe game** that demonstrates MCP in action:
-- An **MCP Server** exposes game-engine tools *and* an AI move tool powered by Azure OpenAI
+- An **MCP Server** exposes game-engine tools *and* an AI move tool powered by Microsoft Foundry
 - An **MCP Client** provides a thin web UI that discovers and calls server tools — no LLM on the client
 - The AI strategy lives entirely on the server, using **Spring AI's ChatClient** to choose moves
 - All game operations flow through the **MCP Streamable HTTP protocol**
 
 ## Prerequisites
 
-- Completed [Module 01 - Introduction](../01-introduction/README.md) (Azure OpenAI resources deployed)
+- Completed [Module 01 - Introduction](../01-introduction/README.md) (Microsoft Foundry resources deployed)
 - Completed previous modules recommended (this module builds on [tool calling from Module 04](../04-tools/README.md))
 - `.env` file in root directory with Azure credentials (created by `azd up` in Module 01)
 
@@ -119,7 +119,7 @@ MCP supports multiple transport mechanisms. This module uses **Streamable HTTP**
 
 This module is split into two Spring Boot applications — an MCP server and an MCP client — each with its own dependencies and configuration.
 
-**Server Dependencies** ([mcp-server/pom.xml](mcp-server/pom.xml)) — The server needs the Web MVC MCP server starter to expose `@McpTool` endpoints over Streamable HTTP, the OpenAI SDK starter for Azure OpenAI access, and the chat client library:
+**Server Dependencies** ([mcp-server/pom.xml](mcp-server/pom.xml)) — The server needs the Web MVC MCP server starter to expose `@McpTool` endpoints over Streamable HTTP, the OpenAI SDK starter for Microsoft Foundry access, and the chat client library:
 
 ```xml
 <!-- Exposes @McpTool methods as MCP endpoints over Streamable HTTP (Spring MVC runtime) -->
@@ -128,7 +128,7 @@ This module is split into two Spring Boot applications — an MCP server and an 
     <artifactId>spring-ai-starter-mcp-server-webmvc</artifactId> <!-- Version managed by Spring AI BOM in root pom.xml -->
 </dependency>
 
-<!-- Azure OpenAI via OpenAI SDK Starter (auto-configures OpenAiSdkChatModel) -->
+<!-- Microsoft Foundry via OpenAI SDK Starter (auto-configures OpenAiSdkChatModel) -->
 <dependency>
     <groupId>org.springframework.ai</groupId>
     <artifactId>spring-ai-starter-model-openai-sdk</artifactId>
@@ -151,7 +151,7 @@ This module is split into two Spring Boot applications — an MCP server and an 
 </dependency>
 ```
 
-**Server Configuration** ([application.yaml](mcp-server/src/main/resources/application.yaml)) — The starter auto-configures the MCP server and the Azure OpenAI chat model from properties:
+**Server Configuration** ([application.yaml](mcp-server/src/main/resources/application.yaml)) — The starter auto-configures the MCP server and the Microsoft Foundry chat model from properties:
 
 ```yaml
 spring:
@@ -191,7 +191,7 @@ No Azure credentials on the client — it only talks to the MCP server.
 
 [TicTacToeTools.java](mcp-server/src/main/java/com/example/springai/mcp/server/TicTacToeTools.java) | [GameEngine.java](mcp-server/src/main/java/com/example/springai/mcp/server/GameEngine.java) | [SpringAiConfig.java](mcp-server/src/main/java/com/example/springai/mcp/server/SpringAiConfig.java)
 
-The MCP server is the game engine **and** the AI strategist. It connects to Azure OpenAI to power the `aiMove` tool. It exposes five tools via `@McpTool`:
+The MCP server is the game engine **and** the AI strategist. It connects to Microsoft Foundry to power the `aiMove` tool. It exposes five tools via `@McpTool`:
 
 | Tool | Description |
 |------|-------------|
@@ -213,7 +213,7 @@ The MCP client is a **thin web frontend** with no LLM or AI logic. It discovers 
 
 ### Game Flow
 
-The sequence diagram below shows how a single turn flows through the system — from the browser click, through the MCP client, across the Streamable HTTP protocol to the MCP server, and (for the AI's turn) out to Azure OpenAI and back.
+The sequence diagram below shows how a single turn flows through the system — from the browser click, through the MCP client, across the Streamable HTTP protocol to the MCP server, and (for the AI's turn) out to Microsoft Foundry and back.
 
 <img src="images/client-server-sequence.png" alt="MCP Tic-Tac-Toe client-server sequence diagram" width="800"/>
 
@@ -225,7 +225,7 @@ The sequence diagram below shows how a single turn flows through the system — 
 2. **Player clicks a cell** (e.g., position 4) — Client calls `makeMove(gameId, 4, "X")`; the server validates and executes the move.
 3. **AI turn** — Client calls `aiMove(gameId)`:
    - Server fetches board state and available moves from its `GameEngine`.
-   - Server prompts Azure OpenAI (GPT-5.2) via `ChatClient` to pick the best position.
+   - Server prompts Microsoft Foundry (GPT-5.2) via `ChatClient` to pick the best position.
    - Server applies the LLM's chosen move as `O` and returns the updated board.
 4. **Board updates in the browser** — repeat until win or draw.
 
@@ -297,7 +297,7 @@ cd 05-mcp
 .\start-server.ps1
 ```
 
-The server starts on **http://localhost:8085**. It exposes the game engine and AI strategy as MCP tools via the Streamable HTTP protocol. The startup script loads Azure OpenAI credentials from the root `.env` file.
+The server starts on **http://localhost:8085**. It exposes the game engine and AI strategy as MCP tools via the Streamable HTTP protocol. The startup script loads Microsoft Foundry credentials from the root `.env` file.
 
 ### Terminal 2: Start the MCP Client
 
@@ -335,7 +335,7 @@ Open http://localhost:8082 in your browser.
 
 <img src="images/game-and-architecture.png" alt="Tic-Tac-Toe Game UI" width="800"/>
 
-The application provides a Tic-Tac-Toe game where you play as **X** against an AI opponent playing as **O**. The AI uses Azure OpenAI to analyze the board and choose strategic moves — all game operations flow through MCP tools on the server.
+The application provides a Tic-Tac-Toe game where you play as **X** against an AI opponent playing as **O**. The AI uses Microsoft Foundry to analyze the board and choose strategic moves — all game operations flow through MCP tools on the server.
 
 ### Start a New Game
 
@@ -347,7 +347,7 @@ Click any empty cell to place your **X**. The client calls the MCP `makeMove` to
 
 ### Watch the AI Respond
 
-After your move, the client calls the server's `aiMove` MCP tool. The server analyzes the board, consults Azure OpenAI through Spring AI's `ChatClient`, and picks the best strategic position — all server-side. The AI's **O** appears on the board moments later.
+After your move, the client calls the server's `aiMove` MCP tool. The server analyzes the board, consults Microsoft Foundry through Spring AI's `ChatClient`, and picks the best strategic position — all server-side. The AI's **O** appears on the board moments later.
 
 ### Track Your Score
 
@@ -398,7 +398,7 @@ Notice how the descriptions are written for AI consumption — they explain not 
 
 [TicTacToeTools.java](mcp-server/src/main/java/com/example/springai/mcp/server/TicTacToeTools.java) | [SpringAiConfig.java](mcp-server/src/main/java/com/example/springai/mcp/server/SpringAiConfig.java)
 
-The `aiMove` tool is where the LLM meets MCP. The server fetches the board state, asks Azure OpenAI for the best strategic move via `ChatClient`, and executes it — all inside a single MCP tool call:
+The `aiMove` tool is where the LLM meets MCP. The server fetches the board state, asks Microsoft Foundry for the best strategic move via `ChatClient`, and executes it — all inside a single MCP tool call:
 
 ```java
 @McpTool(description = "AI makes a strategic move as player O using LLM-powered analysis. "
@@ -561,7 +561,7 @@ The LLM evaluates the board state and returns a single position number, keeping 
 | **ToolCallbackProvider** | Auto-discovery of remote MCP tools on the client | [GameService.java](mcp-client/src/main/java/com/example/springai/mcp/client/GameService.java) |
 | **ToolCallback.call()** | Direct invocation of MCP tools without LLM intermediation | [GameService.java](mcp-client/src/main/java/com/example/springai/mcp/client/GameService.java) |
 | **ChatClient** | Fluent API for LLM interactions — AI game strategy on the server | [TicTacToeTools.java](mcp-server/src/main/java/com/example/springai/mcp/server/TicTacToeTools.java) |
-| **OpenAiSdkChatModel** | Azure OpenAI integration auto-configured by the OpenAI SDK starter | [SpringAiConfig.java](mcp-server/src/main/java/com/example/springai/mcp/server/SpringAiConfig.java) |
+| **OpenAiSdkChatModel** | Microsoft Foundry integration auto-configured by the OpenAI SDK starter | [SpringAiConfig.java](mcp-server/src/main/java/com/example/springai/mcp/server/SpringAiConfig.java) |
 
 ## MCP vs Tools (Module 04)
 

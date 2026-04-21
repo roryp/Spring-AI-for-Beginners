@@ -32,20 +32,20 @@ The following diagram provides an overview of the key topics and skills you'll d
 
 <img src="images/what-youll-learn.png" alt="What You'll Learn" width="800"/>
 
-In the previous module, you explored basic Spring AI interactions with Azure OpenAI and saw how memory enables conversational AI. Now we'll focus on how you ask questions — the prompts themselves — using Azure OpenAI's GPT-5.2. The way you structure your prompts dramatically affects the quality of responses you get. We start with a review of the fundamental prompting techniques, then move into eight advanced patterns that take full advantage of GPT-5.2's capabilities.
+In the previous module, you explored basic Spring AI interactions with Microsoft Foundry and saw how memory enables conversational AI. Now we'll focus on how you ask questions — the prompts themselves — using Microsoft Foundry's GPT-5.2. The way you structure your prompts dramatically affects the quality of responses you get. We start with a review of the fundamental prompting techniques, then move into eight advanced patterns that take full advantage of GPT-5.2's capabilities.
 
 We'll use GPT-5.2 because it introduces reasoning control - you can tell the model how much thinking to do before answering. This makes different prompting strategies more apparent and helps you understand when to use each approach. We'll also benefit from Azure's fewer rate limits for GPT-5.2 compared to GitHub Models.
 
 ## Prerequisites
 
-- Completed Module 01 (Azure OpenAI resources deployed)
+- Completed Module 01 (Microsoft Foundry resources deployed)
 - `.env` file in root directory with Azure credentials (created by `azd up` in Module 01)
 
 > **Note:** If you haven't completed Module 01, follow the deployment instructions there first.
 
 ## How This Uses Spring AI
 
-This module uses the same Spring AI dependency introduced in [Module 01](../01-introduction/README.md#how-this-uses-spring-ai) — `spring-ai-starter-model-openai-sdk` — which auto-configures `OpenAiSdkChatModel` for Azure OpenAI. No additional Spring AI dependencies are needed.
+This module uses the same Spring AI dependency introduced in [Module 01](../01-introduction/README.md#how-this-uses-spring-ai) — `spring-ai-starter-model-openai-sdk` — which auto-configures `OpenAiSdkChatModel` for Microsoft Foundry. No additional Spring AI dependencies are needed.
 
 The `application.yaml` configuration is identical to Module 01 ([application.yaml](src/main/resources/application.yaml)):
 
