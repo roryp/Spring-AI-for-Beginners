@@ -16,6 +16,12 @@ import tools.jackson.databind.ObjectMapper;
  *   3 | 4 | 5
  *   ---------
  *   6 | 7 | 8
+ *
+ * 💡 Ask GitHub Copilot:
+ * - "Why is the game state held in-memory with ConcurrentHashMap — what would break at scale?"
+ * - "How would I persist games to a database so they survive a server restart?"
+ * - "Why is GameEngine kept free of any Spring AI / MCP imports?"
+ * - "How could I add an expiration policy so abandoned games get cleaned up?"
  */
 public class GameEngine {
 

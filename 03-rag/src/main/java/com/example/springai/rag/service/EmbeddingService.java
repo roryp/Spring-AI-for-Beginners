@@ -10,6 +10,12 @@ import java.util.List;
 
 /**
  * Service for storing document embeddings in the vector store.
+ *
+ * 💡 Ask GitHub Copilot:
+ * - "When I call vectorStore.add(), where does the embedding computation actually happen?"
+ * - "How would I batch large document sets to stay within embedding API rate limits?"
+ * - "How do I swap SimpleVectorStore for a persistent store like Azure AI Search or pgvector?"
+ * - "What metadata should I store alongside each chunk to improve retrieval and citation?"
  */
 @Service
 public class EmbeddingService {

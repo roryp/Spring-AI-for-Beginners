@@ -24,6 +24,12 @@ import java.util.Map;
  * - ToolCallback.call() invokes MCP tools directly (no LLM needed on client)
  * - The server's aiMove tool handles LLM-powered strategy internally
  * - MCP Streamable HTTP protocol connects client to server
+ *
+ * 💡 Ask GitHub Copilot:
+ * - "How does ToolCallbackProvider discover the server's tools at startup — what wire calls happen?"
+ * - "Why does this client have no ChatClient — when would I add one back?"
+ * - "How would I swap stdio transport for Streamable HTTP (or vice versa) without changing this code?"
+ * - "How should I handle errors or timeouts coming back from a remote MCP tool call?"
  */
 @Service
 public class GameService {

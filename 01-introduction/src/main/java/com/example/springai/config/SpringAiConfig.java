@@ -13,6 +13,12 @@ import org.springframework.context.annotation.Configuration;
  *   spring.ai.openai-sdk.microsoft-deployment-name → AZURE_OPENAI_DEPLOYMENT
  *
  * Azure mode is detected automatically when the base URL contains openai.azure.com.
+ *
+ * 💡 Ask GitHub Copilot:
+ * - "What exactly does the spring-ai-starter-model-openai-sdk auto-configure for me?"
+ * - "How would I switch this app from Azure OpenAI to OpenAI.com or a local model?"
+ * - "When would I need to define an OpenAiSdkChatModel bean manually instead of using the starter?"
+ * - "How do I configure timeouts, retries, or a proxy for outbound model calls?"
  */
 @Configuration
 public class SpringAiConfig {

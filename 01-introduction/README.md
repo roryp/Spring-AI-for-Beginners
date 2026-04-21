@@ -123,6 +123,11 @@ chatMemory.add(conversationId, response.getResult().getOutput());
 
 The stateless chat endpoint skips memory entirely — just `chatModel.call(new Prompt(prompt))` like the quick start. The stateful endpoint adds messages to history, retrieves context, and includes it with each request. Same model configuration, different patterns.
 
+> **🤖 Try with [GitHub Copilot](https://github.com/features/copilot) Chat:** Open [`ChatController.java`](src/main/java/com/example/springai/app/ChatController.java) and ask:
+> - "Why is this controller stateless — what would change if I added ChatMemory here?"
+> - "How would I stream responses back to the client instead of waiting for the full completion?"
+> - "What's the benefit of using OpenAiSdkChatModel directly vs wrapping it with ChatClient?"
+
 ## Deploy Azure OpenAI Infrastructure
 
 **Bash:**

@@ -13,6 +13,11 @@ import org.springframework.ai.chat.client.ChatClient;
  * <p>When to use: Complex tasks with distinct categories of input that require
  * different handling or specialized processing.</p>
  *
+ * 💡 Ask GitHub Copilot:
+ * - "Why is a small routing LLM better than stuffing all cases into one big prompt?"
+ * - "How do I improve routing accuracy when categories overlap or the input is ambiguous?"
+ * - "How could I add a fallback route for inputs that don't match any category confidently?"
+ * - "Can I replace the LLM router with a cheaper classifier (embeddings or rules) for known cases?"
  */
 public class RoutingWorkflow {
 

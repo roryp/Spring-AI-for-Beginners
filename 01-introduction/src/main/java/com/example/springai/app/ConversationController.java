@@ -10,6 +10,12 @@ import java.util.Map;
 /**
  * REST controller for conversational chat with memory.
  * Maintains conversation history across multiple requests.
+ *
+ * 💡 Ask GitHub Copilot:
+ * - "How does the conversation ID isolate users — what happens if two users share one?"
+ * - "How would I expire abandoned conversations to reclaim memory?"
+ * - "Could I persist conversations to a database so they survive restarts?"
+ * - "How should I secure this API so users can only access their own conversations?"
  */
 @RestController
 @RequestMapping("/api/conversation")

@@ -16,6 +16,11 @@ import java.util.Map;
  * 1. POST /api/game/new       → starts a new game via MCP tool
  * 2. POST /api/game/move       → player moves, then AI responds via LLM strategy
  * 3. GET  /api/game/state/{id} → fetches current board state via MCP tool
+ *
+ * 💡 Ask GitHub Copilot:
+ * - "Why does the REST controller call GameService instead of invoking MCP tools directly?"
+ * - "How would I stream the AI's move back to the browser with Server-Sent Events?"
+ * - "How do I surface remote MCP errors as meaningful HTTP status codes?"
  */
 @RestController
 @RequestMapping("/api/game")

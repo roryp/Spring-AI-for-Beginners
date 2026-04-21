@@ -158,6 +158,11 @@ Implementation: [ChainWorkflow.java](src/main/java/com/example/springai/agents/p
 
 *The Chain Workflow demo page — enter your input, run the pipeline, and inspect the output of every step in the chain.*
 
+> **🤖 Try with [GitHub Copilot](https://github.com/features/copilot) Chat:** Open [`ChainWorkflow.java`](src/main/java/com/example/springai/agents/patterns/ChainWorkflow.java) and ask:
+> - "Why is prompt chaining more accurate than one big prompt for multi-step tasks?"
+> - "How would I add a validation/gate step between two chain steps to catch bad output early?"
+> - "What's the latency trade-off and how could I parallelize independent steps?"
+
 ### 2. Parallelization Workflow
 
 What if you need to run the same prompt against many inputs, or get several independent perspectives on one input? Running LLM calls sequentially wastes time when they don't depend on each other. The **Parallelization Workflow** fans out independent calls across a thread pool and gathers the results in order.
@@ -175,6 +180,11 @@ Implementation: [ParallelizationWorkflow.java](src/main/java/com/example/springa
 <img src="images/parallelization-ui.png" alt="Parallelization Workflow demo page" width="700"/>
 
 *The Parallelization demo — submit a batch of inputs and watch them processed concurrently, with per-item results returned in order.*
+
+> **🤖 Try with [GitHub Copilot](https://github.com/features/copilot) Chat:** Open [`ParallelizationWorkflow.java`](src/main/java/com/example/springai/agents/patterns/ParallelizationWorkflow.java) and ask:
+> - "When should I use sectioning vs voting, and what problems does each solve?"
+> - "How do I choose the right `nWorkers` value to balance throughput against rate limits?"
+> - "What happens if one parallel call fails, and how do I add retries without blocking the rest?"
 
 ### 3. Routing Workflow
 
@@ -194,6 +204,11 @@ Implementation: [RoutingWorkflow.java](src/main/java/com/example/springai/agents
 
 *The Routing demo — see the chosen route alongside the specialized response, so you can verify the classifier is picking correctly.*
 
+> **🤖 Try with [GitHub Copilot](https://github.com/features/copilot) Chat:** Open [`RoutingWorkflow.java`](src/main/java/com/example/springai/agents/patterns/RoutingWorkflow.java) and ask:
+> - "Why is a small routing LLM better than stuffing all cases into one big prompt?"
+> - "How do I improve routing accuracy when categories overlap or the input is ambiguous?"
+> - "Can I replace the LLM router with a cheaper classifier (embeddings or rules) for known cases?"
+
 ### 4. Orchestrator-Workers
 
 Some tasks can't be broken down in advance — the subtasks depend on the input itself. Writing a product description in "formal," "conversational," and "technical" voices sounds straightforward, but the actual angles worth exploring vary per product. The **Orchestrator-Workers** pattern uses a central LLM to **plan** the subtasks dynamically, then dispatches each one to a worker LLM.
@@ -212,6 +227,11 @@ Implementation: [OrchestratorWorkers.java](src/main/java/com/example/springai/ag
 
 *The Orchestrator-Workers demo — inspect the plan the orchestrator produces and the independent worker responses that back it.*
 
+> **🤖 Try with [GitHub Copilot](https://github.com/features/copilot) Chat:** Open [`OrchestratorWorkers.java`](src/main/java/com/example/springai/agents/patterns/OrchestratorWorkers.java) and ask:
+> - "How is orchestrator-workers different from a fixed chain — when does the dynamic split pay off?"
+> - "How do I keep the orchestrator's JSON plan reliable and avoid parsing errors?"
+> - "Could workers run in parallel once the orchestrator has decomposed the task?"
+
 ### 5. Evaluator-Optimizer
 
 The first output of an LLM is rarely its best. Instead of hoping the initial answer is good enough, the **Evaluator-Optimizer** pattern pairs a **generator** LLM with an **evaluator** LLM: the generator proposes an answer, the evaluator grades it (PASS / NEEDS_IMPROVEMENT / FAIL), and any feedback is looped back into the next generation attempt until the answer is good enough or a max-iterations cap is reached.
@@ -229,6 +249,11 @@ Implementation: [EvaluatorOptimizer.java](src/main/java/com/example/springai/age
 <img src="images/evaluator-ui.png" alt="Evaluator-Optimizer demo page" width="700"/>
 
 *The Evaluator-Optimizer demo — every iteration shows the generator's draft and the evaluator's verdict, so you can see the refinement loop in action.*
+
+> **🤖 Try with [GitHub Copilot](https://github.com/features/copilot) Chat:** Open [`EvaluatorOptimizer.java`](src/main/java/com/example/springai/agents/patterns/EvaluatorOptimizer.java) and ask:
+> - "What makes a good evaluator prompt — how do I avoid it being too lenient or too strict?"
+> - "How do I decide a max iteration count and stop conditions to avoid infinite refinement loops?"
+> - "How would I plug in a non-LLM evaluator (unit tests, schema validation) for deterministic checks?"
 
 ## Best Practices
 

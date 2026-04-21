@@ -16,6 +16,12 @@ import com.example.springai.agents.patterns.RoutingWorkflow;
 /**
  * Service that exposes each agentic workflow pattern.
  * Each method demonstrates one of the five patterns
+ *
+ * 💡 Ask GitHub Copilot:
+ * - "Which of the five patterns should I reach for first when building a new agent?"
+ * - "How could I combine two patterns (e.g. routing + chain) in a single workflow?"
+ * - "How do I add tracing/logging so I can debug which pattern path was taken?"
+ * - "How would I expose these patterns as @Tool-callable functions for an outer agent?"
  */
 @Service
 public class AgentPatternsService {
