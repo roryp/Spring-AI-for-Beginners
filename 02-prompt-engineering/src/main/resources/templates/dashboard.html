@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPT-5 Prompt Engineering Showcase</title>
+    <link rel="stylesheet" th:href="@{/css/prompt-demo.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 GPT-5 Prompt Engineering Showcase</h1>
+            <p>8 Advanced Patterns for Better AI Interactions</p>
+            <div class="stats">
+                <div class="stat">8 Patterns</div>
+                <div class="stat">Multiple Use Cases</div>
+                <div class="stat">Live Examples</div>
+            </div>
+        </div>
+
+        <div class="pattern-grid">
+            <!-- Low Eagerness -->
+            <div class="pattern-card">
+                <div class="card-header">
+                    <span class="pattern-icon">⚡</span>
+                    <h3>Low Eagerness</h3>
+                </div>
+                <div class="card-body">
+                    <p>Quick, direct answers with minimal reasoning. Perfect for simple calculations and lookups.</p>
+                    <div class="metrics">
+                        <span class="badge badge-fast">Fast</span>
+                        <span class="badge badge-quality">Medium Quality</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a th:href="@{/patterns/focused}" class="btn">Try It →</a>
+                </div>
+            </div>
+
+            <!-- High Eagerness -->
+            <div class="pattern-card">
+                <div class="card-header">
+                    <span class="pattern-icon">🔍</span>
+                    <h3>High Eagerness</h3>
+                </div>
+                <div class="card-body">
+                    <p>Thorough exploration with autonomous decision-making. Ideal for complex system design.</p>
+                    <div class="metrics">
+                        <span class="badge badge-slow">Thorough</span>
+                        <span class="badge badge-quality">High Quality</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a th:href="@{/patterns/autonomous}" class="btn">Try It →</a>
+                </div>
+            </div>
+
+            <!-- Tool Preambles -->
+            <div class="pattern-card">
+                <div class="card-header">
+                    <span class="pattern-icon">📋</span>
+                    <h3>Tool Preambles</h3>
+                </div>
+                <div class="card-body">
+                    <p>Step-by-step narration with progress updates. Great for multi-step workflows.</p>
+                    <div class="metrics">
+                        <span class="badge badge-medium">Medium</span>
+                        <span class="badge badge-quality">High Quality</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a th:href="@{/patterns/task}" class="btn">Try It →</a>
+                </div>
+            </div>
+
+            <!-- Code Generation -->
+            <div class="pattern-card">
+                <div class="card-header">
+                    <span class="pattern-icon">💻</span>
+                    <h3>Self-Reflecting Code</h3>
+                </div>
+                <div class="card-body">
+                    <p>Production-quality code with internal quality rubrics and iterative improvement.</p>
+                    <div class="metrics">
+                        <span class="badge badge-medium">Medium</span>
+                        <span class="badge badge-quality">Very High Quality</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a th:href="@{/patterns/code}" class="btn">Try It →</a>
+                </div>
+            </div>
+
+            <!-- Structured Analysis -->
+            <div class="pattern-card">
+                <div class="card-header">
+                    <span class="pattern-icon">🔬</span>
+                    <h3>Structured Analysis</h3>
+                </div>
+                <div class="card-body">
+                    <p>Framework-based code review with consistent feedback categories and severity levels.</p>
+                    <div class="metrics">
+                        <span class="badge badge-medium">Medium</span>
+                        <span class="badge badge-quality">High Quality</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a th:href="@{/patterns/analyze}" class="btn">Try It →</a>
+                </div>
+            </div>
+
+            <!-- Multi-Turn Chat -->
+            <div class="pattern-card">
+                <div class="card-header">
+                    <span class="pattern-icon">💬</span>
+                    <h3>Multi-Turn Chat</h3>
+                </div>
+                <div class="card-body">
+                    <p>Context preservation across multiple messages. Perfect for interactive assistants.</p>
+                    <div class="metrics">
+                        <span class="badge badge-fast">Fast</span>
+                        <span class="badge badge-quality">High Quality</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a th:href="@{/patterns/chat}" class="btn">Try It →</a>
+                </div>
+            </div>
+
+            <!-- Step-by-Step Reasoning -->
+            <div class="pattern-card">
+                <div class="card-header">
+                    <span class="pattern-icon">🧠</span>
+                    <h3>Step-by-Step Reasoning</h3>
+                </div>
+                <div class="card-body">
+                    <p>Explicit reasoning with clear verification. Great for math problems and logic puzzles.</p>
+                    <div class="metrics">
+                        <span class="badge badge-medium">Medium</span>
+                        <span class="badge badge-quality">High Quality</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a th:href="@{/patterns/reason}" class="btn">Try It →</a>
+                </div>
+            </div>
+
+            <!-- Constrained Output -->
+            <div class="pattern-card">
+                <div class="card-header">
+                    <span class="pattern-icon">📏</span>
+                    <h3>Constrained Output</h3>
+                </div>
+                <div class="card-body">
+                    <p>Strict format and word count adherence. Ideal for summaries and structured reports.</p>
+                    <div class="metrics">
+                        <span class="badge badge-fast">Fast</span>
+                        <span class="badge badge-quality">Medium Quality</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a th:href="@{/patterns/constrained}" class="btn">Try It →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

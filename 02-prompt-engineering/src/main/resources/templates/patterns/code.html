@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Self-Reflecting Code Generation</title>
+    <link rel="stylesheet" th:href="@{/css/prompt-demo.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="demo-page">
+            <a th:href="@{/}" class="back-link">← Back to Dashboard</a>
+            
+            <div class="demo-header">
+                <span class="icon">💻</span>
+                <div class="demo-title">
+                    <h1>Self-Reflecting Code</h1>
+                    <p>Production-quality code with iterative improvement</p>
+                </div>
+            </div>
+
+            <div class="demo-section">
+                <h2>Try It Out</h2>
+                <div class="input-group">
+                    <label for="requirement">Enter your code requirement:</label>
+                    <textarea id="requirement" placeholder="Create a service that validates email addresses"></textarea>
+                </div>
+
+                <div class="examples">
+                    <button class="example-btn" onclick="setExample('Create a service that validates email addresses')">Email validator</button>
+                    <button class="example-btn" onclick="setExample('Build a file upload handler')">File upload</button>
+                    <button class="example-btn" onclick="setExample('Implement rate limiting middleware')">Rate limiter</button>
+                </div>
+
+                <div class="button-group">
+                    <button id="submit-btn" class="btn" onclick="submitCodeStreaming()">🔴 Stream Code (Live)</button>
+                    <button id="submit-btn-sync" class="btn" onclick="submitCode()" style="margin-left:10px; opacity: 0.7;">Generate Code (Non-streaming)</button>
+                </div>
+            </div>
+
+            <div id="loading" class="loading">
+                <div class="loading-spinner"></div>
+                <p>Generating production-quality code...</p>
+            </div>
+
+            <div id="response"></div>
+
+            <div class="demo-section" style="margin-top: 40px;">
+                <h2>When to Use</h2>
+                <ul>
+                    <li>Production-level code generation with quality checks</li>
+                    <li>When code needs to follow best practices and standards</li>
+                    <li>Complex implementations requiring iterative refinement</li>
+                    <li>When code quality is critical (security, performance, maintainability)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/pattern-demo.js}"></script>
+    <script>
+        function submitCodeStreaming() {
+            const requirement = document.getElementById('requirement').value.trim();
+            if (!requirement) { alert('Please enter a requirement'); return; }
+            callPatternStreaming('code', { requirement });
+        }
+
+        function submitCode() {
+            const requirement = document.getElementById('requirement').value.trim();
+            if (!requirement) {
+                alert('Please enter a requirement');
+                return;
+            }
+            callPattern('code', { requirement });
+        }
+    </script>
+</body>
+</html>

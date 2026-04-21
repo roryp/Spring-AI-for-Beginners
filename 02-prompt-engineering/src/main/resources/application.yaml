@@ -1,0 +1,39 @@
+server:
+  port: 8083
+  # Disable compression to prevent Chrome from buffering SSE streams.
+  # Compressed SSE responses are not delivered incrementally in Chrome.
+  compression:
+    enabled: false
+
+spring:
+  application:
+    name: prompt-engineering
+  mvc:
+    async:
+      request-timeout: -1
+  # Azure OpenAI configuration via spring-ai-starter-model-openai-sdk
+  ai:
+    openai-sdk:
+      base-url: ${AZURE_OPENAI_ENDPOINT}
+      api-key: ${AZURE_OPENAI_API_KEY}
+      chat:
+        options:
+          model: ${AZURE_OPENAI_DEPLOYMENT}
+
+# Spring Boot Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# Logging
+logging:
+  level:
+    root: INFO
+    "[com.example.springai.prompts]": DEBUG
+    "[org.springframework.ai]": INFO
+

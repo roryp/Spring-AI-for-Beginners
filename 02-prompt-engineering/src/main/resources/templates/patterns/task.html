@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tool Preambles - Progress Updates</title>
+    <link rel="stylesheet" th:href="@{/css/prompt-demo.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="demo-page">
+            <a th:href="@{/}" class="back-link">← Back to Dashboard</a>
+            
+            <div class="demo-header">
+                <span class="icon">📋</span>
+                <div class="demo-title">
+                    <h1>Tool Preambles</h1>
+                    <p>Step-by-step narration with progress updates</p>
+                </div>
+            </div>
+
+            <div class="demo-section">
+                <h2>Try It Out</h2>
+                <div class="input-group">
+                    <label for="task">Enter your task:</label>
+                    <textarea id="task" placeholder="Create a Spring Boot REST endpoint for user management"></textarea>
+                </div>
+
+                <div class="examples">
+                    <button class="example-btn" onclick="setExample('Create a Spring Boot REST endpoint for user management')">REST endpoint</button>
+                    <button class="example-btn" onclick="setExample('Implement JWT authentication in an existing API')">JWT auth</button>
+                    <button class="example-btn" onclick="setExample('Migrate database from MySQL to PostgreSQL')">DB migration</button>
+                </div>
+
+                <div class="button-group">
+                    <button id="submit-btn" class="btn" onclick="submitTaskStreaming()">🔴 Stream Response (Live)</button>
+                    <button id="submit-btn-sync" class="btn" onclick="submitTask()" style="margin-left:10px; opacity: 0.7;">Generate Response (Non-streaming)</button>
+                </div>
+            </div>
+
+            <div id="loading" class="loading">
+                <div class="loading-spinner"></div>
+                <p>Planning and executing task...</p>
+            </div>
+
+            <div id="response"></div>
+
+            <div class="demo-section" style="margin-top: 40px;">
+                <h2>When to Use</h2>
+                <ul>
+                    <li>Multi-step workflows requiring clear progress updates</li>
+                    <li>User-facing tasks where transparency is important</li>
+                    <li>Complex operations that benefit from upfront planning</li>
+                    <li>When users need to understand the process, not just results</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/pattern-demo.js}"></script>
+    <script>
+        function submitTaskStreaming() {
+            const task = document.getElementById('task').value.trim();
+            if (!task) { alert('Please enter a task'); return; }
+            callPatternStreaming('task', { task });
+        }
+
+        function submitTask() {
+            const task = document.getElementById('task').value.trim();
+            if (!task) {
+                alert('Please enter a task');
+                return;
+            }
+            callPattern('task', { task });
+        }
+    </script>
+</body>
+</html>

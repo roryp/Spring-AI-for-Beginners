@@ -1,0 +1,181 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "ToolIntegrationDemo",
+            "request": "launch",
+            "mainClass": "com.example.springai.quickstart.ToolIntegrationDemo",
+            "projectName": "spring-ai-quickstart"
+        },
+        {
+            "type": "java",
+            "name": "SimpleReaderDemo",
+            "request": "launch",
+            "mainClass": "com.example.springai.quickstart.SimpleReaderDemo",
+            "projectName": "spring-ai-quickstart"
+        },
+        {
+            "type": "java",
+            "name": "BasicChatDemo",
+            "request": "launch",
+            "mainClass": "com.example.springai.quickstart.BasicChatDemo",
+            "projectName": "spring-ai-quickstart",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "ResponsibleAIDemo",
+            "request": "launch",
+            "mainClass": "com.example.springai.quickstart.ResponsibleAIDemo",
+            "projectName": "spring-ai-quickstart",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "PromptEngineeringDemo",
+            "request": "launch",
+            "mainClass": "com.example.springai.quickstart.PromptEngineeringDemo",
+            "projectName": "spring-ai-quickstart",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "MCP: Stdio Transport Demo",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/05-mcp",
+            "mainClass": "com.example.springai.mcp.StdioTransportDemo",
+            "projectName": "mcp-example",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot: Introduction",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/01-introduction",
+            "mainClass": "com.example.springai.app.Application",
+            "projectName": "introduction",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot: Prompt Engineering",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/02-prompt-engineering",
+            "mainClass": "com.example.springai.prompts.app.Application",
+            "projectName": "prompt-engineering",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot: RAG",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/03-rag",
+            "mainClass": "com.example.springai.rag.RagApplication",
+            "projectName": "rag",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot: Tools",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/04-tools",
+            "mainClass": "com.example.springai.tools.ToolsApplication",
+            "projectName": "spring-ai-tools",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot: MCP Server",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/05-mcp/mcp-server",
+            "mainClass": "com.example.springai.mcp.server.McpServerApplication",
+            "projectName": "spring-ai-mcp-server",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot: MCP Client",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/05-mcp/mcp-client",
+            "mainClass": "com.example.springai.mcp.client.McpClientApplication",
+            "projectName": "spring-ai-mcp-client",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot: Agents",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/06-agents",
+            "mainClass": "com.example.springai.agents.app.Application",
+            "projectName": "spring-ai-agents",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-RagApplication<spring-ai-rag>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.example.springai.rag.RagApplication",
+            "projectName": "spring-ai-rag",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-Application<spring-ai-introduction>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.example.springai.app.Application",
+            "projectName": "spring-ai-introduction",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-McpServerApplication<spring-ai-mcp-server>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.example.springai.mcp.server.McpServerApplication",
+            "projectName": "spring-ai-mcp-server",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-McpClientApplication<spring-ai-mcp-client>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.example.springai.mcp.client.McpClientApplication",
+            "projectName": "spring-ai-mcp-client",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-Application<spring-ai-agents>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.example.springai.agents.app.Application",
+            "projectName": "spring-ai-agents",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-Application<spring-ai-prompt-engineering>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.example.springai.prompts.app.Application",
+            "projectName": "spring-ai-prompt-engineering",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

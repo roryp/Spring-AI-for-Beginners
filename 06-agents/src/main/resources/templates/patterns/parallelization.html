@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parallelization Workflow</title>
+    <link rel="stylesheet" th:href="@{/css/agent-demo.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="demo-page">
+            <a th:href="@{/}" class="back-link">← Back to Dashboard</a>
+
+            <div class="demo-header">
+                <span class="icon">⚡</span>
+                <div class="demo-title">
+                    <h1>Parallelization Workflow</h1>
+                    <p>Concurrent LLM calls for independent subtasks or multi-perspective voting</p>
+                </div>
+            </div>
+
+            <div class="demo-section">
+                <h2>Try It Out</h2>
+                <div class="input-group">
+                    <label for="prompt">Prompt template (applied to each input):</label>
+                    <textarea id="prompt" placeholder="Analyze how market changes will impact this stakeholder group."></textarea>
+                </div>
+                <div class="input-group">
+                    <label for="inputs">Inputs (one per line — each processed in parallel):</label>
+                    <textarea id="inputs" placeholder="Customers: price-sensitive segment&#10;Employees: remote workforce&#10;Investors: long-term holders"></textarea>
+                </div>
+
+                <div class="examples">
+                    <button class="example-btn" onclick="setParallelExample()">Stakeholder Analysis</button>
+                    <button class="example-btn" onclick="setTranslationExample()">Multi-Language Translation</button>
+                </div>
+
+                <div class="button-group">
+                    <button id="submit-btn" class="btn" onclick="submitParallel()">Run in Parallel →</button>
+                </div>
+            </div>
+
+            <div id="loading" class="loading">
+                <div class="loading-spinner"></div>
+                <p>Processing inputs in parallel...</p>
+            </div>
+
+            <div id="response"></div>
+
+            <div class="log-panel-wrapper">
+                <h2><span class="pulse"></span> Advisor Logs (live)</h2>
+                <div id="advisor-logs"></div>
+            </div>
+
+            <div class="demo-section" style="margin-top: 40px;">
+                <h2>When to Use</h2>
+                <ul>
+                    <li>Processing large volumes of similar but independent items</li>
+                    <li>Tasks requiring multiple independent perspectives</li>
+                    <li>When processing time is critical and tasks are parallelizable</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/pattern-demo.js}"></script>
+    <script>
+        function setParallelExample() {
+            document.getElementById('prompt').value = 'Analyze how market changes will impact this stakeholder group. Provide 3-4 key insights.';
+            document.getElementById('inputs').value = 'Customers: price-sensitive retail segment\nEmployees: remote-first engineering team\nInvestors: institutional long-term holders\nSuppliers: single-source component vendors';
+        }
+
+        function setTranslationExample() {
+            document.getElementById('prompt').value = 'Translate the following text into the specified language. Keep the tone professional.';
+            document.getElementById('inputs').value = 'French: Spring AI makes building AI applications easy.\nSpanish: Spring AI makes building AI applications easy.\nGerman: Spring AI makes building AI applications easy.';
+        }
+
+        function submitParallel() {
+            const prompt = document.getElementById('prompt').value.trim();
+            const inputsText = document.getElementById('inputs').value.trim();
+            if (!prompt || !inputsText) { alert('Please enter both a prompt and inputs'); return; }
+            const inputs = inputsText.split('\n').filter(s => s.trim().length > 0);
+            callPattern('parallelization', { prompt, inputs });
+        }
+    </script>
+</body>
+</html>

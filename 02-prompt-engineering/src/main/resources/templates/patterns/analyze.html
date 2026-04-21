@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Structured Analysis</title>
+    <link rel="stylesheet" th:href="@{/css/prompt-demo.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="demo-page">
+            <a th:href="@{/}" class="back-link">← Back to Dashboard</a>
+            
+            <div class="demo-header">
+                <span class="icon">🔬</span>
+                <div class="demo-title">
+                    <h1>Structured Analysis</h1>
+                    <p>Framework-based code review with consistent feedback</p>
+                </div>
+            </div>
+
+            <div class="demo-section">
+                <h2>Try It Out</h2>
+                <div class="input-group">
+                    <label for="code">Enter your code to analyze:</label>
+                    <textarea id="code" placeholder="public void process(String s) { return s.toLowerCase(); }"></textarea>
+                </div>
+
+                <div class="examples">
+                    <button class="example-btn" onclick="setExample('public void process(String s) { return s.toLowerCase(); }')">Simple method</button>
+                    <button class="example-btn" onclick="setExample('public class User { String name; int age; }')">Simple class</button>
+                    <button class="example-btn" onclick="setExample('@GetMapping(&quot;/api/users&quot;) public List&lt;User&gt; getUsers() { return userRepo.findAll(); }')">REST endpoint</button>
+                </div>
+
+                <div class="button-group">
+                    <button id="submit-btn" class="btn" onclick="submitAnalyzeStreaming()">🔴 Stream Analysis (Live)</button>
+                    <button id="submit-btn-sync" class="btn" onclick="submitAnalyze()" style="margin-left:10px; opacity: 0.7;">Analyze Code (Non-streaming)</button>
+                </div>
+            </div>
+
+            <div id="loading" class="loading">
+                <div class="loading-spinner"></div>
+                <p>Analyzing code...</p>
+            </div>
+
+            <div id="response"></div>
+
+            <div class="demo-section" style="margin-top: 40px;">
+                <h2>When to Use</h2>
+                <ul>
+                    <li>Code review and quality assessment</li>
+                    <li>Identifying bugs, security issues, and performance problems</li>
+                    <li>Getting structured feedback with severity levels</li>
+                    <li>Learning best practices through detailed analysis</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/pattern-demo.js}"></script>
+    <script>
+        function submitAnalyzeStreaming() {
+            const code = document.getElementById('code').value.trim();
+            if (!code) { alert('Please enter code to analyze'); return; }
+            callPatternStreaming('analyze', { code });
+        }
+
+        function submitAnalyze() {
+            const code = document.getElementById('code').value.trim();
+            if (!code) {
+                alert('Please enter code to analyze');
+                return;
+            }
+            callPattern('analyze', { code });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Routing Workflow</title>
+    <link rel="stylesheet" th:href="@{/css/agent-demo.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="demo-page">
+            <a th:href="@{/}" class="back-link">← Back to Dashboard</a>
+
+            <div class="demo-header">
+                <span class="icon">🔀</span>
+                <div class="demo-title">
+                    <h1>Routing Workflow</h1>
+                    <p>Classifies input and routes to the best-fit specialized handler</p>
+                </div>
+            </div>
+
+            <div class="demo-section">
+                <h2>Try It Out</h2>
+                <div class="input-group">
+                    <label for="input">Enter a customer support request:</label>
+                    <textarea id="input" placeholder="My account was charged twice last week..."></textarea>
+                </div>
+
+                <div class="route-info">
+                    <p><b>Available routes:</b></p>
+                    <ul>
+                        <li><b>billing</b> — billing specialist for payment and invoice issues</li>
+                        <li><b>technical</b> — technical support engineer for bugs and errors</li>
+                        <li><b>general</b> — customer service representative for general inquiries</li>
+                    </ul>
+                </div>
+
+                <div class="examples">
+                    <button class="example-btn" onclick="setExample('My account was charged twice for the same order last week. Order #12345.')">Billing Issue</button>
+                    <button class="example-btn" onclick="setExample('The app crashes every time I try to upload a file larger than 10MB on Android.')">Technical Issue</button>
+                    <button class="example-btn" onclick="setExample('What are your business hours and do you have a physical store I can visit?')">General Inquiry</button>
+                </div>
+
+                <div class="button-group">
+                    <button id="submit-btn" class="btn" onclick="submitRouting()">Route Request →</button>
+                </div>
+            </div>
+
+            <div id="loading" class="loading">
+                <div class="loading-spinner"></div>
+                <p>Classifying and routing request...</p>
+            </div>
+
+            <div id="response"></div>
+
+            <div class="log-panel-wrapper">
+                <h2><span class="pulse"></span> Advisor Logs (live)</h2>
+                <div id="advisor-logs"></div>
+            </div>
+
+            <div class="demo-section" style="margin-top: 40px;">
+                <h2>How It Works</h2>
+                <ol>
+                    <li>The LLM analyzes the input and classifies it into a category</li>
+                    <li>A specialized prompt for the chosen route is selected</li>
+                    <li>The input is processed using the specialized prompt</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/pattern-demo.js}"></script>
+    <script>
+        function submitRouting() {
+            const input = document.getElementById('input').value.trim();
+            if (!input) { alert('Please enter a support request'); return; }
+            callPattern('routing', { input });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Constrained Output</title>
+    <link rel="stylesheet" th:href="@{/css/prompt-demo.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="demo-page">
+            <a th:href="@{/}" class="back-link">← Back to Dashboard</a>
+            
+            <div class="demo-header">
+                <span class="icon">📏</span>
+                <div class="demo-title">
+                    <h1>Constrained Output</h1>
+                    <p>Strict format and word count adherence</p>
+                </div>
+            </div>
+
+            <div class="demo-section">
+                <h2>Try It Out</h2>
+                <div class="input-group">
+                    <label for="topic">Topic to summarize:</label>
+                    <input type="text" id="topic" placeholder="machine learning" />
+                </div>
+
+                <div class="input-group">
+                    <label for="format">Output format:</label>
+                    <select id="format">
+                        <option value="bullet points">Bullet Points</option>
+                        <option value="numbered list">Numbered List</option>
+                        <option value="paragraph">Paragraph</option>
+                        <option value="JSON">JSON</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="maxWords">Maximum words: <span id="word-count">100</span></label>
+                    <input type="range" id="maxWords" min="25" max="500" value="100" 
+                           oninput="document.getElementById('word-count').textContent = this.value" 
+                           style="width: 100%;" />
+                </div>
+
+                <div class="examples">
+                    <button class="example-btn" onclick="setConstrainedExample('machine learning', 'bullet points', 100)">ML bullets</button>
+                    <button class="example-btn" onclick="setConstrainedExample('microservices', 'numbered list', 150)">Microservices list</button>
+                    <button class="example-btn" onclick="setConstrainedExample('REST API', 'paragraph', 75)">REST paragraph</button>
+                </div>
+
+                <div class="button-group">
+                    <button id="submit-btn" class="btn" onclick="submitConstrainedStreaming()">🔴 Stream Response (Live)</button>
+                    <button id="submit-btn-sync" class="btn" onclick="submitConstrained()" style="margin-left:10px; opacity: 0.7;">Generate Response (Non-streaming)</button>
+                </div>
+            </div>
+
+            <div id="loading" class="loading">
+                <div class="loading-spinner"></div>
+                <p>Generating constrained output...</p>
+            </div>
+
+            <div id="response"></div>
+
+            <div class="demo-section" style="margin-top: 40px;">
+                <h2>When to Use</h2>
+                <ul>
+                    <li>Summaries with specific word limits</li>
+                    <li>Reports requiring specific formats</li>
+                    <li>Structured data generation (JSON, XML)</li>
+                    <li>When output format consistency is critical</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/pattern-demo.js}"></script>
+    <script>
+        function submitConstrainedStreaming() {
+            const topic = document.getElementById('topic').value.trim();
+            const format = document.getElementById('format').value;
+            const maxWords = parseInt(document.getElementById('maxWords').value);
+            if (!topic) { alert('Please enter a topic'); return; }
+            callPatternStreaming('constrained', { topic, format, maxWords });
+        }
+
+        function submitConstrained() {
+            const topic = document.getElementById('topic').value.trim();
+            const format = document.getElementById('format').value;
+            const maxWords = parseInt(document.getElementById('maxWords').value);
+
+            if (!topic) {
+                alert('Please enter a topic');
+                return;
+            }
+
+            callPattern('constrained', { topic, format, maxWords });
+        }
+
+        function setConstrainedExample(topic, format, maxWords) {
+            document.getElementById('topic').value = topic;
+            document.getElementById('format').value = format;
+            document.getElementById('maxWords').value = maxWords;
+            document.getElementById('word-count').textContent = maxWords;
+        }
+    </script>
+</body>
+</html>
