@@ -177,16 +177,24 @@ function callPatternStreaming(endpoint, requestBody) {
 
         for (const event of events) {
             if (!event.trim()) continue;
-            const lines = event.split('\n');
-            for (const line of lines) {
+            // Per SSE spec, multi-line payloads are split across consecutive
+            // `data:` lines with the line breaks stripped. Re-join with \n
+            // so newlines emitted by the model are preserved.
+            const dataLines = [];
+            for (const line of event.split('\n')) {
                 if (line.startsWith('data:')) {
-                    let token = line.substring(5);
-                    if (token.startsWith('"') && token.endsWith('"')) {
-                        try { token = JSON.parse(token); } catch(e) { /* use raw */ }
-                    }
-                    tokenQueue.push(token);
+                    // Spring writes "data:<value>" with no leading space, so
+                    // do NOT strip a leading space — many tokens legitimately
+                    // begin with a space (e.g. " the", " and").
+                    dataLines.push(line.substring(5));
                 }
             }
+            if (dataLines.length === 0) continue;
+            let token = dataLines.join('\n');
+            if (token.startsWith('"') && token.endsWith('"')) {
+                try { token = JSON.parse(token); } catch(e) { /* use raw */ }
+            }
+            tokenQueue.push(token);
         }
         startRendering();
     }
