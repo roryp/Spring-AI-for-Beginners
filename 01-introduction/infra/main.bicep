@@ -27,7 +27,7 @@ param openAiDeployments array = [
     }
     sku: {
       name: 'GlobalStandard'
-      capacity: 20
+      capacity: 10000
     }
   }
   {
