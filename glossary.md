@@ -97,6 +97,7 @@ A reference of the key terms, Spring AI abstractions, and AI/ML concepts used th
 - **MCP Server** — An application that exposes tools through MCP so any compatible client can use them.
 - **MCP Client** — An application that connects to one or more MCP servers, discovers their tools, and invokes them (often on behalf of an LLM).
 - **`@McpTool` Annotation** — Spring AI annotation that exposes a Java method as an MCP-discoverable tool on a server.
+- **`@McpToolParam` Annotation** — Spring AI annotation (from `org.springframework.ai.mcp.annotation`) that describes an MCP tool's parameters so clients and LLMs can understand what to pass; the MCP equivalent of `@ToolParam`.
 - **ToolCallbackProvider** — A Spring AI interface used by MCP clients to discover remote tools and present them to a `ChatClient` like local tools.
 - **Tool Discovery** — The MCP step in which a client asks a server for its list of tools, including names, descriptions, and parameter schemas.
 - **Tool Invocation** — The MCP step in which a client sends a structured call (tool name + arguments) to the server and receives the result.
