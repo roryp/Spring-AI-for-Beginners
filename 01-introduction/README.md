@@ -145,7 +145,7 @@ azd up  # Select subscription and location (eastus2 recommended)
 > **Note:** If you encounter a timeout error (`RequestConflict: Cannot modify resource ... provisioning state is not terminal`), simply run `azd up` again. Azure resources may still be provisioning in the background, and retrying allows the deployment to complete once resources reach a terminal state.
 
 This will:
-1. Deploy Microsoft Foundry resource with GPT-5.2 and text-embedding-3-small models
+1. Deploy Microsoft Foundry resource with GPT-5.2, gpt-4o-mini, and text-embedding-3-small models
 2. Automatically generate `.env` file in project root with credentials
 3. Set up all required environment variables
 

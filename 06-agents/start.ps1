@@ -27,10 +27,10 @@ Get-Content $EnvFile | ForEach-Object {
 # Verify required variables
 $endpoint = [Environment]::GetEnvironmentVariable('AZURE_OPENAI_ENDPOINT', 'Process')
 $apiKey = [Environment]::GetEnvironmentVariable('AZURE_OPENAI_API_KEY', 'Process')
-$deployment = [Environment]::GetEnvironmentVariable('AZURE_OPENAI_DEPLOYMENT', 'Process')
+$deployment = [Environment]::GetEnvironmentVariable('AZURE_OPENAI_FAST_DEPLOYMENT', 'Process')
 
 if (-not $endpoint -or -not $apiKey -or -not $deployment) {
-    Write-Error "Missing required environment variables (AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY, AZURE_OPENAI_DEPLOYMENT)"
+    Write-Error "Missing required environment variables (AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY, AZURE_OPENAI_FAST_DEPLOYMENT)"
     exit 1
 }
 
