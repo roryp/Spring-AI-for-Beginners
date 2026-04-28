@@ -31,6 +31,18 @@ param openAiDeployments array = [
     }
   }
   {
+    name: 'gpt-4o-mini'
+    model: {
+      format: 'OpenAI'
+      name: 'gpt-4o-mini'
+      version: '2024-07-18'
+    }
+    sku: {
+      name: 'GlobalStandard'
+      capacity: 31660
+    }
+  }
+  {
     name: 'text-embedding-3-small'
     model: {
       format: 'OpenAI'
@@ -81,6 +93,7 @@ output AZURE_RESOURCE_GROUP_NAME string = rg.name
 
 output AZURE_OPENAI_ENDPOINT string = openAi.outputs.endpoint
 output AZURE_OPENAI_DEPLOYMENT string = 'gpt-5.2'
+output AZURE_OPENAI_FAST_DEPLOYMENT string = 'gpt-4o-mini'
 output AZURE_OPENAI_EMBEDDING_DEPLOYMENT string = 'text-embedding-3-small'
 output AZURE_OPENAI_NAME string = openAi.outputs.name
 output AZURE_OPENAI_KEY string = openAi.outputs.key

@@ -77,7 +77,7 @@ spring:
       api-key: ${AZURE_OPENAI_API_KEY}
       chat:
         options:
-          model: ${AZURE_OPENAI_DEPLOYMENT}
+          model: ${AZURE_OPENAI_FAST_DEPLOYMENT}
 ```
 
 The difference in this module is how `ChatClient` calls are **orchestrated** — chained, parallelized, routed, delegated, or looped — rather than executed as single calls.
@@ -88,7 +88,7 @@ The difference in this module is how `ChatClient` calls are **orchestrated** —
    ```
    AZURE_OPENAI_ENDPOINT=https://your-endpoint.openai.azure.com/
    AZURE_OPENAI_API_KEY=your-api-key
-   AZURE_OPENAI_DEPLOYMENT=your-deployment-name
+   AZURE_OPENAI_FAST_DEPLOYMENT=your-fast-deployment-name
    ```
 
 2. **Build and run:**

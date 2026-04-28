@@ -161,7 +161,7 @@ spring:
       api-key: ${AZURE_OPENAI_API_KEY}
       chat:
         options:
-          model: ${AZURE_OPENAI_DEPLOYMENT}
+          model: ${AZURE_OPENAI_FAST_DEPLOYMENT}
     mcp:
       server:
         name: tictactoe-server
@@ -217,7 +217,7 @@ The sequence diagram below shows how a single turn flows through the system — 
 
 <img src="images/client-server-sequence.png" alt="MCP Tic-Tac-Toe client-server sequence diagram" width="800"/>
 
-*Player turns call `makeMove` directly; AI turns call `aiMove`, which lets the server consult GPT-5.2 and execute the chosen move — the client never talks to the LLM.*
+*Player turns call `makeMove` directly; AI turns call `aiMove`, which lets the server consult `gpt-4o-mini` and execute the chosen move — the client never talks to the LLM.*
 
 **Step-by-step:**
 
@@ -225,7 +225,7 @@ The sequence diagram below shows how a single turn flows through the system — 
 2. **Player clicks a cell** (e.g., position 4) — Client calls `makeMove(gameId, 4, "X")`; the server validates and executes the move.
 3. **AI turn** — Client calls `aiMove(gameId)`:
    - Server fetches board state and available moves from its `GameEngine`.
-   - Server prompts Microsoft Foundry (GPT-5.2) via `ChatClient` to pick the best position.
+   - Server prompts Microsoft Foundry (`gpt-4o-mini`) via `ChatClient` to pick the best position.
    - Server applies the LLM's chosen move as `O` and returns the updated board.
 4. **Board updates in the browser** — repeat until win or draw.
 

@@ -37,7 +37,8 @@ A reference of the key terms, Spring AI abstractions, and AI/ML concepts used th
 ## Module 01: Introduction
 
 - **Microsoft Foundry** — Microsoft's enterprise hosting of OpenAI models on Azure, used by modules 1–6. You configure a custom endpoint, deployment name, and API key.
-- **gpt-5.2** — The Microsoft Foundry model used by the introduction and later modules.
+- **gpt-5.2** — A Microsoft Foundry reasoning model with adjustable thinking effort. Used by Module 02 to demonstrate prompt engineering with reasoning controls.
+- **gpt-4o-mini** — A fast, low-latency non-reasoning model. Used by Modules 01, 03, 04, 05, and 06 to keep demos responsive while focusing on Spring AI patterns rather than model latency.
 - **Spring Boot Auto-configuration** — Spring Boot's mechanism for creating beans (such as `OpenAiChatModel`) automatically from `application.yaml` properties when the matching starter is on the classpath.
 - **`spring-ai-starter-model-openai`** — The Spring AI starter that auto-configures the OpenAI SDK–based `ChatModel`.
 - **Stateless Chat** — A chat pattern where each request is independent and the model has no memory of prior turns.

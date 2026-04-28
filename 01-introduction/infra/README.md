@@ -32,9 +32,10 @@ This directory contains the Azure infrastructure as code (IaC) using Bicep and A
 The infrastructure deploys the following Azure resources:
 
 ### AI Services
-- **Microsoft Foundry**: Cognitive Services with two model deployments:
-  - **gpt-5.2**: Chat completion model (20K TPM capacity)
-  - **text-embedding-3-small**: Embedding model for RAG (20K TPM capacity)
+- **Microsoft Foundry**: Cognitive Services with three model deployments:
+  - **gpt-5.2**: Reasoning chat model used by Module 02 (prompt engineering)
+  - **gpt-4o-mini**: Fast non-reasoning chat model used by all other modules (01, 03, 04, 05, 06)
+  - **text-embedding-3-small**: Embedding model for RAG (Module 03)
 
 ### Local Development
 All Spring Boot applications run locally on your machine:
@@ -76,7 +77,7 @@ When prompted:
 - Confirm the environment name (default: `spring-ai-dev`)
 
 This will create:
-- Microsoft Foundry resource with GPT-5.2 and text-embedding-3-small
+- Microsoft Foundry resource with GPT-5.2, gpt-4o-mini, and text-embedding-3-small
 - Output connection details
 
 ### 2. Get Connection Details
@@ -94,7 +95,8 @@ azd env get-values
 This displays:
 - `AZURE_OPENAI_ENDPOINT`: Your Microsoft Foundry endpoint URL
 - `AZURE_OPENAI_KEY`: API key for authentication
-- `AZURE_OPENAI_DEPLOYMENT`: Chat model name (gpt-5.2)
+- `AZURE_OPENAI_DEPLOYMENT`: Reasoning chat model name (gpt-5.2) — used by Module 02
+- `AZURE_OPENAI_FAST_DEPLOYMENT`: Fast chat model name (gpt-4o-mini) — used by all other modules
 - `AZURE_OPENAI_EMBEDDING_DEPLOYMENT`: Embedding model name
 
 ### 3. Run Applications Locally
@@ -144,15 +146,27 @@ To change model deployments, edit `infra/main.bicep` and modify the `openAiDeplo
 ```bicep
 param openAiDeployments array = [
   {
-    name: 'gpt-5.2'  // Model deployment name
+    name: 'gpt-5.2'  // Reasoning model used by Module 02
     model: {
       format: 'OpenAI'
       name: 'gpt-5.2'
-      version: '2025-12-11'  // Model version
+      version: '2025-12-11'
     }
     sku: {
       name: 'GlobalStandard'
-      capacity: 20  // TPM in thousands
+      capacity: 10000
+    }
+  }
+  {
+    name: 'gpt-4o-mini'  // Fast non-reasoning model used by all other modules
+    model: {
+      format: 'OpenAI'
+      name: 'gpt-4o-mini'
+      version: '2024-07-18'
+    }
+    sku: {
+      name: 'GlobalStandard'
+      capacity: 31660
     }
   }
   // Add more deployments...
@@ -288,6 +302,7 @@ The subdomain name generated from your subscription/environment is already in us
    - Choose a unique name for your resource
    - Deploy the following models:
      - **GPT-5.2**
+     - **gpt-4o-mini** (used by modules 01, 03, 04, 05, 06 for fast non-reasoning chat)
      - **text-embedding-3-small** (for RAG modules)
    - **Important:** Note your deployment names - they must match `.env` configuration
    - After deployment, get your endpoint and API key from "Keys and Endpoint"
@@ -298,6 +313,7 @@ The subdomain name generated from your subscription/environment is already in us
      AZURE_OPENAI_ENDPOINT=https://your-resource-name.openai.azure.com
      AZURE_OPENAI_API_KEY=your-api-key-here
      AZURE_OPENAI_DEPLOYMENT=gpt-5.2
+     AZURE_OPENAI_FAST_DEPLOYMENT=gpt-4o-mini
      AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-3-small
      ```
 

@@ -13,7 +13,7 @@ spring:
       api-key: ${AZURE_OPENAI_API_KEY}
       chat:
         options:
-          model: ${AZURE_OPENAI_DEPLOYMENT}
+          model: ${AZURE_OPENAI_FAST_DEPLOYMENT}
 
 server:
   port: 8084

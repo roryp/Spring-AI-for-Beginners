@@ -31,6 +31,8 @@ An end-to-end curriculum that takes a Java developer from "hello, LLM" to produc
 
 > **Note:** This training uses both GitHub Models and Microsoft Foundry. The [Quick Start](00-quick-start/README.md) module uses GitHub Models (no Azure subscription required), while modules 1-6 use Microsoft Foundry. Get started with a [FREE Azure account](https://aka.ms/azure-free-account) if you don't have one.
 
+> **Models used:** `azd up` provisions two chat deployments. Module 02 uses **gpt-5.2** to demonstrate reasoning controls; modules 01, 03, 04, 05, and 06 use **gpt-4o-mini** so demos stay fast and the focus stays on the Spring AI patterns. Both are routed via env vars (`AZURE_OPENAI_DEPLOYMENT` / `AZURE_OPENAI_FAST_DEPLOYMENT`) — see [01-introduction/infra/README.md](01-introduction/infra/README.md) for details.
+
 
 ## Learning with GitHub Copilot
 

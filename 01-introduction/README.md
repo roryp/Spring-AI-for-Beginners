@@ -17,9 +17,9 @@
 
 ## What You'll Learn
 
-In the quick start, you used GitHub Models to send prompts, call tools, ask questions about documents, and test guardrails. Those demos showed what's possible — now we switch to Microsoft Foundry and GPT-5.2 and start building production-style applications. This module focuses on conversational AI that remembers context and maintains state.
+In the quick start, you used GitHub Models to send prompts, call tools, ask questions about documents, and test guardrails. Those demos showed what's possible — now we switch to Microsoft Foundry and start building production-style applications. This module focuses on conversational AI that remembers context and maintains state.
 
-We'll use Microsoft Foundry's GPT-5.2 throughout this guide because its advanced reasoning capabilities make the behavior of different patterns more apparent. When you add memory, you'll clearly see the difference. This makes it easier to understand what each component brings to your application.
+We'll use Microsoft Foundry's `gpt-4o-mini` throughout this guide. It's fast and cheap, which keeps the focus on the patterns rather than waiting for responses. When you add memory, you'll clearly see the difference between stateless and stateful behavior. (Module 02 will switch to GPT-5.2 specifically to explore reasoning controls.)
 
 You'll build one application that demonstrates both patterns:
 
@@ -37,7 +37,7 @@ You'll build one application that demonstrates both patterns:
 
 > **Note:** Java, Maven, Azure CLI and Azure Developer CLI (azd) are pre-installed in the provided devcontainer.
 
-> **Note:** This module uses GPT-5.2 on Microsoft Foundry. The deployment is configured automatically via `azd up` - do not modify the model name in the code.
+> **Note:** This module uses `gpt-4o-mini` on Microsoft Foundry (via `AZURE_OPENAI_FAST_DEPLOYMENT`). The deployment is configured automatically via `azd up`.
 
 ## Understanding the Core Problem
 
@@ -94,7 +94,7 @@ spring:
       api-key: ${AZURE_OPENAI_API_KEY}
       chat:
         options:
-          model: ${AZURE_OPENAI_DEPLOYMENT}
+          model: ${AZURE_OPENAI_FAST_DEPLOYMENT}
 ```
 
 Credentials come from environment variables set by `azd up`. Microsoft Foundry mode is detected automatically when the base URL contains `openai.azure.com`.
@@ -297,7 +297,7 @@ Now try the same sequence here. Ask "My name is John" and then "What's my name?"
 
 *AI remembers your name from earlier in the conversation*
 
-Both panels use the same GPT-5.2 model. The only difference is memory. This makes it clear what memory brings to your application and why it's essential for real use cases.
+Both panels use the same `gpt-4o-mini` model. The only difference is memory. This makes it clear what memory brings to your application and why it's essential for real use cases.
 
 ## Next Steps
 

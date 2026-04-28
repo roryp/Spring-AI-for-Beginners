@@ -43,6 +43,8 @@ We'll use GPT-5.2 because it introduces reasoning control - you can tell the mod
 
 > **Note:** If you haven't completed Module 01, follow the deployment instructions there first.
 
+> **Why this module is different:** The other Foundry modules (01, 03, 04, 05, 06) use `gpt-4o-mini` for speed. This module is the *only* one that uses **gpt-5.2** because reasoning control is the subject of the demos — you'll be adjusting reasoning effort and watching the behaviour change. Expect responses here to be slower than in other modules; that's the point.
+
 ## How This Uses Spring AI
 
 This module uses the same Spring AI dependency introduced in [Module 01](../01-introduction/README.md#how-this-uses-spring-ai) — `spring-ai-starter-model-openai` — which auto-configures `OpenAiChatModel` for Microsoft Foundry. No additional Spring AI dependencies are needed.

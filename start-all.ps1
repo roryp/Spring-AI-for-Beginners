@@ -33,6 +33,7 @@ if (-not $endpoint -or -not $apiKey -or -not $deployment) {
 Write-Host "Environment variables loaded successfully" -ForegroundColor Green
 Write-Host "AZURE_OPENAI_ENDPOINT: $endpoint"
 Write-Host "AZURE_OPENAI_DEPLOYMENT: $deployment"
+Write-Host "AZURE_OPENAI_FAST_DEPLOYMENT: $([Environment]::GetEnvironmentVariable('AZURE_OPENAI_FAST_DEPLOYMENT','Process'))"
 Write-Host ""
 
 function Test-PortInUse {
