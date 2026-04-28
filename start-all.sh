@@ -30,6 +30,7 @@ fi
 echo "Environment variables loaded successfully"
 echo "AZURE_OPENAI_ENDPOINT: $AZURE_OPENAI_ENDPOINT"
 echo "AZURE_OPENAI_DEPLOYMENT: $AZURE_OPENAI_DEPLOYMENT"
+echo "AZURE_OPENAI_FAST_DEPLOYMENT: $AZURE_OPENAI_FAST_DEPLOYMENT"
 
 is_port_in_use() {
     local port=$1

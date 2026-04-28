@@ -43,6 +43,7 @@ try {
     $AzureOpenAiEndpoint = if ($AzdEnvVars['AZURE_OPENAI_ENDPOINT']) { $AzdEnvVars['AZURE_OPENAI_ENDPOINT'] } else { $ExistingVars['AZURE_OPENAI_ENDPOINT'] }
     $AzureOpenAiApiKey = if ($AzdEnvVars['AZURE_OPENAI_KEY']) { $AzdEnvVars['AZURE_OPENAI_KEY'] } else { $ExistingVars['AZURE_OPENAI_API_KEY'] }
     $AzureOpenAiDeployment = if ($AzdEnvVars['AZURE_OPENAI_DEPLOYMENT']) { $AzdEnvVars['AZURE_OPENAI_DEPLOYMENT'] } elseif ($ExistingVars['AZURE_OPENAI_DEPLOYMENT']) { $ExistingVars['AZURE_OPENAI_DEPLOYMENT'] } else { 'gpt-5.2' }
+    $AzureOpenAiFastDeployment = if ($AzdEnvVars['AZURE_OPENAI_FAST_DEPLOYMENT']) { $AzdEnvVars['AZURE_OPENAI_FAST_DEPLOYMENT'] } elseif ($ExistingVars['AZURE_OPENAI_FAST_DEPLOYMENT']) { $ExistingVars['AZURE_OPENAI_FAST_DEPLOYMENT'] } else { 'gpt-4o-mini' }
     $AzureOpenAiEmbeddingDeployment = if ($AzdEnvVars['AZURE_OPENAI_EMBEDDING_DEPLOYMENT']) { $AzdEnvVars['AZURE_OPENAI_EMBEDDING_DEPLOYMENT'] } elseif ($ExistingVars['AZURE_OPENAI_EMBEDDING_DEPLOYMENT']) { $ExistingVars['AZURE_OPENAI_EMBEDDING_DEPLOYMENT'] } else { 'text-embedding-3-small' }
 
     # Validate required variables
@@ -66,6 +67,7 @@ try {
 AZURE_OPENAI_ENDPOINT=$AzureOpenAiEndpoint
 AZURE_OPENAI_API_KEY=$AzureOpenAiApiKey
 AZURE_OPENAI_DEPLOYMENT=$AzureOpenAiDeployment
+AZURE_OPENAI_FAST_DEPLOYMENT=$AzureOpenAiFastDeployment
 AZURE_OPENAI_EMBEDDING_DEPLOYMENT=$AzureOpenAiEmbeddingDeployment
 "@ | Set-Content -Path $EnvFile
 
@@ -94,6 +96,7 @@ AZURE_OPENAI_EMBEDDING_DEPLOYMENT=$AzureOpenAiEmbeddingDeployment
     Write-Host "  AZURE_OPENAI_ENDPOINT: $AzureOpenAiEndpoint"
     Write-Host "  AZURE_OPENAI_API_KEY: [HIDDEN]"
     Write-Host "  AZURE_OPENAI_DEPLOYMENT: $AzureOpenAiDeployment"
+    Write-Host "  AZURE_OPENAI_FAST_DEPLOYMENT: $AzureOpenAiFastDeployment"
     Write-Host "  AZURE_OPENAI_EMBEDDING_DEPLOYMENT: $AzureOpenAiEmbeddingDeployment"
     Write-Host ""
     Write-Host "You can now run: .\start-all.ps1"
