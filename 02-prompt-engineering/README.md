@@ -54,9 +54,10 @@ The `application.yaml` configuration is identical to Module 01 ([application.yam
 ```yaml
 spring:
   ai:
-    openai-sdk:
+    openai:
       base-url: ${AZURE_OPENAI_ENDPOINT}
       api-key: ${AZURE_OPENAI_API_KEY}
+      microsoft-deployment-name: ${AZURE_OPENAI_DEPLOYMENT}
       chat:
         options:
           model: ${AZURE_OPENAI_DEPLOYMENT}
