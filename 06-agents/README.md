@@ -65,7 +65,7 @@ That orchestration layer is what this module focuses on. The five patterns below
 
 ## How This Uses Spring AI
 
-This module reuses `spring-ai-starter-model-openai-sdk` from [Module 01](../01-introduction/README.md#how-this-uses-spring-ai) and `spring-ai-client-chat` introduced in [Module 03](../03-rag/README.md#how-this-uses-spring-ai). No new Spring AI dependencies are added — all five agentic patterns are orchestrated through `ChatClient` ([pom.xml](pom.xml)).
+This module reuses `spring-ai-starter-model-openai` from [Module 01](../01-introduction/README.md#how-this-uses-spring-ai) and `spring-ai-client-chat` introduced in [Module 03](../03-rag/README.md#how-this-uses-spring-ai). No new Spring AI dependencies are added — all five agentic patterns are orchestrated through `ChatClient` ([pom.xml](pom.xml)).
 
 The `application.yaml` is the same chat-model configuration as earlier modules ([application.yaml](src/main/resources/application.yaml)):
 

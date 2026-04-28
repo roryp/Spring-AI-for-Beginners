@@ -9,8 +9,8 @@ import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.openaisdk.OpenAiSdkChatModel;
-import org.springframework.ai.openaisdk.OpenAiSdkChatOptions;
+import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.function.FunctionToolCallback;
 
@@ -30,7 +30,7 @@ import org.springframework.ai.tool.function.FunctionToolCallback;
  * 
  * Key Concepts:
  * - FunctionToolCallback for registering tools
- * - OpenAiSdkChatOptions for tool configuration
+ * - OpenAiChatOptions for tool configuration
  * - Parameter extraction from natural language
  * - Multi-step reasoning with tools
  * 
@@ -113,7 +113,7 @@ public class ToolIntegrationDemo {
         );
 
         // Configure the chat model with tool capabilities
-        var chatOptions = OpenAiSdkChatOptions.builder()
+        var chatOptions = OpenAiChatOptions.builder()
                 .baseUrl("https://models.github.ai/inference")
                 .apiKey(githubToken)
                 .model("gpt-4.1-nano")
@@ -121,7 +121,7 @@ public class ToolIntegrationDemo {
                 .toolCallbacks(toolCallbacks)
                 .build();
 
-        var chatModel = OpenAiSdkChatModel.builder()
+        var chatModel = OpenAiChatModel.builder()
                 .options(chatOptions)
                 .build();
 
@@ -170,7 +170,7 @@ public class ToolIntegrationDemo {
      * Sends a message to the chat model, maintaining conversation history.
      * Spring AI handles tool execution internally by default.
      */
-    private static String chat(OpenAiSdkChatModel chatModel, List<Message> history, String userMessage) {
+    private static String chat(OpenAiChatModel chatModel, List<Message> history, String userMessage) {
         history.add(new UserMessage(userMessage));
 
         // Keep history manageable (last 10 user/assistant messages)

@@ -45,7 +45,7 @@ We'll use GPT-5.2 because it introduces reasoning control - you can tell the mod
 
 ## How This Uses Spring AI
 
-This module uses the same Spring AI dependency introduced in [Module 01](../01-introduction/README.md#how-this-uses-spring-ai) — `spring-ai-starter-model-openai-sdk` — which auto-configures `OpenAiSdkChatModel` for Microsoft Foundry. No additional Spring AI dependencies are needed.
+This module uses the same Spring AI dependency introduced in [Module 01](../01-introduction/README.md#how-this-uses-spring-ai) — `spring-ai-starter-model-openai` — which auto-configures `OpenAiChatModel` for Microsoft Foundry. No additional Spring AI dependencies are needed.
 
 The `application.yaml` configuration is identical to Module 01 ([application.yaml](src/main/resources/application.yaml)):
 

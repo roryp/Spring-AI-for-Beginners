@@ -6,8 +6,8 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
-import org.springframework.ai.openaisdk.OpenAiSdkChatModel;
-import org.springframework.ai.openaisdk.OpenAiSdkChatOptions;
+import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
 
 import java.util.Map;
 
@@ -50,7 +50,7 @@ public class PromptEngineeringDemo {
         displayHeader("Prompt Engineering Patterns Demo");
 
         // Configure the chat model options for GitHub Models endpoint
-        var chatOptions = OpenAiSdkChatOptions.builder()
+        var chatOptions = OpenAiChatOptions.builder()
                 .baseUrl("https://models.github.ai/inference")
                 .apiKey(githubToken)
                 .model("gpt-4.1-nano")
@@ -59,7 +59,7 @@ public class PromptEngineeringDemo {
                 .build();
 
         // Build the Spring AI chat model
-        var chatModel = OpenAiSdkChatModel.builder()
+        var chatModel = OpenAiChatModel.builder()
                 .options(chatOptions)
                 .build();
 
@@ -86,7 +86,7 @@ public class PromptEngineeringDemo {
      * Pattern 1: Zero-shot Prompting
      * Direct task instruction without examples
      */
-    private static void demonstrateZeroShot(OpenAiSdkChatModel chatModel) {
+    private static void demonstrateZeroShot(OpenAiChatModel chatModel) {
         System.out.println("\n" + "=".repeat(60));
         System.out.println("PATTERN 1: Zero-Shot Prompting");
         System.out.println("=".repeat(60));
@@ -105,7 +105,7 @@ public class PromptEngineeringDemo {
      * Pattern 2: Few-Shot Prompting
      * Provide examples to guide the model's behavior
      */
-    private static void demonstrateFewShot(OpenAiSdkChatModel chatModel) {
+    private static void demonstrateFewShot(OpenAiChatModel chatModel) {
         System.out.println("\n" + "=".repeat(60));
         System.out.println("PATTERN 2: Few-Shot Prompting");
         System.out.println("=".repeat(60));
@@ -135,7 +135,7 @@ public class PromptEngineeringDemo {
      * Pattern 3: Chain of Thought
      * Ask the model to explain its reasoning step-by-step
      */
-    private static void demonstrateChainOfThought(OpenAiSdkChatModel chatModel) {
+    private static void demonstrateChainOfThought(OpenAiChatModel chatModel) {
         System.out.println("\n" + "=".repeat(60));
         System.out.println("PATTERN 3: Chain of Thought");
         System.out.println("=".repeat(60));
@@ -159,7 +159,7 @@ public class PromptEngineeringDemo {
      * Pattern 4: Role-Based Prompting
      * Set a specific persona/context for the AI
      */
-    private static void demonstrateRoleBased(OpenAiSdkChatModel chatModel) {
+    private static void demonstrateRoleBased(OpenAiChatModel chatModel) {
         System.out.println("\n" + "=".repeat(60));
         System.out.println("PATTERN 4: Role-Based Prompting");
         System.out.println("=".repeat(60));
@@ -188,7 +188,7 @@ public class PromptEngineeringDemo {
      * Pattern 5: Prompt Templates
      * Create reusable prompts with variable placeholders
      */
-    private static void demonstratePromptTemplates(OpenAiSdkChatModel chatModel) {
+    private static void demonstratePromptTemplates(OpenAiChatModel chatModel) {
         System.out.println("\n" + "=".repeat(60));
         System.out.println("PATTERN 5: Prompt Templates");
         System.out.println("=".repeat(60));
@@ -233,7 +233,7 @@ public class PromptEngineeringDemo {
      * This is the only pattern that requires memory — the follow-up question
      * references information from the first turn.
      */
-    private static void demonstrateConversationalMemory(OpenAiSdkChatModel chatModel) {
+    private static void demonstrateConversationalMemory(OpenAiChatModel chatModel) {
         System.out.println("\n" + "=".repeat(60));
         System.out.println("PATTERN 6: Conversational Memory");
         System.out.println("=".repeat(60));

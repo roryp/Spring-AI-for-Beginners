@@ -14,8 +14,8 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.openaisdk.OpenAiSdkChatModel;
-import org.springframework.ai.openaisdk.OpenAiSdkChatOptions;
+import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
 
 /**
  * SimpleReaderDemo - Simple Document Q&A with Spring AI
@@ -57,14 +57,14 @@ public class SimpleReaderDemo {
         System.out.println("Loaded document (" + documentContent.length() + " characters).");
 
         // --- 2. Create the chat model (GitHub Models / OpenAI-compatible) ---
-        var chatOptions = OpenAiSdkChatOptions.builder()
+        var chatOptions = OpenAiChatOptions.builder()
                 .baseUrl("https://models.github.ai/inference")
                 .apiKey(apiKey)
                 .model("gpt-4.1-nano")
                 .gitHubModels(true)
                 .build();
 
-        var chatModel = OpenAiSdkChatModel.builder()
+        var chatModel = OpenAiChatModel.builder()
                 .options(chatOptions)
                 .build();
 

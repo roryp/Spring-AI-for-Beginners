@@ -6,7 +6,7 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.openaisdk.OpenAiSdkChatModel;
+import org.springframework.ai.openai.OpenAiChatModel;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,7 +29,7 @@ import static org.mockito.Mockito.*;
  * These tests validate that prompts are structured correctly according to best practices.
  * 
  * Testing Philosophy for Beginners:
- * - Uses Mockito to mock OpenAiSdkChatModel
+ * - Uses Mockito to mock OpenAiChatModel
  * - ArgumentCaptor captures the actual prompt sent to the model
  * - Tests verify prompt structure contains expected GPT-5 patterns
  * - Doesn't require real LLM - keeps tests fast and deterministic
@@ -43,7 +43,7 @@ class SimpleGpt5PromptTest {
     private Gpt5PromptService promptService;
     
     @Mock
-    private OpenAiSdkChatModel mockChatModel;
+    private OpenAiChatModel mockChatModel;
     
     private ArgumentCaptor<Prompt> promptCaptor;
 

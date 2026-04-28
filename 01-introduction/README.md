@@ -80,11 +80,11 @@ This module uses two core Spring AI capabilities — **ChatModel** for sending p
 ```xml
 <dependency>
     <groupId>org.springframework.ai</groupId>
-    <artifactId>spring-ai-starter-model-openai-sdk</artifactId> <!-- Version managed by Spring AI BOM in root pom.xml -->
+    <artifactId>spring-ai-starter-model-openai</artifactId> <!-- Version managed by Spring AI BOM in root pom.xml -->
 </dependency>
 ```
 
-**Chat Model** - The starter auto-configures `OpenAiSdkChatModel` from properties in `application.yaml` — no manual `@Bean` needed ([SpringAiConfig.java](src/main/java/com/example/springai/config/SpringAiConfig.java)):
+**Chat Model** - The starter auto-configures `OpenAiChatModel` from properties in `application.yaml` — no manual `@Bean` needed ([SpringAiConfig.java](src/main/java/com/example/springai/config/SpringAiConfig.java)):
 
 ```yaml
 spring:
@@ -126,7 +126,7 @@ The stateless chat endpoint skips memory entirely — just `chatModel.call(new P
 > **🤖 Try with [GitHub Copilot](https://github.com/features/copilot) Chat:** Open [`ChatController.java`](src/main/java/com/example/springai/app/ChatController.java) and ask:
 > - "Why is this controller stateless — what would change if I added ChatMemory here?"
 > - "How would I stream responses back to the client instead of waiting for the full completion?"
-> - "What's the benefit of using OpenAiSdkChatModel directly vs wrapping it with ChatClient?"
+> - "What's the benefit of using OpenAiChatModel directly vs wrapping it with ChatClient?"
 
 ## Deploy Microsoft Foundry Infrastructure
 

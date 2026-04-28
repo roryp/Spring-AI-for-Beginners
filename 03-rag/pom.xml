@@ -30,10 +30,10 @@
       <artifactId>spring-boot-starter-thymeleaf</artifactId>
     </dependency>
 
-    <!-- Spring AI OpenAI SDK Starter (auto-configures OpenAiSdkChatModel) -->
+    <!-- Spring AI OpenAI SDK Starter (auto-configures OpenAiChatModel) -->
     <dependency>
       <groupId>org.springframework.ai</groupId>
-      <artifactId>spring-ai-starter-model-openai-sdk</artifactId>
+      <artifactId>spring-ai-starter-model-openai</artifactId>
     </dependency>
 
     <!-- Spring AI ChatClient for fluent API and advisor support -->

@@ -2,8 +2,8 @@ package com.example.springai.quickstart;
 
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.openaisdk.OpenAiSdkChatModel;
-import org.springframework.ai.openaisdk.OpenAiSdkChatOptions;
+import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
 
 /**
  * BasicChatDemo - Introduction to Spring AI Chat Capabilities
@@ -20,7 +20,7 @@ import org.springframework.ai.openaisdk.OpenAiSdkChatOptions;
  * 
  * 💡 Ask GitHub Copilot:
  * - "How would I switch from GitHub Models to Microsoft Foundry in this code?"
- * - "What other parameters can I configure in OpenAiSdkChatOptions.builder()?"
+ * - "What other parameters can I configure in OpenAiChatOptions.builder()?"
  * - "How do I add streaming responses instead of waiting for the complete response?"
  * - "What builder methods are available for configuring the OpenAI SDK client?"
  */
@@ -39,7 +39,7 @@ public class BasicChatDemo {
 
         // Configure the chat model options for GitHub Models endpoint
         // This uses GPT-4.1-nano through GitHub's inference API
-        var chatOptions = OpenAiSdkChatOptions.builder()
+        var chatOptions = OpenAiChatOptions.builder()
                 .baseUrl("https://models.github.ai/inference")
                 .apiKey(githubToken)
                 .model("gpt-4.1-nano")
@@ -47,7 +47,7 @@ public class BasicChatDemo {
                 .build();
 
         // Build the Spring AI chat model
-        var chatModel = OpenAiSdkChatModel.builder()
+        var chatModel = OpenAiChatModel.builder()
                 .options(chatOptions)
                 .build();
 

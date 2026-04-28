@@ -6,7 +6,7 @@ import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.openaisdk.OpenAiSdkChatModel;
+import org.springframework.ai.openai.OpenAiChatModel;
 
 import org.springframework.stereotype.Service;
 
@@ -41,11 +41,11 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class ConversationService {
 
-    private final OpenAiSdkChatModel chatModel;
+    private final OpenAiChatModel chatModel;
     private final ChatMemory chatMemory;
     private final Set<String> activeConversations = ConcurrentHashMap.newKeySet();
 
-    public ConversationService(OpenAiSdkChatModel chatModel) {
+    public ConversationService(OpenAiChatModel chatModel) {
         this.chatModel = chatModel;
         this.chatMemory = MessageWindowChatMemory.builder()
                 .maxMessages(10)

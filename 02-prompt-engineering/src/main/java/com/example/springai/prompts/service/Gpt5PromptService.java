@@ -11,7 +11,7 @@ import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.openaisdk.OpenAiSdkChatModel;
+import org.springframework.ai.openai.OpenAiChatModel;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +54,7 @@ public class Gpt5PromptService {
     private static final Logger log = LoggerFactory.getLogger(Gpt5PromptService.class);
 
     @Autowired
-    private OpenAiSdkChatModel chatModel;
+    private OpenAiChatModel chatModel;
 
     @Autowired
     private OpenAIClientAsync openAIClientAsync;

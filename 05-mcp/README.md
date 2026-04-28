@@ -128,10 +128,10 @@ This module is split into two Spring Boot applications — an MCP server and an 
     <artifactId>spring-ai-starter-mcp-server-webmvc</artifactId> <!-- Version managed by Spring AI BOM in root pom.xml -->
 </dependency>
 
-<!-- Microsoft Foundry via OpenAI SDK Starter (auto-configures OpenAiSdkChatModel) -->
+<!-- Microsoft Foundry via OpenAI SDK Starter (auto-configures OpenAiChatModel) -->
 <dependency>
     <groupId>org.springframework.ai</groupId>
-    <artifactId>spring-ai-starter-model-openai-sdk</artifactId>
+    <artifactId>spring-ai-starter-model-openai</artifactId>
 </dependency>
 
 <!-- Spring AI Chat Client for LLM-powered AI moves -->
@@ -561,7 +561,7 @@ The LLM evaluates the board state and returns a single position number, keeping 
 | **ToolCallbackProvider** | Auto-discovery of remote MCP tools on the client | [GameService.java](mcp-client/src/main/java/com/example/springai/mcp/client/GameService.java) |
 | **ToolCallback.call()** | Direct invocation of MCP tools without LLM intermediation | [GameService.java](mcp-client/src/main/java/com/example/springai/mcp/client/GameService.java) |
 | **ChatClient** | Fluent API for LLM interactions — AI game strategy on the server | [TicTacToeTools.java](mcp-server/src/main/java/com/example/springai/mcp/server/TicTacToeTools.java) |
-| **OpenAiSdkChatModel** | Microsoft Foundry integration auto-configured by the OpenAI SDK starter | [SpringAiConfig.java](mcp-server/src/main/java/com/example/springai/mcp/server/SpringAiConfig.java) |
+| **OpenAiChatModel** | Microsoft Foundry integration auto-configured by the OpenAI SDK starter | [SpringAiConfig.java](mcp-server/src/main/java/com/example/springai/mcp/server/SpringAiConfig.java) |
 
 ## MCP vs Tools (Module 04)
 

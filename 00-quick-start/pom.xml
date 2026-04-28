@@ -20,7 +20,7 @@
     <!-- Spring AI OpenAI SDK (Official OpenAI Java SDK integration) -->
     <dependency>
       <groupId>org.springframework.ai</groupId>
-      <artifactId>spring-ai-openai-sdk</artifactId>
+      <artifactId>spring-ai-openai</artifactId>
     </dependency>
 
     <!-- SLF4J Simple Logger (for logging) -->
