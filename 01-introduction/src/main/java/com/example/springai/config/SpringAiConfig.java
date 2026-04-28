@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
  *
  *   spring.ai.openai.base-url  → AZURE_OPENAI_ENDPOINT
  *   spring.ai.openai.api-key   → AZURE_OPENAI_API_KEY
- *   spring.ai.openai.microsoft-deployment-name → AZURE_OPENAI_DEPLOYMENT
+ *   spring.ai.openai.microsoft-deployment-name → AZURE_OPENAI_FAST_DEPLOYMENT
  *
  * Azure mode is detected automatically when the base URL contains openai.azure.com.
  *

@@ -26,8 +26,8 @@ source "$ENV_FILE"
 set +a
 
 # Verify required variables
-if [ -z "$AZURE_OPENAI_ENDPOINT" ] || [ -z "$AZURE_OPENAI_API_KEY" ] || [ -z "$AZURE_OPENAI_DEPLOYMENT" ] || [ -z "$AZURE_OPENAI_EMBEDDING_DEPLOYMENT" ]; then
-    echo "Error: Missing required environment variables (AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY, AZURE_OPENAI_DEPLOYMENT, AZURE_OPENAI_EMBEDDING_DEPLOYMENT)"
+if [ -z "$AZURE_OPENAI_ENDPOINT" ] || [ -z "$AZURE_OPENAI_API_KEY" ] || [ -z "$AZURE_OPENAI_FAST_DEPLOYMENT" ] || [ -z "$AZURE_OPENAI_EMBEDDING_DEPLOYMENT" ]; then
+    echo "Error: Missing required environment variables (AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY, AZURE_OPENAI_FAST_DEPLOYMENT, AZURE_OPENAI_EMBEDDING_DEPLOYMENT)"
     exit 1
 fi
 

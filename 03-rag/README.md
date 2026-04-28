@@ -79,9 +79,10 @@ The `application.yaml` extends Module 01's config with an **embedding model** fo
 ```yaml
 spring:
   ai:
-    openai-sdk:
+    openai:
       base-url: ${AZURE_OPENAI_ENDPOINT}
       api-key: ${AZURE_OPENAI_API_KEY}
+      microsoft-deployment-name: ${AZURE_OPENAI_FAST_DEPLOYMENT}
       chat:
         options:
           model: ${AZURE_OPENAI_FAST_DEPLOYMENT}

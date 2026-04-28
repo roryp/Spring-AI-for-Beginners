@@ -89,9 +89,10 @@ This module uses two core Spring AI capabilities — **ChatModel** for sending p
 ```yaml
 spring:
   ai:
-    openai-sdk:
+    openai:
       base-url: ${AZURE_OPENAI_ENDPOINT}
       api-key: ${AZURE_OPENAI_API_KEY}
+      microsoft-deployment-name: ${AZURE_OPENAI_FAST_DEPLOYMENT}
       chat:
         options:
           model: ${AZURE_OPENAI_FAST_DEPLOYMENT}
@@ -145,7 +146,7 @@ azd up  # Select subscription and location (eastus2 recommended)
 > **Note:** If you encounter a timeout error (`RequestConflict: Cannot modify resource ... provisioning state is not terminal`), simply run `azd up` again. Azure resources may still be provisioning in the background, and retrying allows the deployment to complete once resources reach a terminal state.
 
 This will:
-1. Deploy Microsoft Foundry resource with GPT-5.2 and text-embedding-3-small models
+1. Deploy Microsoft Foundry resource with GPT-5.2, gpt-4o-mini, and text-embedding-3-small models
 2. Automatically generate `.env` file in project root with credentials
 3. Set up all required environment variables
 
