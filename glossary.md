@@ -37,8 +37,6 @@ A reference of the key terms, Spring AI abstractions, and AI/ML concepts used th
 ## Module 01: Introduction
 
 - **Microsoft Foundry** — Microsoft's enterprise hosting of OpenAI models on Azure, used by modules 1–6. You configure a custom endpoint, deployment name, and API key.
-- **gpt-5.2** — A Microsoft Foundry reasoning model with adjustable thinking effort. Used by Module 02 to demonstrate prompt engineering with reasoning controls.
-- **gpt-4o-mini** — A fast, low-latency non-reasoning model. Used by Modules 01, 03, 04, 05, and 06 to keep demos responsive while focusing on Spring AI patterns rather than model latency.
 - **Spring Boot Auto-configuration** — Spring Boot's mechanism for creating beans (such as `OpenAiChatModel`) automatically from `application.yaml` properties when the matching starter is on the classpath.
 - **`spring-ai-starter-model-openai`** — The Spring AI starter that auto-configures the OpenAI SDK–based `ChatModel`.
 - **Stateless Chat** — A chat pattern where each request is independent and the model has no memory of prior turns.
@@ -122,6 +120,7 @@ A reference of the key terms, Spring AI abstractions, and AI/ML concepts used th
 - **Autonomous Agent** — An LLM system that chooses its own actions and tools dynamically rather than following a fixed code path.
 - **Quality Criteria** — Explicit rules an evaluator uses to decide whether a generated answer is acceptable or needs another iteration.
 - **Latency vs. Accuracy Trade-off** — Simple workflows are faster but less thorough; multi-step agentic workflows are slower but typically produce higher-quality results.
+- **`MyLoggingAdvisor`** — The custom Spring AI advisor used in this module to log every LLM request/response (system prompt, user input, available tools, generated output) so you can see exactly what each step in a workflow sends to the model.
 
 ## Cross-Cutting Terms
 
@@ -129,7 +128,17 @@ These terms appear in multiple modules and are worth knowing throughout the cour
 
 - **LLM (Large Language Model)** — A neural network trained on large amounts of text that can generate and reason about natural language.
 - **Provider** — The service that hosts the LLM (GitHub Models, Microsoft Foundry, etc.); Spring AI lets you switch providers without changing application code.
+- **gpt-5.2** — A Microsoft Foundry reasoning model with adjustable thinking effort. Used by Module 02 only, to demonstrate prompt engineering with reasoning controls.
+- **gpt-4o-mini** — A fast, low-latency non-reasoning model. Used by Modules 01, 03, 04, 05, and 06 to keep demos responsive while focusing on Spring AI patterns rather than model latency.
+- **azd (Azure Developer CLI)** — The command-line tool that provisions the Microsoft Foundry resource and model deployments for modules 1–6 (`azd up`); see [01-introduction/infra/README.md](01-introduction/infra/README.md).
 - **Dev Container / Codespaces** — The pre-configured development environment for this course (Java 21, Maven 3.9+, Copilot) that you can launch as a GitHub Codespace.
 - **Maven** — The Java build tool used to compile and run every example (`mvn compile exec:java -Dexec.mainClass=...`).
-- **`.env` / `GITHUB_TOKEN`** — The environment file and variable used by the quick start to authenticate against GitHub Models.
 - **`application.yaml`** — The Spring Boot configuration file used by modules 1–6 to wire up Microsoft Foundry credentials, model names, and other settings.
+- **`microsoft-deployment-name`** — The `spring.ai.openai` property that tells the OpenAI SDK to route requests to a named Azure deployment (instead of the OpenAI public model name).
+- **Environment variables** — The shared `.env` file at the repo root provides credentials to every module:
+  - `GITHUB_TOKEN` — GitHub Models PAT, used by Module 00 only.
+  - `AZURE_OPENAI_ENDPOINT` — Microsoft Foundry resource URL.
+  - `AZURE_OPENAI_API_KEY` — Foundry API key.
+  - `AZURE_OPENAI_DEPLOYMENT` — reasoning chat deployment name (`gpt-5.2`), used by Module 02.
+  - `AZURE_OPENAI_FAST_DEPLOYMENT` — fast chat deployment name (`gpt-4o-mini`), used by Modules 01, 03, 04, 05, 06.
+  - `AZURE_OPENAI_EMBEDDING_DEPLOYMENT` — embedding deployment name (`text-embedding-3-small`), used by Module 03.
