@@ -45,7 +45,7 @@ Tools change this. By giving the model access to functions it can call, you tran
 
 ## How This Uses Spring AI
 
-This module reuses `spring-ai-starter-model-openai-sdk` from [Module 01](../01-introduction/README.md#how-this-uses-spring-ai) and `spring-ai-client-chat` introduced in [Module 03](../03-rag/README.md#how-this-uses-spring-ai). No new Spring AI dependencies are added — tool calling is built into `ChatClient` via the `.tools()` method ([pom.xml](pom.xml)).
+This module reuses `spring-ai-starter-model-openai` from [Module 01](../01-introduction/README.md#how-this-uses-spring-ai) and `spring-ai-client-chat` introduced in [Module 03](../03-rag/README.md#how-this-uses-spring-ai). No new Spring AI dependencies are added — tool calling is built into `ChatClient` via the `.tools()` method ([pom.xml](pom.xml)).
 
 The `application.yaml` is the same chat-model configuration as Module 01 ([application.yaml](src/main/resources/application.yaml)):
 
@@ -111,7 +111,7 @@ chatClient.prompt()
     .content();
 
 // ChatClient is auto-configured by Spring Boot with:
-// - ChatModel bean (OpenAiSdkChatModel via starter)
+// - ChatModel bean (OpenAiChatModel via starter)
 // - ChatMemory for session management
 ```
 

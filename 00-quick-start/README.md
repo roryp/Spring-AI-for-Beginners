@@ -49,7 +49,7 @@ In this quickstart you'll get hands-on with five fundamentals: chat, prompt temp
 
 > **Note:** This module uses `gpt-4.1-nano` from GitHub Models. Do not modify the model name in the code - it's configured to work with GitHub's available models.
 >
-> **Note:** Spring AI 2.0.0-M4 (milestone) is used. The Spring Milestones repository is configured in the root `pom.xml`.
+> **Note:** Spring AI 2.0.0-M5 (milestone) is used. The Spring Milestones repository is configured in the root `pom.xml`.
 
 ## Setup
 
@@ -171,17 +171,17 @@ See how AI safety filters block harmful content.
 
 **Basic Chat** - [BasicChatDemo.java](src/main/java/com/example/springai/quickstart/BasicChatDemo.java)
 
-Start here to see Spring AI at its simplest. You'll create an `OpenAiSdkChatModel`, send a prompt, and get back a `ChatResponse`. This demonstrates the foundation: how to initialize models with custom endpoints and API keys. Once you understand this pattern, everything else builds on it.
+Start here to see Spring AI at its simplest. You'll create an `OpenAiChatModel`, send a prompt, and get back a `ChatResponse`. This demonstrates the foundation: how to initialize models with custom endpoints and API keys. Once you understand this pattern, everything else builds on it.
 
 ```java
-var chatOptions = OpenAiSdkChatOptions.builder()
+var chatOptions = OpenAiChatOptions.builder()
     .baseUrl("https://models.github.ai/inference")
     .apiKey(System.getenv("GITHUB_TOKEN"))
     .model("gpt-4.1-nano")
     .gitHubModels(true)
     .build();
 
-var chatModel = OpenAiSdkChatModel.builder()
+var chatModel = OpenAiChatModel.builder()
     .options(chatOptions)
     .build();
 
@@ -191,7 +191,7 @@ System.out.println(response.getResult().getOutput().getText());
 
 > **🤖 Try with [GitHub Copilot](https://github.com/features/copilot) Chat:** Open [`BasicChatDemo.java`](src/main/java/com/example/springai/quickstart/BasicChatDemo.java) and ask:
 > - "How would I switch from GitHub Models to Microsoft Foundry in this code?"
-> - "What other parameters can I configure in OpenAiSdkChatOptions.builder()?"
+> - "What other parameters can I configure in OpenAiChatOptions.builder()?"
 > - "How do I add streaming responses instead of waiting for the complete response?"
 
 **Prompt Engineering** - [PromptEngineeringDemo.java](src/main/java/com/example/springai/quickstart/PromptEngineeringDemo.java)
@@ -251,7 +251,7 @@ List<ToolCallback> toolCallbacks = List.of(
         .build()
 );
 
-var chatOptions = OpenAiSdkChatOptions.builder()
+var chatOptions = OpenAiChatOptions.builder()
     .model("gpt-4.1-nano")
     .toolCallbacks(toolCallbacks)
     .build();

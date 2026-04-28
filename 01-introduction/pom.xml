@@ -27,7 +27,7 @@
     <!-- Spring AI OpenAI SDK Starter (Official OpenAI Java SDK integration with auto-configuration) -->
     <dependency>
       <groupId>org.springframework.ai</groupId>
-      <artifactId>spring-ai-starter-model-openai-sdk</artifactId>
+      <artifactId>spring-ai-starter-model-openai</artifactId>
     </dependency>
 
     <!-- JSON binding (optional, helps with mapping) -->

@@ -1,7 +1,7 @@
 package com.example.springai.prompts.config;
 
 import com.openai.client.OpenAIClientAsync;
-import org.springframework.ai.openaisdk.setup.OpenAiSdkSetup;
+import org.springframework.ai.openai.setup.OpenAiSetup;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * Configuration for Spring AI with Microsoft Foundry using the OpenAI SDK starter.
  * 
- * The starter (spring-ai-starter-model-openai-sdk) auto-configures OpenAiSdkChatModel
+ * The starter (spring-ai-starter-model-openai) auto-configures OpenAiChatModel
  * using properties from application.yaml. Azure mode is detected automatically
  * when the base URL contains openai.azure.com.
  * 
@@ -43,7 +43,7 @@ public class SpringAiConfig {
      */
     @Bean
     public OpenAIClientAsync openAIClientAsync() {
-        return OpenAiSdkSetup.setupAsyncClient(
+        return OpenAiSetup.setupAsyncClient(
                 azureEndpoint, azureApiKey, null, deploymentName,
                 null, null, true, false, deploymentName,
                 java.time.Duration.ofSeconds(60), 3, null, null);

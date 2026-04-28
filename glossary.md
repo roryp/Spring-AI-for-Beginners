@@ -20,8 +20,8 @@ A reference of the key terms, Spring AI abstractions, and AI/ML concepts used th
 - **Spring AI** — A Java framework that provides a consistent API across AI providers (OpenAI, Microsoft Foundry, GitHub Models, etc.) so you can swap providers without rewriting application code.
 - **GitHub Models** — GitHub's hosted catalog of language models (e.g., `gpt-4.1-nano`) accessed via a Personal Access Token; used in this module so you can try Spring AI without an Azure subscription.
 - **ChatModel** — Spring AI's core abstraction for a chat-capable language model. You send it a `Prompt` and receive a `ChatResponse`.
-- **OpenAiSdkChatModel** — Spring AI's concrete `ChatModel` implementation built on the OpenAI Java SDK; works with both GitHub Models and Microsoft Foundry by configuring the base URL and API key.
-- **OpenAiSdkChatOptions** — Builder-style configuration for `OpenAiSdkChatModel` (model name, base URL, API key, tool callbacks, etc.).
+- **OpenAiChatModel** — Spring AI's concrete `ChatModel` implementation built on the OpenAI Java SDK; works with both GitHub Models and Microsoft Foundry by configuring the base URL and API key.
+- **OpenAiChatOptions** — Builder-style configuration for `OpenAiChatModel` (model name, base URL, API key, tool callbacks, etc.).
 - **Prompt** — The structured request sent to a `ChatModel`, made up of one or more `Message` objects.
 - **ChatResponse** — The structured result returned by a `ChatModel`, containing the generated text, token usage, and metadata.
 - **PromptTemplate** — A reusable prompt with `{variable}` placeholders that Spring AI fills in at call time so you don't rebuild prompts by hand.
@@ -38,8 +38,8 @@ A reference of the key terms, Spring AI abstractions, and AI/ML concepts used th
 
 - **Microsoft Foundry** — Microsoft's enterprise hosting of OpenAI models on Azure, used by modules 1–6. You configure a custom endpoint, deployment name, and API key.
 - **gpt-5.2** — The Microsoft Foundry model used by the introduction and later modules.
-- **Spring Boot Auto-configuration** — Spring Boot's mechanism for creating beans (such as `OpenAiSdkChatModel`) automatically from `application.yaml` properties when the matching starter is on the classpath.
-- **`spring-ai-starter-model-openai-sdk`** — The Spring AI starter that auto-configures the OpenAI SDK–based `ChatModel`.
+- **Spring Boot Auto-configuration** — Spring Boot's mechanism for creating beans (such as `OpenAiChatModel`) automatically from `application.yaml` properties when the matching starter is on the classpath.
+- **`spring-ai-starter-model-openai`** — The Spring AI starter that auto-configures the OpenAI SDK–based `ChatModel`.
 - **Stateless Chat** — A chat pattern where each request is independent and the model has no memory of prior turns.
 - **Stateful Conversation** — A chat pattern where prior turns are stored in `ChatMemory` and replayed so the model can reason about earlier context.
 - **Token** — The basic unit of text the model processes; words, subwords, and punctuation are split into tokens, and models impose limits on how many tokens fit in a request.

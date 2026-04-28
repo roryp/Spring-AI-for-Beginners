@@ -5,7 +5,7 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.openaisdk.OpenAiSdkChatModel;
+import org.springframework.ai.openai.OpenAiChatModel;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
  * These tests validate conversation lifecycle, memory management, and context preservation.
  * 
  * Testing Philosophy for Beginners:
- * - Uses Mockito to mock OpenAiSdkChatModel (simplest way!)
+ * - Uses Mockito to mock OpenAiChatModel (simplest way!)
  * - @Mock annotation creates a mock instance
  * - when().thenReturn() defines the mock behavior
  * - Tests the conversation management logic without real LLM calls
@@ -41,7 +41,7 @@ class SimpleConversationTest {
     private ConversationService conversationService;
     
     @Mock
-    private OpenAiSdkChatModel mockChatModel;
+    private OpenAiChatModel mockChatModel;
 
     private static ChatResponse mockChatResponse(String text) {
         return new ChatResponse(List.of(new Generation(new AssistantMessage(text))));

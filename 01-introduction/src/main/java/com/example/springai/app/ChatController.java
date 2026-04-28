@@ -1,7 +1,7 @@
 package com.example.springai.app;
 
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.openaisdk.OpenAiSdkChatModel;
+import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +10,7 @@ import java.util.Map;
 
 /**
  * Simple REST controller exposing a chat endpoint.
- * Delegates requests to the OpenAiSdkChatModel provided by Spring AI.
+ * Delegates requests to the OpenAiChatModel provided by Spring AI.
  * 
  * This controller demonstrates basic stateless chat completion without memory.
  * For conversational chat with history, see {@link ConversationController}.
@@ -19,13 +19,13 @@ import java.util.Map;
  * - "Why is this controller stateless — what would change if I added ChatMemory here?"
  * - "How would I stream responses back to the client instead of waiting for the full completion?"
  * - "How could I add a system prompt to shape the assistant's persona for every request?"
- * - "What's the benefit of using OpenAiSdkChatModel directly vs wrapping it with ChatClient?"
+ * - "What's the benefit of using OpenAiChatModel directly vs wrapping it with ChatClient?"
  */
 @RestController
 @RequestMapping("/api/chat")
 public class ChatController {
 
-  private final OpenAiSdkChatModel chatModel;
+  private final OpenAiChatModel chatModel;
 
   /**
    * Constructor injection of the chat model bean.
@@ -33,7 +33,7 @@ public class ChatController {
    *
    * @param chatModel configured OpenAI SDK chat model
    */
-  public ChatController(OpenAiSdkChatModel chatModel) {
+  public ChatController(OpenAiChatModel chatModel) {
     this.chatModel = chatModel;
   }
 

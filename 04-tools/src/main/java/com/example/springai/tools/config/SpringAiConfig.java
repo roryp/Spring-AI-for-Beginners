@@ -1,7 +1,7 @@
 package com.example.springai.tools.config;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.openaisdk.OpenAiSdkChatModel;
+import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Configuration;
  * SpringAiConfig - Configuration for Spring AI with Microsoft Foundry and Tool Calling
  * Run: ./start.sh (from module directory, after deploying Azure resources with azd up)
  * 
- * The OpenAI SDK starter (spring-ai-starter-model-openai-sdk) auto-configures
- * OpenAiSdkChatModel using properties from application.yaml.
+ * The OpenAI SDK starter (spring-ai-starter-model-openai) auto-configures
+ * OpenAiChatModel using properties from application.yaml.
  * Azure mode is detected automatically when the base URL contains openai.azure.com.
  * 
  * Tools are registered using Spring AI's @Tool and @ToolParam annotations
@@ -41,7 +41,7 @@ public class SpringAiConfig {
      * @return ChatClient.Builder for creating ChatClient instances
      */
     @Bean
-    public ChatClient.Builder chatClientBuilder(OpenAiSdkChatModel chatModel) {
+    public ChatClient.Builder chatClientBuilder(OpenAiChatModel chatModel) {
         return ChatClient.builder(chatModel);
     }
 }

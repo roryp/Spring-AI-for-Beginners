@@ -52,7 +52,7 @@ This grounds the model's responses in your actual data instead of relying on its
 
 ## How This Uses Spring AI
 
-This module reuses `spring-ai-starter-model-openai-sdk` from [Module 01](../01-introduction/README.md#how-this-uses-spring-ai) for the chat model and introduces three new Spring AI dependencies for the RAG pipeline ([pom.xml](pom.xml)):
+This module reuses `spring-ai-starter-model-openai` from [Module 01](../01-introduction/README.md#how-this-uses-spring-ai) for the chat model and introduces three new Spring AI dependencies for the RAG pipeline ([pom.xml](pom.xml)):
 
 ```xml
 <!-- Fluent ChatClient API with advisor support (used by AdvisorRagService) -->
@@ -186,8 +186,8 @@ The diagram below visualizes this concept — text goes in, numerical vectors co
 *This diagram shows how an embedding model converts text into numerical vectors, placing similar meanings — like "car" and "automobile" — near each other in vector space.*
 
 ```java
-// Auto-configured by spring-ai-starter-model-openai-sdk via application.yaml:
-//   spring.ai.openai-sdk.embedding.options.model: ${AZURE_OPENAI_EMBEDDING_DEPLOYMENT}
+// Auto-configured by spring-ai-starter-model-openai via application.yaml:
+//   spring.ai.openai.embedding.options.model: ${AZURE_OPENAI_EMBEDDING_DEPLOYMENT}
 
 @Bean
 public VectorStore vectorStore(EmbeddingModel embeddingModel) {
@@ -273,7 +273,7 @@ String answer = chatModel.call(new Prompt(promptText))
         .getResult().getOutput().getText();
 ```
 
-The diagram below shows this assembly in action — the top-scoring chunks from the search step are injected into the prompt template, and the `OpenAiSdkChatModel` generates a grounded answer:
+The diagram below shows this assembly in action — the top-scoring chunks from the search step are injected into the prompt template, and the `OpenAiChatModel` generates a grounded answer:
 
 <img src="images/context-assembly.png" alt="Context Assembly" width="800"/>
 
@@ -418,7 +418,7 @@ Watch how the relevance scores change based on how well your question matches do
 
 Spring AI 2.0 provides a `QuestionAnswerAdvisor` that encapsulates the entire RAG pipeline — vector search, context injection, and prompt augmentation — into a single advisor you attach to a `ChatClient` call. This is the recommended approach for production applications.
 
-**Dependencies** — In addition to `spring-ai-starter-model-openai-sdk` and `spring-ai-vector-store`, you need:
+**Dependencies** — In addition to `spring-ai-starter-model-openai` and `spring-ai-vector-store`, you need:
 
 ```xml
 <!-- Spring AI ChatClient for fluent API and advisor support -->
@@ -438,7 +438,7 @@ Spring AI 2.0 provides a `QuestionAnswerAdvisor` that encapsulates the entire RA
 
 ```java
 @Bean
-public ChatClient chatClient(OpenAiSdkChatModel chatModel) {
+public ChatClient chatClient(OpenAiChatModel chatModel) {
     return ChatClient.builder(chatModel).build();
 }
 ```

@@ -7,7 +7,7 @@ spring:
   mvc:
     async:
       request-timeout: -1
-  # Microsoft Foundry configuration via spring-ai-starter-model-openai-sdk
+  # Microsoft Foundry configuration via spring-ai-starter-model-openai
   ai:
     openai-sdk:
       base-url: ${AZURE_OPENAI_ENDPOINT}

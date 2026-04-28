@@ -2,7 +2,7 @@ package com.example.springai.rag.config;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.embedding.EmbeddingModel;
-import org.springframework.ai.openaisdk.OpenAiSdkChatModel;
+import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.context.annotation.Bean;
@@ -11,8 +11,8 @@ import org.springframework.context.annotation.Configuration;
 /**
  * Configuration class for Spring AI RAG components.
  * 
- * The OpenAI SDK starter (spring-ai-starter-model-openai-sdk) auto-configures
- * both OpenAiSdkChatModel and OpenAiSdkEmbeddingModel using properties
+ * The OpenAI SDK starter (spring-ai-starter-model-openai) auto-configures
+ * both OpenAiChatModel and OpenAiSdkEmbeddingModel using properties
  * from application.yaml. Azure mode is detected automatically when the
  * base URL contains openai.azure.com.
  * 
@@ -35,7 +35,7 @@ public class SpringAiRagConfig {
      * @return configured ChatClient
      */
     @Bean
-    public ChatClient chatClient(OpenAiSdkChatModel chatModel) {
+    public ChatClient chatClient(OpenAiChatModel chatModel) {
         return ChatClient.builder(chatModel).build();
     }
 

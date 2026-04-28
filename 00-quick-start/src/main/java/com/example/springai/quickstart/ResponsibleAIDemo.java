@@ -4,8 +4,8 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.openaisdk.OpenAiSdkChatModel;
-import org.springframework.ai.openaisdk.OpenAiSdkChatOptions;
+import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
 
 import java.util.List;
 
@@ -30,7 +30,7 @@ import java.util.List;
  */
 public class ResponsibleAIDemo {
     
-    private final OpenAiSdkChatModel chatModel;
+    private final OpenAiChatModel chatModel;
 
     private static final String SYSTEM_PROMPT = "You are a helpful assistant. Always be respectful and safe.";
     
@@ -61,14 +61,14 @@ public class ResponsibleAIDemo {
 
         String modelName = System.getenv().getOrDefault("GITHUB_MODEL", "gpt-4.1-nano");
 
-        var chatOptions = OpenAiSdkChatOptions.builder()
+        var chatOptions = OpenAiChatOptions.builder()
                 .baseUrl("https://models.github.ai/inference")
                 .apiKey(githubToken)
                 .model(modelName)
                 .gitHubModels(true)
                 .build();
 
-        this.chatModel = OpenAiSdkChatModel.builder()
+        this.chatModel = OpenAiChatModel.builder()
                 .options(chatOptions)
                 .build();
     }
