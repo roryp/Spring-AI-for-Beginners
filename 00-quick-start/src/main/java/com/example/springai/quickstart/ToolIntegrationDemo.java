@@ -42,41 +42,6 @@ import org.springframework.ai.tool.function.FunctionToolCallback;
  */
 public class ToolIntegrationDemo {
 
-    // Input record for two-number operations
-    record TwoNumbers(double a, double b) {}
-
-    // Input record for single-number operations
-    record SingleNumber(double number) {}
-
-    // Calculator functions
-    static final Function<TwoNumbers, Double> ADD = input -> {
-        System.out.println("[TOOL] Executing: add(" + input.a() + ", " + input.b() + ")");
-        return input.a() + input.b();
-    };
-
-    static final Function<TwoNumbers, Double> SUBTRACT = input -> {
-        System.out.println("[TOOL] Executing: subtract(" + input.a() + ", " + input.b() + ")");
-        return input.a() - input.b();
-    };
-
-    static final Function<TwoNumbers, Double> MULTIPLY = input -> {
-        System.out.println("[TOOL] Executing: multiply(" + input.a() + ", " + input.b() + ")");
-        return input.a() * input.b();
-    };
-
-    static final Function<TwoNumbers, Double> DIVIDE = input -> {
-        System.out.println("[TOOL] Executing: divide(" + input.a() + ", " + input.b() + ")");
-        if (input.b() == 0) {
-            throw new IllegalArgumentException("Division by zero is undefined");
-        }
-        return input.a() / input.b();
-    };
-
-    static final Function<SingleNumber, Double> SQUARE_ROOT = input -> {
-        System.out.println("[TOOL] Executing: squareRoot(" + input.number() + ")");
-        return Math.sqrt(input.number());
-    };
-
     public static void main(String[] args) {
         // Ensure authentication token is present
         String githubToken = System.getenv("GITHUB_TOKEN");
@@ -165,6 +130,41 @@ public class ToolIntegrationDemo {
         System.out.println("   - Parameters extracted from conversational language");
         System.out.println("   - Multiple tool calls coordinated automatically");
     }
+
+    // Input record for two-number operations
+    record TwoNumbers(double a, double b) {}
+
+    // Input record for single-number operations
+    record SingleNumber(double number) {}
+
+    // Calculator functions
+    static final Function<TwoNumbers, Double> ADD = input -> {
+        System.out.println("[TOOL] Executing: add(" + input.a() + ", " + input.b() + ")");
+        return input.a() + input.b();
+    };
+
+    static final Function<TwoNumbers, Double> SUBTRACT = input -> {
+        System.out.println("[TOOL] Executing: subtract(" + input.a() + ", " + input.b() + ")");
+        return input.a() - input.b();
+    };
+
+    static final Function<TwoNumbers, Double> MULTIPLY = input -> {
+        System.out.println("[TOOL] Executing: multiply(" + input.a() + ", " + input.b() + ")");
+        return input.a() * input.b();
+    };
+
+    static final Function<TwoNumbers, Double> DIVIDE = input -> {
+        System.out.println("[TOOL] Executing: divide(" + input.a() + ", " + input.b() + ")");
+        if (input.b() == 0) {
+            throw new IllegalArgumentException("Division by zero is undefined");
+        }
+        return input.a() / input.b();
+    };
+
+    static final Function<SingleNumber, Double> SQUARE_ROOT = input -> {
+        System.out.println("[TOOL] Executing: squareRoot(" + input.number() + ")");
+        return Math.sqrt(input.number());
+    };
 
     /**
      * Sends a message to the chat model, maintaining conversation history.
