@@ -51,6 +51,18 @@ In this quickstart you'll get hands-on with five fundamentals: chat, prompt temp
 >
 > **Note:** Spring AI 2.0.0-M5 (milestone) is used. The Spring Milestones repository is configured in the root `pom.xml`.
 
+This module's [`pom.xml`](pom.xml) already includes the dependency below — if you're building your own project, add the same to your `<dependencies>` block:
+
+```xml
+<!-- Spring AI OpenAI SDK (Official OpenAI Java SDK integration) -->
+<dependency>
+  <groupId>org.springframework.ai</groupId>
+  <artifactId>spring-ai-openai</artifactId>
+</dependency>
+```
+
+The version is managed by the parent [`pom.xml`](../pom.xml) via the Spring AI BOM (`spring-ai-bom` 2.0.0-M5), and the Spring Milestones repository is configured there as well.
+
 ## Setup
 
 ### 1. Get Your GitHub Token
@@ -168,6 +180,10 @@ mvn --% compile exec:java -Dexec.mainClass=com.example.springai.quickstart.Respo
 See how AI safety filters block harmful content.
 
 ## What Each Example Shows
+
+> **About the demo style:** Each example in this module is a plain Java class with a `main()` method that builds an `OpenAiChatModel` directly via `OpenAiChatModel.builder()`. This is the simplest way to demonstrate each concept in isolation without any Spring Boot features. It keeps the focus on the core AI interactions.
+>
+> Starting in [Module 01](../01-introduction/README.md), the same `OpenAiChatModel` will instead be auto-configured by Spring Boot from `application.yaml` and injected into controllers and services. You'll add the `spring-ai-starter-model-openai` dependency (the Boot starter), drop the manual builder calls, and run the code as a real web app.
 
 **Basic Chat** - [BasicChatDemo.java](src/main/java/com/example/springai/quickstart/BasicChatDemo.java)
 
@@ -366,7 +382,15 @@ This forces UTF-8 encoding in the terminal. Alternatively, use Windows Terminal 
 **Issue**: Authentication errors, rate limits, or unexpected responses from the AI model
 
 **Solution**: Set the `OPENAI_LOG` environment variable to enable debug logging from the OpenAI Java SDK:
+
+**Bash:**
 ```bash
 export OPENAI_LOG=debug
 ```
+
+**PowerShell:**
+```powershell
+$env:OPENAI_LOG="debug"
+```
+
 This shows HTTP requests and responses in the console, helping troubleshoot authentication errors, rate limits, or unexpected responses. Remove this variable in production to reduce log noise.

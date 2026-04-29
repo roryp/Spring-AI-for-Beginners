@@ -75,7 +75,7 @@ Spring AI provides conversation management through its `ChatMemory` abstraction.
 
 This module uses two core Spring AI capabilities — **ChatModel** for sending prompts and **Chat Memory** for maintaining conversation history. Here's how the pieces fit together:
 
-**Dependencies** - Add the Spring AI OpenAI SDK starter for auto-configuration:
+**Dependencies** - In the previous module you added `spring-ai-openai` — the plain SDK integration — because those demos built `OpenAiChatModel` by hand inside a `main()` method (calling `OpenAiChatModel.builder()...build()` directly). This module is a Spring Boot web app, so we swap to the **starter** variant, which pulls in the same OpenAI SDK *plus* Spring Boot auto-configuration: `OpenAiChatModel` is constructed for you from properties in `application.yaml` and injected wherever you need it. This is the standard pattern for Spring Boot applications, and it keeps your code clean and focused on business logic rather than boilerplate setup.
 
 ```xml
 <dependency>
@@ -83,6 +83,8 @@ This module uses two core Spring AI capabilities — **ChatModel** for sending p
     <artifactId>spring-ai-starter-model-openai</artifactId> <!-- Version managed by Spring AI BOM in root pom.xml -->
 </dependency>
 ```
+
+> Rule of thumb: use `spring-ai-<provider>` for plain Java apps, and `spring-ai-starter-model-<provider>` when running inside Spring Boot.
 
 **Chat Model** - The starter auto-configures `OpenAiChatModel` from properties in `application.yaml` — no manual `@Bean` needed ([SpringAiConfig.java](src/main/java/com/example/springai/config/SpringAiConfig.java)):
 
