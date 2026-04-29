@@ -29,50 +29,7 @@ import java.util.List;
  * - "How can I use Spring AI advisors for output guardrails?"
  */
 public class ResponsibleAIDemo {
-    
-    private final OpenAiChatModel chatModel;
 
-    private static final String SYSTEM_PROMPT = "You are a helpful assistant. Always be respectful and safe.";
-    
-    private static final String[] BLOCKED_KEYWORDS = {
-        "explosives", "bomb", "weapon", "hack into", "steal",
-        "kill", "murder", "attack", "poison"
-    };
-    
-    /**
-     * Validates user input against blocked keywords.
-     * Returns null if safe, or a reason string if blocked.
-     */
-    private static String validateInput(String text) {
-        String lower = text.toLowerCase();
-        for (String keyword : BLOCKED_KEYWORDS) {
-            if (lower.contains(keyword)) {
-                return "Blocked by guardrail: contains prohibited keyword '" + keyword + "'";
-            }
-        }
-        return null;
-    }
-    
-    public ResponsibleAIDemo() {
-        String githubToken = System.getenv("GITHUB_TOKEN");
-        if (githubToken == null || githubToken.isBlank()) {
-            throw new IllegalStateException("Set GITHUB_TOKEN to a token with models:read scope.");
-        }
-
-        String modelName = System.getenv().getOrDefault("GITHUB_MODEL", "gpt-4.1-nano");
-
-        var chatOptions = OpenAiChatOptions.builder()
-                .baseUrl("https://models.github.ai/inference")
-                .apiKey(githubToken)
-                .model(modelName)
-                .gitHubModels(true)
-                .build();
-
-        this.chatModel = OpenAiChatModel.builder()
-                .options(chatOptions)
-                .build();
-    }
-    
     public static void main(String[] args) {
         ResponsibleAIDemo demo = new ResponsibleAIDemo();
         
@@ -104,7 +61,50 @@ public class ResponsibleAIDemo {
 
         System.exit(0);
     }
-    
+
+    private final OpenAiChatModel chatModel;
+
+    private static final String SYSTEM_PROMPT = "You are a helpful assistant. Always be respectful and safe.";
+
+    private static final String[] BLOCKED_KEYWORDS = {
+        "explosives", "bomb", "weapon", "hack into", "steal",
+        "kill", "murder", "attack", "poison"
+    };
+
+    /**
+     * Validates user input against blocked keywords.
+     * Returns null if safe, or a reason string if blocked.
+     */
+    private static String validateInput(String text) {
+        String lower = text.toLowerCase();
+        for (String keyword : BLOCKED_KEYWORDS) {
+            if (lower.contains(keyword)) {
+                return "Blocked by guardrail: contains prohibited keyword '" + keyword + "'";
+            }
+        }
+        return null;
+    }
+
+    public ResponsibleAIDemo() {
+        String githubToken = System.getenv("GITHUB_TOKEN");
+        if (githubToken == null || githubToken.isBlank()) {
+            throw new IllegalStateException("Set GITHUB_TOKEN to a token with models:read scope.");
+        }
+
+        String modelName = System.getenv().getOrDefault("GITHUB_MODEL", "gpt-4.1-nano");
+
+        var chatOptions = OpenAiChatOptions.builder()
+                .baseUrl("https://models.github.ai/inference")
+                .apiKey(githubToken)
+                .model(modelName)
+                .gitHubModels(true)
+                .build();
+
+        this.chatModel = OpenAiChatModel.builder()
+                .options(chatOptions)
+                .build();
+    }
+
     /**
      * Tests the application-level Input Guardrail - blocks before reaching LLM.
      */
