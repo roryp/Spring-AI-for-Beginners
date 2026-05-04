@@ -1,6 +1,6 @@
 {
   "name": "Spring AI Java Development Environment",
-  "image": "mcr.microsoft.com/devcontainers/java:21",
+  "image": "mcr.microsoft.com/devcontainers/java:25",
   "features": {
     "ghcr.io/devcontainers/features/common-utils:2": {
       "installZsh": false,

@@ -44,7 +44,7 @@ In this quickstart you'll get hands-on with five fundamentals: chat, prompt temp
 **Using the Dev Container?** Java and Maven are already installed. You only need a GitHub Personal Access Token.
 
 **Local Development:**
-- Java 21+, Maven 3.9+
+- Java 25+, Maven 3.9+
 - GitHub Personal Access Token (instructions below)
 
 > **Note:** This module uses `gpt-4.1-nano` from GitHub Models. Do not modify the model name in the code - it's configured to work with GitHub's available models.
