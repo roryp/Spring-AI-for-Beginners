@@ -109,3 +109,4 @@ regen-boot-seq.py
 render-puml.py
 .env copy
 tools/
+.devcontainer/devcontainer-lock.json
