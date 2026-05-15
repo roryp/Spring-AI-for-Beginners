@@ -131,7 +131,7 @@ These terms appear in multiple modules and are worth knowing throughout the cour
 - **gpt-5.2** — A Microsoft Foundry reasoning model with adjustable thinking effort. Used by Module 02 only, to demonstrate prompt engineering with reasoning controls.
 - **gpt-4o-mini** — A fast, low-latency non-reasoning model. Used by Modules 01, 03, 04, 05, and 06 to keep demos responsive while focusing on Spring AI patterns rather than model latency.
 - **azd (Azure Developer CLI)** — The command-line tool that provisions the Microsoft Foundry resource and model deployments for modules 1–6 (`azd up`); see [01-introduction/infra/README.md](01-introduction/infra/README.md).
-- **Dev Container / Codespaces** — The pre-configured development environment for this course (Java 25, Maven 3.9+, Copilot) that you can launch as a GitHub Codespace.
+- **Dev Container / Codespaces** — The pre-configured development environment for this course (Java 25, Maven 3.9+, Copilot) that you can launch as a GitHub Codespace. Spring AI itself runs on Java 17+, but this repo targets Java 25 because it builds on Spring Boot 4.
 - **Maven** — The Java build tool used to compile and run every example (`mvn compile exec:java -Dexec.mainClass=...`).
 - **`application.yaml`** — The Spring Boot configuration file used by modules 1–6 to wire up Microsoft Foundry credentials, model names, and other settings.
 - **`microsoft-deployment-name`** — The `spring.ai.openai` property that tells the OpenAI SDK to route requests to a named Azure deployment (instead of the OpenAI public model name).

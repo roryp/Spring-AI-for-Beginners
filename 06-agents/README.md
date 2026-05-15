@@ -59,7 +59,7 @@ That orchestration layer is what this module focuses on. The five patterns below
 ## Prerequisites
 
 - Completed [Module 01 - Introduction](../01-introduction/README.md) (Microsoft Foundry resources deployed)
-- Java 17+
+- Java 25 (Spring AI itself supports Java 17+, but this repo targets Java 25 via Spring Boot 4)
 - Maven 3.9+
 - `.env` file in root directory with Azure credentials (created by `azd up` in Module 01)
 
