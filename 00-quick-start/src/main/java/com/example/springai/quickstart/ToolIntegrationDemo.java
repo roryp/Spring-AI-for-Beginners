@@ -4,11 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
-import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.tool.ToolCallback;
@@ -17,28 +16,29 @@ import org.springframework.ai.tool.function.FunctionToolCallback;
 /**
  * ToolIntegrationDemo - AI Function Calling with Spring AI
  * Run: mvn exec:java -Dexec.mainClass="com.example.springai.quickstart.ToolIntegrationDemo"
- * 
+ *
  * This example demonstrates one of the most powerful features of modern LLMs:
  * the ability to call external functions/tools. The AI can:
  * 1. Understand when a tool is needed
  * 2. Extract parameters from natural language
  * 3. Execute the tool and incorporate results
- * 
+ *
  * This enables AI agents to perform actions, not just generate text.
  * We'll use a calculator as an example, but this pattern applies to
  * any functionality: databases, APIs, file operations, etc.
- * 
+ *
  * Key Concepts:
- * - FunctionToolCallback for registering tools
- * - OpenAiChatOptions for tool configuration
+ * - {@link FunctionToolCallback} for registering tools
+ * - {@link ChatClient.Builder#defaultToolCallbacks(List)} to attach tools once
  * - Parameter extraction from natural language
  * - Multi-step reasoning with tools
- * 
+ *
  * 💡 Ask GitHub Copilot:
  * - "How does FunctionToolCallback work and what does Spring AI do with it behind the scenes?"
  * - "Can the AI call multiple tools in sequence to solve complex problems?"
  * - "What happens if a tool throws an exception - how should I handle errors?"
  * - "How would I integrate a real API (like weather or currency) instead of this calculator example?"
+ * - "When should I use ChatClient.prompt().tools(...) per-call vs defaultToolCallbacks(...) at build time?"
  */
 public class ToolIntegrationDemo {
 
@@ -77,17 +77,23 @@ public class ToolIntegrationDemo {
                 .build()
         );
 
-        // Configure the chat model with tool capabilities
+        // Bootstrap the chat model (no tools at the model level any more — tools are
+        // now an application-layer concern attached via the ChatClient builder).
         var chatOptions = OpenAiChatOptions.builder()
                 .baseUrl("https://models.github.ai/inference")
                 .apiKey(githubToken)
                 .model("gpt-4.1-nano")
                 .gitHubModels(true)
-                .toolCallbacks(toolCallbacks)
                 .build();
 
-        var chatModel = OpenAiChatModel.builder()
+        OpenAiChatModel chatModel = OpenAiChatModel.builder()
                 .options(chatOptions)
+                .build();
+
+        // Wire the tool callbacks onto the ChatClient once via defaultToolCallbacks.
+        // Spring AI handles the tool-call loop (model -> tool -> model) automatically.
+        ChatClient chatClient = ChatClient.builder(chatModel)
+                .defaultToolCallbacks(toolCallbacks)
                 .build();
 
         // Maintain conversation history for multi-turn context
@@ -99,7 +105,7 @@ public class ToolIntegrationDemo {
         String query1 = "Can you calculate 42 plus 58 for me?";
         System.out.println("User: " + query1);
         System.out.println();
-        String result1 = chat(chatModel, conversationHistory, query1);
+        String result1 = chat(chatClient, conversationHistory, query1);
         System.out.println("Assistant: " + result1);
         System.out.println();
 
@@ -109,7 +115,7 @@ public class ToolIntegrationDemo {
         String query2 = "I purchased an item for 80 dollars with a 15% discount. What's the final price?";
         System.out.println("User: " + query2);
         System.out.println();
-        String result2 = chat(chatModel, conversationHistory, query2);
+        String result2 = chat(chatClient, conversationHistory, query2);
         System.out.println("Assistant: " + result2);
         System.out.println();
 
@@ -119,7 +125,7 @@ public class ToolIntegrationDemo {
         String query3 = "Calculate the square root of 256 please";
         System.out.println("User: " + query3);
         System.out.println();
-        String result3 = chat(chatModel, conversationHistory, query3);
+        String result3 = chat(chatClient, conversationHistory, query3);
         System.out.println("Assistant: " + result3);
         System.out.println();
 
@@ -167,19 +173,26 @@ public class ToolIntegrationDemo {
     };
 
     /**
-     * Sends a message to the chat model, maintaining conversation history.
-     * Spring AI handles tool execution internally by default.
+     * Sends a message to the chat client, maintaining conversation history.
+     * The {@link ChatClient} fluent API drives the tool-call loop automatically:
+     * the model decides when to call a registered tool, Spring AI executes it,
+     * feeds the result back, and returns only the final assistant text.
      */
-    private static String chat(OpenAiChatModel chatModel, List<Message> history, String userMessage) {
+    private static String chat(ChatClient chatClient, List<Message> history, String userMessage) {
         history.add(new UserMessage(userMessage));
 
-        // Keep history manageable (last 10 user/assistant messages)
+        // Keep history manageable (last 20 messages = ~10 user/assistant pairs)
         if (history.size() > 20) {
-            history = new ArrayList<>(history.subList(history.size() - 20, history.size()));
+            List<Message> trimmed = new ArrayList<>(history.subList(history.size() - 20, history.size()));
+            history.clear();
+            history.addAll(trimmed);
         }
 
-        ChatResponse response = chatModel.call(new Prompt(history));
-        String text = response.getResult().getOutput().getText();
+        String text = chatClient.prompt()
+                .messages(history)
+                .call()
+                .content();
+
         history.add(new AssistantMessage(text));
         return text;
     }

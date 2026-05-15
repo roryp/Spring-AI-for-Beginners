@@ -1,5 +1,6 @@
 package com.example.springai.prompts.service;
 
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
@@ -7,6 +8,7 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,13 +29,14 @@ import static org.mockito.Mockito.*;
 /**
  * Simple tests for Gpt5PromptService demonstrating GPT-5 prompting patterns.
  * These tests validate that prompts are structured correctly according to best practices.
- * 
+ *
  * Testing Philosophy for Beginners:
- * - Uses Mockito to mock OpenAiChatModel
- * - ArgumentCaptor captures the actual prompt sent to the model
+ * - Uses Mockito to mock the underlying OpenAiChatModel
+ * - The service consumes a {@link ChatClient}; here we hand it a real ChatClient
+ *   built around the mocked ChatModel, so every fluent call still routes through
+ *   the mock and an {@link ArgumentCaptor} can capture the {@link Prompt}
  * - Tests verify prompt structure contains expected GPT-5 patterns
- * - Doesn't require real LLM - keeps tests fast and deterministic
- * - Validates prompt engineering patterns, not AI responses
+ * - Doesn't require a real LLM — keeps tests fast and deterministic
  */
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -41,10 +44,10 @@ import static org.mockito.Mockito.*;
 class SimpleGpt5PromptTest {
 
     private Gpt5PromptService promptService;
-    
+
     @Mock
     private OpenAiChatModel mockChatModel;
-    
+
     private ArgumentCaptor<Prompt> promptCaptor;
 
     private static ChatResponse mockChatResponse(String text) {
@@ -54,14 +57,23 @@ class SimpleGpt5PromptTest {
     @BeforeEach
     void setUp() {
         promptCaptor = ArgumentCaptor.forClass(Prompt.class);
-        
+
         // Default mock behavior
         when(mockChatModel.call(any(Prompt.class)))
             .thenReturn(mockChatResponse("Mocked response"));
-        
+
+        // ChatClient internally calls chatModel.getDefaultOptions().mutate() to
+        // merge per-request options, so the mock must return a non-null instance.
+        when(mockChatModel.getDefaultOptions())
+            .thenReturn(OpenAiChatOptions.builder().build());
+
         promptService = new Gpt5PromptService();
-        // Use reflection to inject the mock (since it uses @Autowired)
-        setField(promptService, "chatModel", mockChatModel);
+        // Inject a real ChatClient backed by the mocked ChatModel so the fluent
+        // chatClient.prompt(...).call().content() chain ultimately routes through
+        // mockChatModel.call(Prompt), letting the existing verify(...) assertions
+        // continue to capture the underlying Prompt.
+        ChatClient realChatClient = ChatClient.builder(mockChatModel).build();
+        setField(promptService, "chatClient", realChatClient);
     }
 
     @Test
@@ -298,6 +310,8 @@ class SimpleGpt5PromptTest {
         reset(mockChatModel);
         when(mockChatModel.call(any(Prompt.class)))
             .thenReturn(mockChatResponse("Fresh response"));
+        when(mockChatModel.getDefaultOptions())
+            .thenReturn(OpenAiChatOptions.builder().build());
         
         promptService.continueConversation("New message 1", "session-1");
         
@@ -321,6 +335,7 @@ class SimpleGpt5PromptTest {
         // 2. Self-reflection (simplified in our implementation)
         reset(mockChatModel);
         when(mockChatModel.call(any(Prompt.class))).thenReturn(mockChatResponse("response"));
+        when(mockChatModel.getDefaultOptions()).thenReturn(OpenAiChatOptions.builder().build());
         promptService.generateCodeWithReflection("test");
         verify(mockChatModel, times(1)).call(promptCaptor.capture());
         assertThat(getPromptText(promptCaptor.getValue())).contains("production-quality");
@@ -328,6 +343,7 @@ class SimpleGpt5PromptTest {
         // 3. Structured output
         reset(mockChatModel);
         when(mockChatModel.call(any(Prompt.class))).thenReturn(mockChatResponse("response"));
+        when(mockChatModel.getDefaultOptions()).thenReturn(OpenAiChatOptions.builder().build());
         promptService.analyzeCode("test");
         verify(mockChatModel, times(1)).call(promptCaptor.capture());
         assertThat(getPromptText(promptCaptor.getValue())).contains("analysis_framework");

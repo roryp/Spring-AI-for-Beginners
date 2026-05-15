@@ -1,13 +1,9 @@
 package com.example.springai.service;
 
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
-import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.messages.Message;
-import org.springframework.ai.chat.messages.UserMessage;
-import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.openai.OpenAiChatModel;
-
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,22 +14,27 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * ConversationService - Stateful Conversation Management
  * Run: ./start.sh (from module directory, after deploying Azure resources with azd up)
- * 
+ *
  * Service for managing conversational interactions with memory.
  * Maintains separate conversation histories for different conversation IDs.
- * 
+ *
  * This demonstrates the core difference between stateless and stateful AI:
  * - Without memory: Each request is independent, no context
  * - With memory: A sliding window of messages maintains conversation history
- * 
+ *
+ * Conversation history is managed automatically by {@link MessageChatMemoryAdvisor}
+ * wired into {@link ChatClient}. The advisor reads the {@code conversationId} from
+ * the request advisor params, fetches prior messages from the shared {@link ChatMemory}
+ * bean, prepends them to the prompt, and persists the new exchange — no manual
+ * add/get bookkeeping needed in this service.
+ *
  * Key Concepts:
- * - ChatMemory abstraction for conversation context management
- * - MessageWindowChatMemory with sliding window of recent messages
- * - Per-user conversation isolation via conversation IDs
- * - Spring AI UserMessage and AssistantMessage type safety
- * 
+ * - ChatClient fluent API with advisor-driven memory
+ * - MessageChatMemoryAdvisor + MessageWindowChatMemory for sliding-window history
+ * - Per-conversation isolation via {@code ChatMemory.CONVERSATION_ID} advisor param
+ *
  * 💡 Ask GitHub Copilot:
- * - "How does the sliding window decide which messages to drop when it's full?"
+ * - "How does MessageChatMemoryAdvisor decide which messages to include in each call?"
  * - "Can I implement custom memory storage using a database instead of in-memory?"
  * - "What happens if I increase maxMessages beyond the model's token limit?"
  * - "How would I add summarization to compress old conversation history?"
@@ -41,14 +42,14 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class ConversationService {
 
-    private final OpenAiChatModel chatModel;
+    private final ChatClient chatClient;
     private final ChatMemory chatMemory;
     private final Set<String> activeConversations = ConcurrentHashMap.newKeySet();
 
-    public ConversationService(OpenAiChatModel chatModel) {
-        this.chatModel = chatModel;
-        this.chatMemory = MessageWindowChatMemory.builder()
-                .maxMessages(10)
+    public ConversationService(ChatClient.Builder chatClientBuilder, ChatMemory chatMemory) {
+        this.chatMemory = chatMemory;
+        this.chatClient = chatClientBuilder
+                .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
                 .build();
     }
 
@@ -64,7 +65,9 @@ public class ConversationService {
     }
 
     /**
-     * Send a message within an existing conversation.
+     * Send a message within an existing conversation. {@link MessageChatMemoryAdvisor}
+     * automatically loads prior messages for the given {@code conversationId}, sends
+     * them along with the new user message, and persists the exchange.
      *
      * @param conversationId the conversation ID
      * @param message the user message
@@ -73,17 +76,11 @@ public class ConversationService {
     public String chat(String conversationId, String message) {
         activeConversations.add(conversationId);
 
-        // Add user message to memory
-        chatMemory.add(conversationId, new UserMessage(message));
-
-        // Generate response using conversation history from ChatMemory
-        ChatResponse chatResponse = chatModel.call(new Prompt(chatMemory.get(conversationId)));
-        String responseText = chatResponse.getResult().getOutput().getText();
-
-        // Add AI response to memory
-        chatMemory.add(conversationId, chatResponse.getResult().getOutput());
-
-        return responseText;
+        return chatClient.prompt()
+                .user(message)
+                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId))
+                .call()
+                .content();
     }
 
     /**
