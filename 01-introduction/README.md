@@ -31,7 +31,7 @@ You'll build one application that demonstrates both patterns:
 
 - Completed [Module 00 - Quick Start](../00-quick-start/README.md)
 - Azure subscription with Microsoft Foundry access
-- Java 17+, Maven 3.9+ 
+- Java 25, Maven 3.9+ (Spring AI itself supports Java 17+, but this repo targets Java 25 via Spring Boot 4)
 - Azure CLI (https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
 - Azure Developer CLI (azd) (https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/install-azd)
 
