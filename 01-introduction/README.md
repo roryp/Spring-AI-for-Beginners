@@ -31,7 +31,7 @@ You'll build one application that demonstrates both patterns:
 
 - Completed [Module 00 - Quick Start](../00-quick-start/README.md)
 - Azure subscription with Microsoft Foundry access
-- Java 25+, Maven 3.9+ 
+- Java 17+, Maven 3.9+ 
 - Azure CLI (https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
 - Azure Developer CLI (azd) (https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/install-azd)
 
@@ -86,7 +86,7 @@ This module uses two core Spring AI capabilities — **ChatModel** for sending p
 
 > Rule of thumb: use `spring-ai-<provider>` for plain Java apps, and `spring-ai-starter-model-<provider>` when running inside Spring Boot.
 
-**Chat Model** - The starter auto-configures `OpenAiChatModel` from properties in `application.yaml` — no manual `@Bean` needed ([SpringAiConfig.java](src/main/java/com/example/springai/config/SpringAiConfig.java)):
+**Chat Model** - The starter auto-configures `OpenAiChatModel` from properties in `application.yaml`, and Spring AI also provides a ready-to-use `ChatClient.Builder` bean that wraps the model with a fluent API. The rest of this module uses `ChatClient` rather than calling `OpenAiChatModel` directly ([SpringAiConfig.java](src/main/java/com/example/springai/config/SpringAiConfig.java)):
 
 ```yaml
 spring:
@@ -96,40 +96,53 @@ spring:
       api-key: ${AZURE_OPENAI_API_KEY}
       microsoft-deployment-name: ${AZURE_OPENAI_FAST_DEPLOYMENT}
       chat:
-        options:
-          model: ${AZURE_OPENAI_FAST_DEPLOYMENT}
+        model: ${AZURE_OPENAI_FAST_DEPLOYMENT}
 ```
 
 Credentials come from environment variables set by `azd up`. Microsoft Foundry mode is detected automatically when the base URL contains `openai.azure.com`.
 
-**Conversation Memory** - Use Spring AI's `MessageWindowChatMemory` for automatic sliding-window memory management ([ConversationService.java](src/main/java/com/example/springai/service/ConversationService.java)):
+**Conversation Memory** - Spring AI's `MessageChatMemoryAdvisor` adds chat memory transparently to a `ChatClient`. It loads prior turns from a `ChatMemory` (here a `MessageWindowChatMemory` backed by an `InMemoryChatMemoryRepository`) before every call and writes the new exchange back afterward — you never touch the message list yourself ([ConversationService.java](src/main/java/com/example/springai/service/ConversationService.java)):
 
 ```java
-ChatMemory chatMemory = MessageWindowChatMemory.builder()
-        .maxMessages(10)
+// In SpringAiConfig.java — wire the memory once:
+@Bean
+ChatMemoryRepository chatMemoryRepository() {
+    return new InMemoryChatMemoryRepository();
+}
+
+@Bean
+ChatMemory chatMemory(ChatMemoryRepository repository) {
+    return MessageWindowChatMemory.builder()
+            .chatMemoryRepository(repository)
+            .maxMessages(10)
+            .build();
+}
+
+// In ConversationService.java — build a memory-aware ChatClient:
+this.chatClient = chatClientBuilder
+        .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
         .build();
 
-String conversationId = "user-123";
-chatMemory.add(conversationId, new UserMessage("My name is John"));
-// send to model with full history
-List<Message> history = chatMemory.get(conversationId);
-ChatResponse response = chatModel.call(new Prompt(history));
-chatMemory.add(conversationId, response.getResult().getOutput());
+String answer = chatClient.prompt()
+        .user(message)
+        .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId))
+        .call()
+        .content();
 ```
 
-`MessageWindowChatMemory` keeps the last 10 messages per conversation ID, automatically trimming older messages. It stores separate histories per conversation ID, allowing multiple users to chat simultaneously. No manual list trimming needed — the framework handles the sliding window for you.
+`MessageWindowChatMemory` keeps the last 10 messages per conversation ID, automatically trimming older messages. The `CONVERSATION_ID` advisor parameter scopes memory per user so multiple chats stay isolated. No manual list management — the advisor handles the sliding window for you.
 
 > **🤖 Try with [GitHub Copilot](https://github.com/features/copilot) Chat:** Open [`ConversationService.java`](src/main/java/com/example/springai/service/ConversationService.java) and ask:
 > - "How does MessageWindowChatMemory decide which messages to drop when it's full?"
 > - "Can I implement custom memory storage using a database instead of in-memory?"
-> - "How would I add summarization to compress old conversation history?"
+> - "How does MessageChatMemoryAdvisor interact with the ChatClient request lifecycle?"
 
-The stateless chat endpoint skips memory entirely — just `chatModel.call(new Prompt(prompt))` like the quick start. The stateful endpoint adds messages to history, retrieves context, and includes it with each request. Same model configuration, different patterns.
+The stateless chat endpoint skips memory entirely — it builds its own `ChatClient` without the advisor and calls `chatClient.prompt(prompt).call().content()`. The stateful endpoint delegates everything to the memory-aware client. Same model configuration, different patterns.
 
 > **🤖 Try with [GitHub Copilot](https://github.com/features/copilot) Chat:** Open [`ChatController.java`](src/main/java/com/example/springai/app/ChatController.java) and ask:
-> - "Why is this controller stateless — what would change if I added ChatMemory here?"
+> - "Why is this controller stateless — what would change if I added MessageChatMemoryAdvisor here?"
 > - "How would I stream responses back to the client instead of waiting for the full completion?"
-> - "What's the benefit of using OpenAiChatModel directly vs wrapping it with ChatClient?"
+> - "When would I drop ChatClient and call OpenAiChatModel directly?"
 
 ## Deploy Microsoft Foundry Infrastructure
 

@@ -8,12 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
-import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 
@@ -23,7 +22,7 @@ import org.springframework.ai.openai.OpenAiChatOptions;
  *
  * Demonstrates a simple document-grounded chat approach using Spring AI:
  * 1. Load a document from the file system
- * 2. Include the document content as context in the system message
+ * 2. Include the document content as the {@link ChatClient}'s default system message
  * 3. Maintain a conversation history for multi-turn chat
  * 4. Chat with the model — answers are grounded in the document content
  *
@@ -31,14 +30,15 @@ import org.springframework.ai.openai.OpenAiChatOptions;
  * For full RAG with vector stores and embeddings, see the 03-rag module.
  *
  * Key Concepts:
- * - Document loading and context injection
- * - System message for grounding the model
- * - Multi-turn conversation with message history
+ * - Document loading and context injection via {@code defaultSystem(...)}
+ * - {@link ChatClient} fluent API for multi-turn conversations
+ * - Manual sliding-window history (system + last 20 user/assistant messages)
  *
  * 💡 Ask GitHub Copilot:
  * - "How does this differ from a full RAG pipeline with vector stores?"
  * - "What are the limitations of context-stuffing vs. embedding-based retrieval?"
  * - "How would I scale this to handle larger documents or multiple files?"
+ * - "When should I switch from a manual List<Message> to MessageChatMemoryAdvisor?"
  */
 public class SimpleReaderDemo {
 
@@ -64,7 +64,7 @@ public class SimpleReaderDemo {
                 .gitHubModels(true)
                 .build();
 
-        var chatModel = OpenAiChatModel.builder()
+        OpenAiChatModel chatModel = OpenAiChatModel.builder()
                 .options(chatOptions)
                 .build();
 
@@ -73,17 +73,21 @@ public class SimpleReaderDemo {
                 You are a helpful assistant that answers questions based on the provided document.
                 Use the document content below to answer user questions accurately.
                 If the answer is not in the document, say so clearly.
-                
+
                 --- DOCUMENT ---
                 %s
                 --- END DOCUMENT ---
                 """.formatted(documentContent);
 
-        SystemMessage systemMessage = new SystemMessage(systemPrompt);
+        // ChatClient with the document baked in as the default system message.
+        // Every turn automatically includes this context without us re-sending it.
+        ChatClient chatClient = ChatClient.builder(chatModel)
+                .defaultSystem(systemPrompt)
+                .build();
 
-        // Maintain conversation history (up to 10 recent messages)
+        // Maintain conversation history (user/assistant turns only — the system
+        // message is supplied by the ChatClient default on every call).
         List<Message> conversationHistory = new ArrayList<>();
-        conversationHistory.add(systemMessage);
 
         // --- 4. Interactive conversation loop ---
         try (Scanner scanner = new Scanner(System.in)) {
@@ -97,16 +101,18 @@ public class SimpleReaderDemo {
 
                 conversationHistory.add(new UserMessage(question));
 
-                // Keep conversation history manageable (system + last 10 user/assistant messages)
-                if (conversationHistory.size() > 21) {
-                    List<Message> trimmed = new ArrayList<>();
-                    trimmed.add(systemMessage);
-                    trimmed.addAll(conversationHistory.subList(conversationHistory.size() - 20, conversationHistory.size()));
-                    conversationHistory = trimmed;
+                // Keep conversation history manageable (last 20 user/assistant messages)
+                if (conversationHistory.size() > 20) {
+                    List<Message> trimmed = new ArrayList<>(
+                            conversationHistory.subList(conversationHistory.size() - 20, conversationHistory.size()));
+                    conversationHistory.clear();
+                    conversationHistory.addAll(trimmed);
                 }
 
-                ChatResponse chatResponse = chatModel.call(new Prompt(conversationHistory));
-                String answer = chatResponse.getResult().getOutput().getText();
+                String answer = chatClient.prompt()
+                        .messages(conversationHistory)
+                        .call()
+                        .content();
 
                 conversationHistory.add(new AssistantMessage(answer));
 

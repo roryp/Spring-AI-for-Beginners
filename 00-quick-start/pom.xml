@@ -23,6 +23,12 @@
       <artifactId>spring-ai-openai</artifactId>
     </dependency>
 
+    <!-- Spring AI Chat Client (ChatClient fluent API + chat memory advisors) -->
+    <dependency>
+      <groupId>org.springframework.ai</groupId>
+      <artifactId>spring-ai-client-chat</artifactId>
+    </dependency>
+
     <!-- SLF4J Simple Logger (for logging) -->
     <dependency>
       <groupId>org.slf4j</groupId>

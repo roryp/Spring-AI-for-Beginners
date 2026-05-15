@@ -1,9 +1,9 @@
 package com.example.springai.quickstart;
 
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
-import org.springframework.ai.chat.messages.UserMessage;
-import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.openai.OpenAiChatModel;
@@ -14,27 +14,31 @@ import java.util.Map;
 /**
  * PromptEngineeringDemo - Basic Prompt Engineering Patterns
  * Run: mvn exec:java -Dexec.mainClass="com.example.springai.quickstart.PromptEngineeringDemo"
- * 
+ *
  * This demonstrates fundamental prompt engineering techniques that improve AI responses:
- * 
+ *
  * 1. Zero-shot prompting - Direct task instruction without examples
  * 2. Few-shot prompting - Providing examples to guide the model
  * 3. Chain of thought - Asking the model to show its reasoning
  * 4. Role-based prompting - Setting context and persona
- * 
+ * 5. Prompt templates - Reusable templates with variable substitution
+ * 6. Conversational memory - Maintaining context across turns
+ *
  * Uses GitHub Models (gpt-4.1-nano) which works better with rate limits
  * than larger models for simple demonstrations.
- * 
+ *
  * Key Concepts:
  * - Different prompting strategies
  * - Temperature parameter for response variability
- * - Prompt structure and formatting
- * 
+ * - {@link ChatClient} fluent API for prompt -> response
+ * - {@link MessageChatMemoryAdvisor} for stateful, multi-turn chat
+ *
  * 💡 Ask GitHub Copilot:
  * - "What's the difference between zero-shot and few-shot prompting, and when should I use each?"
  * - "How does the temperature parameter affect the model's responses?"
  * - "What are some techniques to prevent prompt injection attacks in production?"
  * - "How can I create reusable PromptTemplate objects for common patterns?"
+ * - "How does MessageChatMemoryAdvisor differ from manually passing a List<Message>?"
  */
 public class PromptEngineeringDemo {
 
@@ -49,7 +53,7 @@ public class PromptEngineeringDemo {
 
         displayHeader("Prompt Engineering Patterns Demo");
 
-        // Configure the chat model options for GitHub Models endpoint
+        // Bootstrap the chat model for GitHub Models endpoint.
         var chatOptions = OpenAiChatOptions.builder()
                 .baseUrl("https://models.github.ai/inference")
                 .apiKey(githubToken)
@@ -58,27 +62,30 @@ public class PromptEngineeringDemo {
                 .gitHubModels(true)
                 .build();
 
-        // Build the Spring AI chat model
         var chatModel = OpenAiChatModel.builder()
                 .options(chatOptions)
                 .build();
 
+        // Wrap the model in a stateless ChatClient for patterns 1-5.
+        ChatClient chatClient = ChatClient.create(chatModel);
+
         // Pattern 1: Zero-shot - Direct instruction
-        demonstrateZeroShot(chatModel);
-        
+        demonstrateZeroShot(chatClient);
+
         // Pattern 2: Few-shot - Learning from examples
-        demonstrateFewShot(chatModel);
-        
+        demonstrateFewShot(chatClient);
+
         // Pattern 3: Chain of Thought - Show reasoning
-        demonstrateChainOfThought(chatModel);
-        
+        demonstrateChainOfThought(chatClient);
+
         // Pattern 4: Role-based - Setting context
-        demonstrateRoleBased(chatModel);
+        demonstrateRoleBased(chatClient);
 
         // Pattern 5: Prompt Templates - Reusable prompts with variables
-        demonstratePromptTemplates(chatModel);
+        demonstratePromptTemplates(chatClient);
 
-        // Pattern 6: Conversational Memory - Maintaining context across turns
+        // Pattern 6: Conversational Memory - Maintaining context across turns.
+        // Builds a separate, memory-aware ChatClient so other patterns stay stateless.
         demonstrateConversationalMemory(chatModel);
     }
 
@@ -86,7 +93,7 @@ public class PromptEngineeringDemo {
      * Pattern 1: Zero-shot Prompting
      * Direct task instruction without examples
      */
-    private static void demonstrateZeroShot(OpenAiChatModel chatModel) {
+    private static void demonstrateZeroShot(ChatClient chatClient) {
         System.out.println("\n" + "=".repeat(60));
         System.out.println("PATTERN 1: Zero-Shot Prompting");
         System.out.println("=".repeat(60));
@@ -96,16 +103,16 @@ public class PromptEngineeringDemo {
         String prompt = "Classify this sentiment: 'I absolutely loved the movie!'";
         System.out.println("Prompt: " + prompt);
         System.out.println();
-        
-        ChatResponse chatResponse = chatModel.call(new Prompt(prompt));
-        System.out.println("Response: " + chatResponse.getResult().getOutput().getText());
+
+        String response = chatClient.prompt(prompt).call().content();
+        System.out.println("Response: " + response);
     }
 
     /**
      * Pattern 2: Few-Shot Prompting
      * Provide examples to guide the model's behavior
      */
-    private static void demonstrateFewShot(OpenAiChatModel chatModel) {
+    private static void demonstrateFewShot(ChatClient chatClient) {
         System.out.println("\n" + "=".repeat(60));
         System.out.println("PATTERN 2: Few-Shot Prompting");
         System.out.println("=".repeat(60));
@@ -114,28 +121,28 @@ public class PromptEngineeringDemo {
 
         String prompt = """
                 Classify the sentiment as positive, negative, or neutral.
-                
+
                 Examples:
                 Text: "This product exceeded my expectations!" → Positive
                 Text: "It's okay, nothing special." → Neutral
                 Text: "Waste of money, very disappointed." → Negative
-                
+
                 Now classify this:
                 Text: "Best purchase I've made all year!"
                 """;
-        
+
         System.out.println("Prompt with examples:");
         System.out.println(prompt);
-        
-        ChatResponse chatResponse = chatModel.call(new Prompt(prompt));
-        System.out.println("Response: " + chatResponse.getResult().getOutput().getText());
+
+        String response = chatClient.prompt(prompt).call().content();
+        System.out.println("Response: " + response);
     }
 
     /**
      * Pattern 3: Chain of Thought
      * Ask the model to explain its reasoning step-by-step
      */
-    private static void demonstrateChainOfThought(OpenAiChatModel chatModel) {
+    private static void demonstrateChainOfThought(ChatClient chatClient) {
         System.out.println("\n" + "=".repeat(60));
         System.out.println("PATTERN 3: Chain of Thought");
         System.out.println("=".repeat(60));
@@ -143,23 +150,23 @@ public class PromptEngineeringDemo {
         System.out.println();
 
         String prompt = """
-                Problem: A store has 15 apples. They sell 8 apples and then 
+                Problem: A store has 15 apples. They sell 8 apples and then
                 receive a shipment of 12 more apples. How many apples do they have now?
-                
+
                 Let's solve this step-by-step:
                 """;
-        
+
         System.out.println("Prompt: " + prompt);
-        
-        ChatResponse chatResponse = chatModel.call(new Prompt(prompt));
-        System.out.println("Response: " + chatResponse.getResult().getOutput().getText());
+
+        String response = chatClient.prompt(prompt).call().content();
+        System.out.println("Response: " + response);
     }
 
     /**
      * Pattern 4: Role-Based Prompting
      * Set a specific persona/context for the AI
      */
-    private static void demonstrateRoleBased(OpenAiChatModel chatModel) {
+    private static void demonstrateRoleBased(ChatClient chatClient) {
         System.out.println("\n" + "=".repeat(60));
         System.out.println("PATTERN 4: Role-Based Prompting");
         System.out.println("=".repeat(60));
@@ -169,26 +176,26 @@ public class PromptEngineeringDemo {
         String prompt = """
                 You are an experienced software architect reviewing code.
                 Provide a brief code review for this function:
-                
+
                 def calculate_total(items):
                     total = 0
                     for item in items:
                         total = total + item['price']
                     return total
                 """;
-        
+
         System.out.println("Prompt with role:");
         System.out.println(prompt);
-        
-        ChatResponse chatResponse = chatModel.call(new Prompt(prompt));
-        System.out.println("Response: " + chatResponse.getResult().getOutput().getText());
+
+        String response = chatClient.prompt(prompt).call().content();
+        System.out.println("Response: " + response);
     }
 
     /**
      * Pattern 5: Prompt Templates
      * Create reusable prompts with variable placeholders
      */
-    private static void demonstratePromptTemplates(OpenAiChatModel chatModel) {
+    private static void demonstratePromptTemplates(ChatClient chatClient) {
         System.out.println("\n" + "=".repeat(60));
         System.out.println("PATTERN 5: Prompt Templates");
         System.out.println("=".repeat(60));
@@ -209,8 +216,8 @@ public class PromptEngineeringDemo {
         System.out.println("Resolved prompt: " + prompt.getContents());
         System.out.println();
 
-        ChatResponse chatResponse = chatModel.call(prompt);
-        System.out.println("Response: " + chatResponse.getResult().getOutput().getText());
+        String response = chatClient.prompt(prompt).call().content();
+        System.out.println("Response: " + response);
 
         // Second example with different variables
         System.out.println();
@@ -223,15 +230,18 @@ public class PromptEngineeringDemo {
         System.out.println("Resolved prompt: " + prompt2.getContents());
         System.out.println();
 
-        ChatResponse chatResponse2 = chatModel.call(prompt2);
-        System.out.println("Response: " + chatResponse2.getResult().getOutput().getText());
+        String response2 = chatClient.prompt(prompt2).call().content();
+        System.out.println("Response: " + response2);
     }
 
     /**
      * Pattern 6: Conversational Memory
      * Maintain context across multiple interactions using ChatMemory.
-     * This is the only pattern that requires memory — the follow-up question
-     * references information from the first turn.
+     *
+     * This builds a memory-aware {@link ChatClient} wired with
+     * {@link MessageChatMemoryAdvisor} — the idiomatic Spring AI 2.0 pattern.
+     * The advisor automatically loads prior turns from the {@link ChatMemory}
+     * before each call and persists the new exchange afterward.
      */
     private static void demonstrateConversationalMemory(OpenAiChatModel chatModel) {
         System.out.println("\n" + "=".repeat(60));
@@ -244,6 +254,12 @@ public class PromptEngineeringDemo {
         ChatMemory chatMemory = MessageWindowChatMemory.builder()
                 .maxMessages(10)
                 .build();
+
+        // Memory-aware ChatClient — the advisor handles read/write of chat history
+        ChatClient memoryClient = ChatClient.builder(chatModel)
+                .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
+                .build();
+
         String conversationId = "demo-session";
 
         // First interaction
@@ -251,25 +267,27 @@ public class PromptEngineeringDemo {
         System.out.println("User (Turn 1): " + question1);
         System.out.println();
 
-        UserMessage userMessage1 = new UserMessage(question1);
-        chatMemory.add(conversationId, userMessage1);
-        ChatResponse response1 = chatModel.call(new Prompt(chatMemory.get(conversationId)));
-        chatMemory.add(conversationId, response1.getResult().getOutput());
+        String response1 = memoryClient.prompt()
+                .user(question1)
+                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId))
+                .call()
+                .content();
 
-        System.out.println("Assistant: " + response1.getResult().getOutput().getText());
+        System.out.println("Assistant: " + response1);
         System.out.println();
 
-        // Second interaction — references the first turn
+        // Second interaction — references the first turn (no need to resend history)
         String question2 = "What's my name, and can you elaborate on the first concept you mentioned?";
         System.out.println("User (Turn 2): " + question2);
         System.out.println();
 
-        UserMessage userMessage2 = new UserMessage(question2);
-        chatMemory.add(conversationId, userMessage2);
-        ChatResponse response2 = chatModel.call(new Prompt(chatMemory.get(conversationId)));
-        chatMemory.add(conversationId, response2.getResult().getOutput());
+        String response2 = memoryClient.prompt()
+                .user(question2)
+                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId))
+                .call()
+                .content();
 
-        System.out.println("Assistant: " + response2.getResult().getOutput().getText());
+        System.out.println("Assistant: " + response2);
         System.out.println();
         System.out.println("[INFO] The model remembered your name and previous context using ChatMemory!");
     }

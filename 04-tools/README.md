@@ -57,8 +57,7 @@ spring:
       api-key: ${AZURE_OPENAI_API_KEY}
       microsoft-deployment-name: ${AZURE_OPENAI_FAST_DEPLOYMENT}
       chat:
-        options:
-          model: ${AZURE_OPENAI_FAST_DEPLOYMENT}
+        model: ${AZURE_OPENAI_FAST_DEPLOYMENT}
 ```
 
 Tools are registered as Spring `@Bean` methods annotated with `@Tool` — Spring AI discovers them automatically and makes them available to `ChatClient`.

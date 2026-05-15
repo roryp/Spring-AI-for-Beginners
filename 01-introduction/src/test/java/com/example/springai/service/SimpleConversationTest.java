@@ -1,11 +1,16 @@
 package com.example.springai.service;
 
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,12 +30,14 @@ import static org.mockito.Mockito.when;
 /**
  * Simple tests for ConversationService demonstrating conversation management and memory.
  * These tests validate conversation lifecycle, memory management, and context preservation.
- * 
+ *
  * Testing Philosophy for Beginners:
- * - Uses Mockito to mock OpenAiChatModel (simplest way!)
- * - @Mock annotation creates a mock instance
- * - when().thenReturn() defines the mock behavior
- * - Tests the conversation management logic without real LLM calls
+ * - Uses Mockito to mock the underlying OpenAiChatModel
+ * - The service consumes a {@link ChatClient}; here we hand it a real ChatClient built
+ *   around the mocked ChatModel, so every fluent call still routes through the mock
+ * - Memory is wired through {@link MessageWindowChatMemory} backed by
+ *   {@link InMemoryChatMemoryRepository} \u2014 the same wiring used at runtime, but
+ *   isolated per test
  * - Keeps tests fast, deterministic, and independent
  */
 @ExtendWith(MockitoExtension.class)
@@ -39,7 +46,7 @@ import static org.mockito.Mockito.when;
 class SimpleConversationTest {
 
     private ConversationService conversationService;
-    
+
     @Mock
     private OpenAiChatModel mockChatModel;
 
@@ -52,8 +59,23 @@ class SimpleConversationTest {
         // Set up default mock behavior - return a simple response
         when(mockChatModel.call(any(Prompt.class)))
             .thenReturn(mockChatResponse("This is a test response"));
-        
-        conversationService = new ConversationService(mockChatModel);
+
+        // ChatClient internally calls chatModel.getDefaultOptions().mutate() to
+        // merge per-request options, so the mock must return a non-null instance.
+        when(mockChatModel.getDefaultOptions())
+            .thenReturn(OpenAiChatOptions.builder().build());
+
+        // Real ChatMemory backed by an in-memory repository
+        ChatMemory chatMemory = MessageWindowChatMemory.builder()
+                .chatMemoryRepository(new InMemoryChatMemoryRepository())
+                .maxMessages(10)
+                .build();
+
+        // Real ChatClient.Builder wrapping the mocked ChatModel so the fluent
+        // chatClient.prompt(...).call() chain ultimately routes through the mock
+        conversationService = new ConversationService(
+                ChatClient.builder(mockChatModel),
+                chatMemory);
     }
 
     @Test

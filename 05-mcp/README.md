@@ -161,8 +161,7 @@ spring:
       api-key: ${AZURE_OPENAI_API_KEY}
       microsoft-deployment-name: ${AZURE_OPENAI_FAST_DEPLOYMENT}
       chat:
-        options:
-          model: ${AZURE_OPENAI_FAST_DEPLOYMENT}
+        model: ${AZURE_OPENAI_FAST_DEPLOYMENT}
     mcp:
       server:
         name: tictactoe-server

@@ -47,7 +47,7 @@ We'll use GPT-5.2 because it introduces reasoning control - you can tell the mod
 
 ## How This Uses Spring AI
 
-This module uses the same Spring AI dependency introduced in [Module 01](../01-introduction/README.md#how-this-uses-spring-ai) — `spring-ai-starter-model-openai` — which auto-configures `OpenAiChatModel` for Microsoft Foundry. No additional Spring AI dependencies are needed.
+This module uses the same Spring AI dependency introduced in [Module 01](../01-introduction/README.md#how-this-uses-spring-ai) — `spring-ai-starter-model-openai` — which auto-configures `OpenAiChatModel` and a `ChatClient.Builder` for Microsoft Foundry. The service code in this module injects `ChatClient` and uses its fluent API for every call. No additional Spring AI dependencies are needed.
 
 The `application.yaml` configuration is identical to Module 01 ([application.yaml](src/main/resources/application.yaml)):
 
@@ -59,8 +59,7 @@ spring:
       api-key: ${AZURE_OPENAI_API_KEY}
       microsoft-deployment-name: ${AZURE_OPENAI_DEPLOYMENT}
       chat:
-        options:
-          model: ${AZURE_OPENAI_DEPLOYMENT}
+        model: ${AZURE_OPENAI_DEPLOYMENT}
 ```
 
 The difference in this module is how the prompts are constructed — the model configuration stays the same.
@@ -97,7 +96,7 @@ The simplest approach: give the model a direct instruction with no examples. The
 
 ```java
 String prompt = "Classify this sentiment: 'I absolutely loved the movie!'";
-String response = chatModel.call(new Prompt(prompt)).getResult().getOutput().getText();
+String response = chatClient.prompt(prompt).call().content();
 // Response: "Positive"
 ```
 
@@ -123,7 +122,7 @@ String prompt = """
     Now classify this:
     Text: "Best purchase I've made all year!"
     """;
-String response = chatModel.call(new Prompt(prompt)).getResult().getOutput().getText();
+String response = chatClient.prompt(prompt).call().content();
 ```
 
 **When to use:** Custom classifications, consistent formatting, domain-specific tasks, or when zero-shot results are inconsistent.
@@ -143,7 +142,7 @@ String prompt = """
     
     Let's solve this step-by-step:
     """;
-String response = chatModel.call(new Prompt(prompt)).getResult().getOutput().getText();
+String response = chatClient.prompt(prompt).call().content();
 // The model shows: 15 - 8 = 7, then 7 + 12 = 19 apples
 ```
 
@@ -168,7 +167,7 @@ String prompt = """
             total = total + item['price']
         return total
     """;
-String response = chatModel.call(new Prompt(prompt)).getResult().getOutput().getText();
+String response = chatClient.prompt(prompt).call().content();
 ```
 
 **When to use:** Code reviews, tutoring, domain-specific analysis, or when you need responses tailored to a particular expertise level or perspective.
@@ -191,7 +190,7 @@ Prompt prompt = template.create(Map.of(
     "activity", "sightseeing"
 ));
 
-String response = chatModel.call(prompt).getResult().getOutput().getText();
+String response = chatClient.prompt(prompt).call().content();
 ```
 
 **When to use:** Repeated queries with different inputs, batch processing, building reusable AI workflows, or any scenario where the prompt structure stays the same but the data changes.
@@ -230,7 +229,7 @@ String prompt = """
     Provide your answer:
     """;
 
-String response = chatModel.call(new Prompt(prompt)).getResult().getOutput().getText();
+String response = chatClient.prompt(prompt).call().content();
 ```
 
 > 💡 **Explore with GitHub Copilot:** Open [`Gpt5PromptService.java`](src/main/java/com/example/springai/prompts/service/Gpt5PromptService.java) and ask:
@@ -249,7 +248,7 @@ String prompt = """
     Problem: Design a caching strategy for a high-traffic REST API.
     """;
 
-String response = chatModel.call(new Prompt(prompt)).getResult().getOutput().getText();
+String response = chatClient.prompt(prompt).call().content();
 ```
 
 **Task Execution (Step-by-Step Progress)** - For multi-step workflows. The model provides an upfront plan, narrates each step as it works, then gives a summary. Use this for migrations, implementations, or any multi-step process.
@@ -287,7 +286,7 @@ String prompt = """
     Begin execution:
     """;
 
-String response = chatModel.call(new Prompt(prompt)).getResult().getOutput().getText();
+String response = chatClient.prompt(prompt).call().content();
 ```
 
 Chain-of-Thought prompting explicitly asks the model to show its reasoning process, improving accuracy for complex tasks. The step-by-step breakdown helps both humans and AI understand the logic.
@@ -311,7 +310,7 @@ String prompt = """
     Keep it simple and include basic error handling.
     """;
 
-String response = chatModel.call(new Prompt(prompt)).getResult().getOutput().getText();
+String response = chatClient.prompt(prompt).call().content();
 ```
 
 The diagram below shows this iterative improvement loop — generate, evaluate, identify weaknesses, and refine until the code meets production standards.
@@ -365,7 +364,7 @@ String prompt = """
     Provide your structured analysis:
     """;
 
-String response = chatModel.call(new Prompt(prompt)).getResult().getOutput().getText();
+String response = chatClient.prompt(prompt).call().content();
 ```
 
 > **🤖 Try with [GitHub Copilot](https://github.com/features/copilot) Chat:** Ask about structured analysis:
@@ -379,23 +378,29 @@ The following diagram shows how this structured framework organizes a code revie
 
 *Framework for consistent code reviews with severity levels*
 
-**Multi-Turn Chat** - For conversations that need context. Spring AI's `MessageWindowChatMemory` automatically maintains a sliding window of recent messages per session, so the model remembers previous turns. Use this for interactive help sessions or complex Q&A.
+**Multi-Turn Chat** - For conversations that need context. Spring AI's `MessageChatMemoryAdvisor` plus `MessageWindowChatMemory` automatically maintains a sliding window of recent messages per session, so the model remembers previous turns without you tracking the history yourself. Use this for interactive help sessions or complex Q&A.
 
 ```java
 ChatMemory chatMemory = MessageWindowChatMemory.builder()
         .maxMessages(10)
         .build();
 
-String sessionId = "user-session-1";
-chatMemory.add(sessionId, new UserMessage("What is Spring Boot?"));
-List<Message> history = chatMemory.get(sessionId);
-String response1 = chatModel.call(new Prompt(history)).getResult().getOutput().getText();
-chatMemory.add(sessionId, new AssistantMessage(response1));
+ChatClient memoryClient = ChatClient.builder(chatModel)
+        .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
+        .build();
 
-chatMemory.add(sessionId, new UserMessage("Show me an example"));
-history = chatMemory.get(sessionId);
-String response2 = chatModel.call(new Prompt(history)).getResult().getOutput().getText();
-chatMemory.add(sessionId, new AssistantMessage(response2));
+String sessionId = "user-session-1";
+String response1 = memoryClient.prompt()
+        .user("What is Spring Boot?")
+        .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, sessionId))
+        .call()
+        .content();
+
+String response2 = memoryClient.prompt()
+        .user("Show me an example")
+        .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, sessionId))
+        .call()
+        .content();
 ```
 
 The diagram below visualizes how conversation context accumulates with each turn and how it relates to the model's token limit.
@@ -415,7 +420,7 @@ String prompt = """
     for the entire journey including the stop?
     """;
 
-String response = chatModel.call(new Prompt(prompt)).getResult().getOutput().getText();
+String response = chatClient.prompt(prompt).call().content();
 ```
 
 The diagram below illustrates how the model breaks problems into explicit, numbered logical steps.
@@ -437,7 +442,7 @@ String prompt = """
     Summarize the key concepts of machine learning.
     """;
 
-String response = chatModel.call(new Prompt(prompt)).getResult().getOutput().getText();
+String response = chatClient.prompt(prompt).call().content();
 ```
 
 The following diagram shows how constraints guide the model to produce output that strictly adheres to your format and length requirements.

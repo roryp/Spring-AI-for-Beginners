@@ -1,6 +1,7 @@
 package com.example.springai.prompts.config;
 
 import com.openai.client.OpenAIClientAsync;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.openai.setup.OpenAiSetup;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -8,14 +9,14 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * Configuration for Spring AI with Microsoft Foundry using the OpenAI SDK starter.
- * 
- * The starter (spring-ai-starter-model-openai) auto-configures OpenAiChatModel
- * using properties from application.yaml. Azure mode is detected automatically
- * when the base URL contains openai.azure.com.
- * 
+ *
+ * The starter (spring-ai-starter-model-openai) auto-configures {@code OpenAiChatModel}
+ * and {@code ChatClient.Builder} from properties in application.yaml. Azure mode is
+ * detected automatically when the base URL contains openai.azure.com.
+ *
  * Note: For GPT-5 reasoning effort is controlled through prompt engineering
  * rather than model configuration parameters. See Gpt5PromptService for examples of how to
- * use prompts like "<reasoning_effort>low</reasoning_effort>" to control model behavior.
+ * use prompts like "&lt;reasoning_effort&gt;low&lt;/reasoning_effort&gt;" to control model behavior.
  *
  * 💡 Ask GitHub Copilot:
  * - "Why is reasoning_effort set via prompts here instead of as an API parameter?"
@@ -34,6 +35,16 @@ public class SpringAiConfig {
 
     @Value("${AZURE_OPENAI_DEPLOYMENT}")
     private String deploymentName;
+
+    /**
+     * High-level fluent chat API. Built from the auto-configured {@link ChatClient.Builder}
+     * so the prompt-engineering service can write {@code chatClient.prompt(...).call().content()}
+     * instead of the lower-level {@code chatModel.call(new Prompt(...))} pattern.
+     */
+    @Bean
+    public ChatClient chatClient(ChatClient.Builder chatClientBuilder) {
+        return chatClientBuilder.build();
+    }
 
     /**
      * Exposes the raw OpenAI async client for direct streaming.

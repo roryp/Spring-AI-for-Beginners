@@ -84,14 +84,12 @@ spring:
       api-key: ${AZURE_OPENAI_API_KEY}
       microsoft-deployment-name: ${AZURE_OPENAI_FAST_DEPLOYMENT}
       chat:
-        options:
-          model: ${AZURE_OPENAI_FAST_DEPLOYMENT}
+        model: ${AZURE_OPENAI_FAST_DEPLOYMENT}
       embedding:
-        options:
-          model: ${AZURE_OPENAI_EMBEDDING_DEPLOYMENT}
+        model: ${AZURE_OPENAI_EMBEDDING_DEPLOYMENT}
 ```
 
-The `embedding.options.model` property configures the `text-embedding-3-small` model deployed by `azd up` in Module 01.
+The `embedding.model` property configures the `text-embedding-3-small` model deployed by `azd up` in Module 01.
 
 ## Understanding RAG
 
@@ -188,7 +186,7 @@ The diagram below visualizes this concept — text goes in, numerical vectors co
 
 ```java
 // Auto-configured by spring-ai-starter-model-openai via application.yaml:
-//   spring.ai.openai.embedding.options.model: ${AZURE_OPENAI_EMBEDDING_DEPLOYMENT}
+//   spring.ai.openai.embedding.model: ${AZURE_OPENAI_EMBEDDING_DEPLOYMENT}
 
 @Bean
 public VectorStore vectorStore(EmbeddingModel embeddingModel) {

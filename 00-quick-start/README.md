@@ -44,12 +44,12 @@ In this quickstart you'll get hands-on with five fundamentals: chat, prompt temp
 **Using the Dev Container?** Java and Maven are already installed. You only need a GitHub Personal Access Token.
 
 **Local Development:**
-- Java 25+, Maven 3.9+
+- Java 17+, Maven 3.9+
 - GitHub Personal Access Token (instructions below)
 
 > **Note:** This module uses `gpt-4.1-nano` from GitHub Models. Do not modify the model name in the code - it's configured to work with GitHub's available models.
 >
-> **Note:** Spring AI 2.0.0-M5 (milestone) is used. The Spring Milestones repository is configured in the root `pom.xml`.
+> **Note:** Spring AI 2.0.0-M6 (milestone) is used. The Spring Milestones repository is configured in the root `pom.xml`.
 
 This module's [`pom.xml`](pom.xml) already includes the dependency below — if you're building your own project, add the same to your `<dependencies>` block:
 
@@ -61,7 +61,7 @@ This module's [`pom.xml`](pom.xml) already includes the dependency below — if 
 </dependency>
 ```
 
-The version is managed by the parent [`pom.xml`](../pom.xml) via the Spring AI BOM (`spring-ai-bom` 2.0.0-M5), and the Spring Milestones repository is configured there as well.
+The version is managed by the parent [`pom.xml`](../pom.xml) via the Spring AI BOM (`spring-ai-bom` 2.0.0-M6), and the Spring Milestones repository is configured there as well.
 
 ## Setup
 
@@ -181,13 +181,13 @@ See how AI safety filters block harmful content.
 
 ## What Each Example Shows
 
-> **About the demo style:** Each example in this module is a plain Java class with a `main()` method that builds an `OpenAiChatModel` directly via `OpenAiChatModel.builder()`. This is the simplest way to demonstrate each concept in isolation without any Spring Boot features. It keeps the focus on the core AI interactions.
+> **About the demo style:** Each example in this module is a plain Java class with a `main()` method that bootstraps an `OpenAiChatModel` via `OpenAiChatModel.builder()` and then wraps it in a `ChatClient` for the actual chat calls. `OpenAiChatOptions` is used purely for one-time wiring — the GitHub Models endpoint, API key, model name, and `gitHubModels(true)` flag — not per-request configuration. This keeps each demo focused on the core AI interactions without needing a Spring Boot context.
 >
-> Starting in [Module 01](../01-introduction/README.md), the same `OpenAiChatModel` will instead be auto-configured by Spring Boot from `application.yaml` and injected into controllers and services. You'll add the `spring-ai-starter-model-openai` dependency (the Boot starter), drop the manual builder calls, and run the code as a real web app.
+> Starting in [Module 01](../01-introduction/README.md), the same `OpenAiChatModel` (and a `ChatClient.Builder`) will be auto-configured by Spring Boot from `application.yaml` and injected into controllers and services. You'll add the `spring-ai-starter-model-openai` dependency (the Boot starter), drop the manual builder calls, and run the code as a real web app.
 
 **Basic Chat** - [BasicChatDemo.java](src/main/java/com/example/springai/quickstart/BasicChatDemo.java)
 
-Start here to see Spring AI at its simplest. You'll create an `OpenAiChatModel`, send a prompt, and get back a `ChatResponse`. This demonstrates the foundation: how to initialize models with custom endpoints and API keys. Once you understand this pattern, everything else builds on it.
+Start here to see Spring AI at its simplest. You'll bootstrap an `OpenAiChatModel`, wrap it in a `ChatClient`, and get an answer with one fluent call. The `ChatClient` is Spring AI's recommended high-level entry point — it produces a `String` directly, supports advisors, structured output, tool calling, and streaming. Once you understand this pattern, everything else builds on it.
 
 ```java
 var chatOptions = OpenAiChatOptions.builder()
@@ -201,20 +201,23 @@ var chatModel = OpenAiChatModel.builder()
     .options(chatOptions)
     .build();
 
-ChatResponse response = chatModel.call(new Prompt("What is Spring AI?"));
-System.out.println(response.getResult().getOutput().getText());
+var chatClient = ChatClient.create(chatModel);
+
+String response = chatClient.prompt("What is Spring AI?").call().content();
+System.out.println(response);
 ```
 
 > **🤖 Try with [GitHub Copilot](https://github.com/features/copilot) Chat:** Open [`BasicChatDemo.java`](src/main/java/com/example/springai/quickstart/BasicChatDemo.java) and ask:
 > - "How would I switch from GitHub Models to Microsoft Foundry in this code?"
 > - "What other parameters can I configure in OpenAiChatOptions.builder()?"
-> - "How do I add streaming responses instead of waiting for the complete response?"
+> - "How do I add streaming responses using ChatClient.prompt(...).stream()?"
+> - "When would I drop ChatClient and call OpenAiChatModel directly?"
 
 **Prompt Engineering** - [PromptEngineeringDemo.java](src/main/java/com/example/springai/quickstart/PromptEngineeringDemo.java)
 
 Now that you know how to talk to a model, let's explore what you say to it. This demo uses the same model setup but shows six different prompting patterns. Try zero-shot prompts for direct instructions, few-shot prompts that learn from examples, chain-of-thought prompts that reveal reasoning steps, role-based prompts that set context, and prompt templates for reusable prompts with variables.
 
-The below example shows a prompt using Spring AI's `PromptTemplate` to fill in variables. The AI will answer based on the provided destination and activity.
+The below example shows a prompt using Spring AI's `PromptTemplate` to fill in variables. The `ChatClient` accepts the resulting `Prompt` object directly:
 
 ```java
 PromptTemplate template = new PromptTemplate(
@@ -226,24 +229,34 @@ Prompt prompt = template.create(Map.of(
     "activity", "sightseeing"
 ));
 
-ChatResponse response = chatModel.call(prompt);
+String response = chatClient.prompt(prompt).call().content();
 ```
 
-The demo also includes a conversational memory pattern using Spring AI's `MessageWindowChatMemory` — showing how the model can remember context across multiple turns:
+The demo also includes a conversational memory pattern using Spring AI's `MessageChatMemoryAdvisor` — the idiomatic way to add chat memory to a `ChatClient`. The advisor automatically loads prior turns from a `ChatMemory` before each call and persists the new exchange afterward:
 
 ```java
 ChatMemory chatMemory = MessageWindowChatMemory.builder()
         .maxMessages(10)
         .build();
+
+ChatClient memoryClient = ChatClient.builder(chatModel)
+        .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
+        .build();
+
 String conversationId = "demo-session";
 
-chatMemory.add(conversationId, new UserMessage("My name is Alex and I'm learning Spring AI."));
-ChatResponse response1 = chatModel.call(new Prompt(chatMemory.get(conversationId)));
-chatMemory.add(conversationId, response1.getResult().getOutput());
+String response1 = memoryClient.prompt()
+        .user("My name is Alex and I'm learning Spring AI.")
+        .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId))
+        .call()
+        .content();
 
-// Second turn — the model remembers your name and previous context
-chatMemory.add(conversationId, new UserMessage("What's my name?"));
-ChatResponse response2 = chatModel.call(new Prompt(chatMemory.get(conversationId)));
+// Second turn — the advisor reloads history automatically
+String response2 = memoryClient.prompt()
+        .user("What's my name?")
+        .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId))
+        .call()
+        .content();
 // response2 correctly recalls "Alex"
 ```
 
@@ -251,11 +264,11 @@ ChatResponse response2 = chatModel.call(new Prompt(chatMemory.get(conversationId
 > - "What's the difference between zero-shot and few-shot prompting, and when should I use each?"
 > - "How does the temperature parameter affect the model's responses?"
 > - "What are some techniques to prevent prompt injection attacks in production?"
-> - "How can I create reusable PromptTemplate objects for common patterns?"
+> - "How does MessageChatMemoryAdvisor differ from manually passing a List<Message>?"
 
 **Tool Integration** - [ToolIntegrationDemo.java](src/main/java/com/example/springai/quickstart/ToolIntegrationDemo.java)
 
-This is where Spring AI gets powerful. You register Java functions as `FunctionToolCallback` instances, and the AI automatically decides when to call them based on the user's request. This demonstrates function calling, a key technique for building AI that can take actions, not just answer questions.
+This is where Spring AI gets powerful. You register Java functions as `FunctionToolCallback` instances and wire them onto a `ChatClient` via `defaultToolCallbacks(...)`. The AI then automatically decides when to call them based on the user's request, and Spring AI handles the tool-call loop (model → tool → model) for you so `call().content()` returns just the final answer.
 
 ```java
 record TwoNumbers(double a, double b) {}
@@ -267,9 +280,8 @@ List<ToolCallback> toolCallbacks = List.of(
         .build()
 );
 
-var chatOptions = OpenAiChatOptions.builder()
-    .model("gpt-4.1-nano")
-    .toolCallbacks(toolCallbacks)
+ChatClient chatClient = ChatClient.builder(chatModel)
+    .defaultToolCallbacks(toolCallbacks)
     .build();
 ```
 
@@ -277,21 +289,23 @@ var chatOptions = OpenAiChatOptions.builder()
 > - "How does FunctionToolCallback work and what does Spring AI do with it behind the scenes?"
 > - "Can the AI call multiple tools in sequence to solve complex problems?"
 > - "What happens if a tool throws an exception - how should I handle errors?"
-> - "How would I integrate a real API instead of this calculator example?"
+> - "When should I use ChatClient.prompt().tools(...) per-call vs defaultToolCallbacks(...) at build time?"
 
 **Document Q&A** - [SimpleReaderDemo.java](src/main/java/com/example/springai/quickstart/SimpleReaderDemo.java)
 
-Here you'll see document-grounded chat using a context-stuffing approach. The document is loaded and included in the system message, so the AI answers based on your document content rather than its general knowledge. This is a lightweight approach suitable for small documents — for full RAG with vector stores and embeddings, see the `03-rag` module.
+Here you'll see document-grounded chat using a context-stuffing approach. The document is loaded once and baked into the `ChatClient` as its default system message, so the AI answers based on your document content rather than its general knowledge — and you never resend the document on each turn. This is a lightweight approach suitable for small documents — for full RAG with vector stores and embeddings, see the `03-rag` module.
 
 ```java
 String documentContent = Files.readString(Paths.get("document.txt"));
 
-SystemMessage systemMessage = new SystemMessage(
-    "Answer questions based on this document:\n" + documentContent
-);
+ChatClient chatClient = ChatClient.builder(chatModel)
+    .defaultSystem("Answer questions based on this document:\n" + documentContent)
+    .build();
 
-List<Message> messages = List.of(systemMessage, new UserMessage("What is the main topic?"));
-ChatResponse response = chatModel.call(new Prompt(messages));
+String answer = chatClient.prompt()
+    .user("What is the main topic?")
+    .call()
+    .content();
 ```
 
 > **🤖 Try with [GitHub Copilot](https://github.com/features/copilot) Chat:** Open [`SimpleReaderDemo.java`](src/main/java/com/example/springai/quickstart/SimpleReaderDemo.java) and ask:

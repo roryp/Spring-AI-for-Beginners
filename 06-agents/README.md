@@ -59,7 +59,7 @@ That orchestration layer is what this module focuses on. The five patterns below
 ## Prerequisites
 
 - Completed [Module 01 - Introduction](../01-introduction/README.md) (Microsoft Foundry resources deployed)
-- Java 25+
+- Java 17+
 - Maven 3.9+
 - `.env` file in root directory with Azure credentials (created by `azd up` in Module 01)
 
@@ -77,8 +77,7 @@ spring:
       api-key: ${AZURE_OPENAI_API_KEY}
       microsoft-deployment-name: ${AZURE_OPENAI_FAST_DEPLOYMENT}
       chat:
-        options:
-          model: ${AZURE_OPENAI_FAST_DEPLOYMENT}
+        model: ${AZURE_OPENAI_FAST_DEPLOYMENT}
 ```
 
 The difference in this module is how `ChatClient` calls are **orchestrated** — chained, parallelized, routed, delegated, or looped — rather than executed as single calls.
