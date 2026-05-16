@@ -25,16 +25,18 @@ $endpoint = [Environment]::GetEnvironmentVariable('AZURE_OPENAI_ENDPOINT', 'Proc
 $apiKey = [Environment]::GetEnvironmentVariable('AZURE_OPENAI_API_KEY', 'Process')
 $deployment = [Environment]::GetEnvironmentVariable('AZURE_OPENAI_DEPLOYMENT', 'Process')
 $fastDeployment = [Environment]::GetEnvironmentVariable('AZURE_OPENAI_FAST_DEPLOYMENT', 'Process')
+$embeddingDeployment = [Environment]::GetEnvironmentVariable('AZURE_OPENAI_EMBEDDING_DEPLOYMENT', 'Process')
 
-if (-not $endpoint -or -not $apiKey -or -not $deployment -or -not $fastDeployment) {
-    Write-Error "Missing required environment variables. Please ensure AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY, AZURE_OPENAI_DEPLOYMENT, and AZURE_OPENAI_FAST_DEPLOYMENT are set in .env"
+if (-not $endpoint -or -not $apiKey -or -not $deployment -or -not $fastDeployment -or -not $embeddingDeployment) {
+    Write-Error "Missing required environment variables. Please ensure AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY, AZURE_OPENAI_DEPLOYMENT, AZURE_OPENAI_FAST_DEPLOYMENT, and AZURE_OPENAI_EMBEDDING_DEPLOYMENT are set in .env"
     exit 1
 }
 
 Write-Host "Environment variables loaded successfully" -ForegroundColor Green
 Write-Host "AZURE_OPENAI_ENDPOINT: $endpoint"
 Write-Host "AZURE_OPENAI_DEPLOYMENT: $deployment"
-Write-Host "AZURE_OPENAI_FAST_DEPLOYMENT: $([Environment]::GetEnvironmentVariable('AZURE_OPENAI_FAST_DEPLOYMENT','Process'))"
+Write-Host "AZURE_OPENAI_FAST_DEPLOYMENT: $fastDeployment"
+Write-Host "AZURE_OPENAI_EMBEDDING_DEPLOYMENT: $embeddingDeployment"
 Write-Host ""
 
 function Test-PortInUse {
