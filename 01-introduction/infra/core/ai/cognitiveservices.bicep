@@ -22,12 +22,12 @@ resource cognitiveServices 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
   }
 }
 
-// First deployment - gpt-5.2
+// First deployment - deployments[0] (gpt-5.2)
 // NOTE: raiPolicyName *must* be set to null here.
 // Leaving it out causes long-running / stuck deployments for some models
 // in this tenant/region, due to how the RP auto-attaches RAI policies.
 // Do not remove unless you've tested end-to-end.
-// NOTE: We hard-code two deployments and sequence them with dependsOn
+// NOTE: We hard-code three deployments and sequence them with dependsOn
 // to avoid parallel deployment conflicts on the same OpenAI account.
 // Previous attempts with a for-loop + concurrent deployments caused timeouts.
 resource deployment1 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = if (length(deployments) > 0) {
@@ -40,7 +40,7 @@ resource deployment1 'Microsoft.CognitiveServices/accounts/deployments@2024-10-0
   }
 }
 
-// Second deployment - text-embedding-3-small (explicit dependency on first)
+// Second deployment - deployments[1] (gpt-4o-mini)
 resource deployment2 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = if (length(deployments) > 1) {
   parent: cognitiveServices
   name: deployments[1].name
@@ -54,10 +54,24 @@ resource deployment2 'Microsoft.CognitiveServices/accounts/deployments@2024-10-0
   ]
 }
 
+// Third deployment - deployments[2] (text-embedding-3-small)
+resource deployment3 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = if (length(deployments) > 2) {
+  parent: cognitiveServices
+  name: deployments[2].name
+  sku: deployments[2].sku
+  properties: {
+    model: deployments[2].model
+    raiPolicyName: null
+  }
+  dependsOn: [
+    deployment2
+  ]
+}
+
 output id string = cognitiveServices.id
 output name string = cognitiveServices.name
 output endpoint string = cognitiveServices.properties.endpoint
-output deploymentNames array = length(deployments) > 0 ? (length(deployments) > 1 ? [deployment1.name, deployment2.name] : [deployment1.name]) : []
+output deploymentNames array = length(deployments) > 0 ? (length(deployments) > 1 ? (length(deployments) > 2 ? [deployment1.name, deployment2.name, deployment3.name] : [deployment1.name, deployment2.name]) : [deployment1.name]) : []
 
 #disable-next-line outputs-should-not-contain-secrets  
 output key string = cognitiveServices.listKeys().key1
