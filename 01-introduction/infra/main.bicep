@@ -71,7 +71,7 @@ resource rg 'Microsoft.Resources/resourceGroups@2024-03-01' = {
   tags: tags
 }
 
-// Microsoft Foundry
+// Microsoft Foundry (AI Services, formerly Cognitive Services multi-service)
 module openAi 'core/ai/cognitiveservices.bicep' = {
   name: 'openai'
   scope: rg
@@ -79,7 +79,7 @@ module openAi 'core/ai/cognitiveservices.bicep' = {
     name: 'aoai-${resourceToken}'
     location: openAiLocation
     tags: tags
-    kind: 'OpenAI'
+    kind: 'AIServices'
     sku: openAiSkuName
     deployments: openAiDeployments
   }
