@@ -1,0 +1,81 @@
+@startuml
+title MCP Tic-Tac-Toe — Two Paths to the Same Tools
+
+' ---------- look & feel ----------
+skinparam backgroundColor #f8fafc
+skinparam shadowing false
+skinparam roundCorner 14
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 14
+skinparam BoxPadding 18
+
+skinparam sequence {
+  ArrowColor #1e3a8a
+  ArrowThickness 1.6
+  ArrowFontColor #0f172a
+  LifeLineBorderColor #94a3b8
+  LifeLineBackgroundColor #e2e8f0
+  ParticipantBorderColor #1e3a8a
+  ParticipantBackgroundColor #dbeafe
+  ParticipantFontColor #0f172a
+  ActorBorderColor #1e3a8a
+  ActorBackgroundColor #dbeafe
+  ActorFontColor #0f172a
+  DividerBackgroundColor #1e3a8a
+  DividerFontColor #f8fafc
+  DividerBorderColor #1e3a8a
+}
+
+skinparam Note {
+  BackgroundColor #fef3c7
+  BorderColor #d97706
+  FontColor #78350f
+}
+
+' ---------- participants ----------
+actor "User" as user
+participant "Browser\n:8082" as browser
+participant "MCP Client\n(Spring Boot)" as client
+participant "MCP Server\n(Spring Boot)" as server
+participant "Microsoft\nFoundry" as foundry
+
+== A • Clicking the board ==
+
+user -> browser : click cell
+browser -> client : POST /api/game/move\n{gameId, position}
+client -> server : **makeMove**(gameId, pos, "X")
+server --> client : updated board
+client -> server : **aiMove**(gameId)
+server -> foundry : "Pick the best move 0–8"
+foundry --> server : chosen index
+server --> client : board after O
+client --> browser : {board, status}
+browser --> user : board updates
+
+== B • Typing in the chat panel ==
+
+user -> browser : "your turn"
+browser -> client : POST /api/agent/chat\n{message, **gameId**}
+
+note right of client #fef3c7
+  First chat turn for a new gameId in this
+  conversation: the client calls the real
+  **getBoardState** MCP tool and appends
+  the result to chat memory as an
+  AssistantMessage — no prompt injection,
+  just another tool call surfaced through
+  conversation history.
+end note
+
+client -> server : **getBoardState**(gameId)
+server --> client : board state JSON
+client -> client : ChatMemory.add(AssistantMessage)
+
+client -> foundry : user message + tool catalog\n+ chat memory (now seeded)
+foundry --> client : "call **makeMove** then **aiMove**"
+client -> server : makeMove / aiMove\n(same MCP tools as path A)
+server --> client : final board
+client --> browser : {reply, board}
+browser --> user : chat reply + board updates
+
+@enduml

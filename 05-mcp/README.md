@@ -5,35 +5,13 @@
 - [What You'll Learn](#what-youll-learn)
 - [Prerequisites](#prerequisites)
 - [Understanding MCP](#understanding-mcp)
-  - [Why MCP?](#why-mcp)
-  - [Custom Tools vs MCP](#custom-tools-vs-mcp)
-  - [MCP Ecosystem](#mcp-ecosystem)
 - [How MCP Works](#how-mcp-works)
-  - [MCP Architecture](#mcp-architecture)
-  - [Tool Discovery](#tool-discovery)
-  - [Transport Mechanisms](#transport-mechanisms)
 - [How This Uses Spring AI](#how-this-uses-spring-ai)
 - [How This Demo Works](#how-this-demo-works)
-  - [MCP Server — Game Engine + AI Strategy](#mcp-server--game-engine--ai-strategy)
-  - [MCP Client — Thin Web UI](#mcp-client--thin-web-ui)
-  - [Game Flow](#game-flow)
 - [Run the Application](#run-the-application)
 - [Using the Application](#using-the-application)
-  - [Start a New Game](#start-a-new-game)
-  - [Make Your Move](#make-your-move)
-  - [Watch the AI Respond](#watch-the-ai-respond)
-  - [Track Your Score](#track-your-score)
 - [Code Walkthrough](#code-walkthrough)
-  - [Server: @McpTool Definitions](#server-mcptool-definitions)
-  - [Server: AI Strategy via ChatClient](#server-ai-strategy-via-chatclient)
-  - [Server: Game Engine Logic](#server-game-engine-logic)
-  - [Client: Tool Discovery via ToolCallbackProvider](#client-tool-discovery-via-toolcallbackprovider)
-  - [Client: Direct MCP Tool Invocation](#client-direct-mcp-tool-invocation)
 - [Key Concepts](#key-concepts)
-  - [MCP Streamable HTTP Protocol](#mcp-streamable-http-protocol)
-  - [Direct Tool Calls vs LLM-Orchestrated Calls](#direct-tool-calls-vs-llm-orchestrated-calls)
-  - [AI Strategy with ChatClient](#ai-strategy-with-chatclient)
-- [Spring AI 2 Features Demonstrated](#spring-ai-2-features-demonstrated)
 - [MCP vs Tools (Module 04)](#mcp-vs-tools-module-04)
 - [Next Steps](#next-steps)
 
@@ -49,9 +27,11 @@ That's what the **Model Context Protocol (MCP)** provides. MCP is an open protoc
 
 In this module, you'll build a **Tic-Tac-Toe game** that demonstrates MCP in action:
 - An **MCP Server** exposes game-engine tools *and* an AI move tool powered by Microsoft Foundry
-- An **MCP Client** provides a thin web UI that discovers and calls server tools — no LLM on the client
-- The AI strategy lives entirely on the server, using **Spring AI's ChatClient** to choose moves
-- All game operations flow through the **MCP Streamable HTTP protocol**
+- An **MCP Client** discovers those tools and invokes them in **two ways**:
+  - **Direct calls** (`ToolCallback.call()`) — the client picks the tool, used by the board UI
+  - **Agent-style calls** (`ChatClient` + the same tool callbacks) — the LLM picks the tool, used by the chat panel
+- The server's own move strategy uses **Spring AI's ChatClient** internally
+- All client–server communication flows through the **MCP Streamable HTTP protocol**
 
 ## Prerequisites
 
@@ -63,95 +43,62 @@ In this module, you'll build a **Tic-Tac-Toe game** that demonstrates MCP in act
 
 ## Understanding MCP
 
-### Why MCP?
+In Module 04, you used `@Tool` annotations to define tools *inside* your application. That works well when tools are tightly coupled to your app, but in practice tools often live in separate services — microservices, third-party APIs, or shared infrastructure.
 
-In Module 04, you used `@Tool` annotations to define tools *inside* your application. That works well for tools that are tightly coupled to your app. But in practice, tools often live in separate services — microservices, third-party APIs, or shared infrastructure.
+MCP gives you:
 
-MCP solves this by providing:
-- **Universal protocol** — A standard way for AI apps to discover and call tools
-- **Service separation** — Tools live in their own process, enabling independent deployment
-- **Auto-discovery** — Clients automatically learn what tools are available
+- **Universal protocol** — a standard way for any AI app to discover and call tools
+- **Service separation** — tools run in their own process and can be deployed independently
+- **Auto-discovery** — clients learn what tools are available at connect time
 - **Cross-language support** — MCP servers and clients can be written in any language
 
-### Custom Tools vs MCP
-
-The following diagram compares the custom `@Tool` approach from Module 04 with the MCP approach in this module. Notice how MCP moves tools out of the application and behind a protocol boundary:
+A growing ecosystem of MCP servers also ships pre-built integrations for databases, APIs, and cloud services, so your AI app can connect to *anyone's* MCP server using the same protocol.
 
 <img src="images/custom-vs-mcp-tools.png" alt="Custom Tools vs MCP Tools" width="800"/>
 
-*Custom @Tool methods run in-process; MCP tools run on a separate server and are discovered over the network via a standard protocol.*
-
-### MCP Ecosystem
-
-MCP isn't just for your own tools. A growing ecosystem of MCP servers provides pre-built integrations for databases, APIs, cloud services, and more. Your AI application can connect to any MCP server — yours or third-party — using the same protocol:
-
-<img src="images/mcp-ecosystem.png" alt="MCP Ecosystem" width="800"/>
-
-*The MCP ecosystem — your AI application can connect to any MCP-compatible server, whether you built it or someone else did.*
+*Custom `@Tool` methods run in-process; `@McpTool` methods run on a separate server and are discovered over the network.*
 
 ## How MCP Works
 
-### MCP Architecture
-
-The protocol follows a client-server model. The **MCP client** (your AI application) discovers and invokes tools on one or more **MCP servers**. Each server exposes a set of tools with typed parameters and descriptions, and the client can call them over HTTP or stdio:
+MCP follows a client–server model. The **MCP client** (your AI application) connects to one or more **MCP servers**, asks each for its tool catalog at startup, and then invokes those tools by name over the transport. Spring AI's `ToolCallbackProvider` handles the connect, discover, and invoke steps automatically — you receive ready-to-use `ToolCallback` objects.
 
 <img src="images/mcp-protocol-detail.png" alt="MCP Protocol Detail" width="800"/>
 
-*The MCP protocol detail — clients send JSON-RPC requests to servers, which respond with structured results. Tool schemas are exchanged during the discovery phase.*
+*Clients send JSON-RPC requests; servers return structured results. Tool schemas are exchanged during the discovery phase.*
 
-### Tool Discovery
+This module uses **Streamable HTTP**, the modern recommended MCP transport (it replaces legacy SSE). MCP also supports stdio for local process-based servers.
 
-When an MCP client connects to a server, it first requests the list of available tools. The server responds with tool names, descriptions, and parameter schemas. Spring AI's `ToolCallbackProvider` handles this automatically — you get a collection of `ToolCallback` objects ready to invoke:
-
-<img src="images/tool-discovery.png" alt="Tool Discovery Flow" width="800"/>
-
-*Tool discovery — the client connects, requests the tool list, and receives typed schemas it can use to invoke tools or pass to an LLM.*
-
-### Transport Mechanisms
-
-MCP supports multiple transport mechanisms. This module uses **Streamable HTTP**, the modern recommended transport:
-
-<img src="images/transport-mechanisms.png" alt="MCP Transport Mechanisms" width="800"/>
-
-*MCP transport options — Streamable HTTP is the recommended choice for web-deployed servers; stdio is for local process-based servers.*
+> **📝 Advanced — Stateful vs Stateless Streamable HTTP.** Streamable HTTP has two flavours, selected with one property. **Stateful** (the default in this module) keeps a long-lived stream so the server can push sampling, elicitation, and progress events back to the client; it needs sticky sessions behind a load balancer. **Stateless** is pure request/response — each tool call is independent, no server-push, scales horizontally without affinity. Switch with `spring.ai.mcp.server.protocol: STATELESS`. Pick stateful if you need server→client callbacks (see [Beyond `@McpTool`](#key-concepts)); pick stateless for high-throughput tool servers and serverless deployments.
 
 ## How This Uses Spring AI
 
-This module is split into two Spring Boot applications — an MCP server and an MCP client — each with its own dependencies and configuration.
+This module is two Spring Boot applications. The **server** uses the Web MVC MCP server starter to expose `@McpTool` endpoints over Streamable HTTP, plus the OpenAI starter so it can call Microsoft Foundry from inside the `aiMove` tool. The **client** uses the matching MCP client starter to discover those tools, plus the OpenAI starter so the agent path can hand the discovered tools to a `ChatClient`.
 
-**Server Dependencies** ([mcp-server/pom.xml](mcp-server/pom.xml)) — The server needs the Web MVC MCP server starter to expose `@McpTool` endpoints over Streamable HTTP, the OpenAI SDK starter for Microsoft Foundry access, and the chat client library:
+**Server dependencies** ([mcp-server/pom.xml](mcp-server/pom.xml)):
 
 ```xml
-<!-- Exposes @McpTool methods as MCP endpoints over Streamable HTTP (Spring MVC runtime) -->
+<!-- Exposes @McpTool methods over Streamable HTTP -->
 <dependency>
     <groupId>org.springframework.ai</groupId>
-    <artifactId>spring-ai-starter-mcp-server-webmvc</artifactId> <!-- Version managed by Spring AI BOM in root pom.xml -->
+    <artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>
 </dependency>
 
-<!-- Microsoft Foundry via OpenAI SDK Starter (auto-configures OpenAiChatModel) -->
+<!-- Microsoft Foundry via the OpenAI SDK starter -->
 <dependency>
     <groupId>org.springframework.ai</groupId>
     <artifactId>spring-ai-starter-model-openai</artifactId>
 </dependency>
 
-<!-- Spring AI Chat Client for LLM-powered AI moves -->
+<!-- Spring AI ChatClient — used by aiMove for LLM strategy -->
 <dependency>
     <groupId>org.springframework.ai</groupId>
     <artifactId>spring-ai-client-chat</artifactId>
 </dependency>
 ```
 
-**Client Dependencies** ([mcp-client/pom.xml](mcp-client/pom.xml)) — The client needs the WebFlux MCP client starter to discover and invoke remote MCP tools. It has **no AI model dependencies** — all LLM logic lives on the server:
+**Client dependencies** ([mcp-client/pom.xml](mcp-client/pom.xml)) mirror the server, replacing the server starter with `spring-ai-starter-mcp-client-webflux`. The OpenAI starter and `spring-ai-client-chat` are only needed for the agent path; the direct-call path doesn't use them.
 
-```xml
-<!-- MCP Client — discovers and invokes tools on the MCP server via Streamable HTTP -->
-<dependency>
-    <groupId>org.springframework.ai</groupId>
-    <artifactId>spring-ai-starter-mcp-client-webflux</artifactId> <!-- Version managed by Spring AI BOM in root pom.xml -->
-</dependency>
-```
-
-**Server Configuration** ([application.yaml](mcp-server/src/main/resources/application.yaml)) — The starter auto-configures the MCP server and the Microsoft Foundry chat model from properties:
+**Server configuration** ([application.yaml](mcp-server/src/main/resources/application.yaml)) wires Microsoft Foundry credentials and declares the MCP server:
 
 ```yaml
 spring:
@@ -168,9 +115,7 @@ spring:
         protocol: STREAMABLE
 ```
 
-Credentials come from environment variables set by `azd up`. The `protocol: STREAMABLE` setting enables the modern Streamable HTTP transport.
-
-**Client Configuration** ([application.yaml](mcp-client/src/main/resources/application.yaml)) — The client points to the MCP server URL. Spring AI handles connection, tool discovery, and invocation automatically:
+**Client configuration** ([application.yaml](mcp-client/src/main/resources/application.yaml)) reuses the same OpenAI block and points at the server URL:
 
 ```yaml
 spring:
@@ -183,15 +128,15 @@ spring:
               url: http://localhost:8085
 ```
 
-No Azure credentials on the client — it only talks to the MCP server.
+The direct-call path only needs the `mcp.client` block; the agent path also needs the `openai` block.
 
 ## How This Demo Works
 
 ### MCP Server — Game Engine + AI Strategy
 
-[TicTacToeTools.java](mcp-server/src/main/java/com/example/springai/mcp/server/TicTacToeTools.java) | [GameEngine.java](mcp-server/src/main/java/com/example/springai/mcp/server/GameEngine.java) | [SpringAiConfig.java](mcp-server/src/main/java/com/example/springai/mcp/server/SpringAiConfig.java)
+[TicTacToeTools.java](mcp-server/src/main/java/com/example/springai/mcp/server/TicTacToeTools.java) | [GameEngine.java](mcp-server/src/main/java/com/example/springai/mcp/server/GameEngine.java)
 
-The MCP server is the game engine **and** the AI strategist. It connects to Microsoft Foundry to power the `aiMove` tool. It exposes five tools via `@McpTool`:
+The MCP server is the game engine **and** the AI strategist. It connects to Microsoft Foundry to power the `aiMove` tool, and exposes five tools via `@McpTool`:
 
 | Tool | Description |
 |------|-------------|
@@ -201,157 +146,81 @@ The MCP server is the game engine **and** the AI strategist. It connects to Micr
 | `getBoardState(gameId)` | Returns the current board, status, and whose turn it is |
 | `getAvailableMoves(gameId)` | Returns the list of empty positions |
 
-### MCP Client — Thin Web UI
+### MCP Client — Two Paths to the Same Tools
 
-[GameService.java](mcp-client/src/main/java/com/example/springai/mcp/client/GameService.java) | [GameController.java](mcp-client/src/main/java/com/example/springai/mcp/client/GameController.java)
+[GameService.java](mcp-client/src/main/java/com/example/springai/mcp/client/GameService.java) | [AgentService.java](mcp-client/src/main/java/com/example/springai/mcp/client/AgentService.java)
 
-The MCP client is a **thin web frontend** with no LLM or AI logic. It discovers the server's tools at startup and calls them directly:
+The client discovers the server's tools once at startup and exposes them through two patterns side by side, sharing the **same** `ToolCallbackProvider` bean:
 
-1. **Direct MCP tool calls** — All operations (new game, human moves, AI moves, board state) are called via `ToolCallback.call()`. No LLM on the client.
+1. **Direct MCP tool calls** (`GameService`) — Board actions call a specific `ToolCallback` via `ToolCallback.call()`. The client picks the tool. Powers the board UI.
+2. **Agent-style tool calls** (`AgentService`) — The same provider is handed to a `ChatClient`. The user types a natural-language request, the LLM reads the discovered tool descriptions, and the model decides which tools to invoke. A `MessageChatMemoryAdvisor` (same pattern as [Module 01](../01-introduction/README.md)) holds the active `gameId` so follow-ups don't have to repeat it.
 
-2. **AI delegation** — When it's the AI's turn, the client simply calls the server's `aiMove` MCP tool. The server handles LLM communication internally and returns the result.
+The only difference between the two paths is **who's making the decision** — your code, or the model.
 
 ### Game Flow
 
-The sequence diagram below shows how a single turn flows through the system — from the browser click, through the MCP client, across the Streamable HTTP protocol to the MCP server, and (for the AI's turn) out to Microsoft Foundry and back.
+<img src="images/client-server-sequence.png" alt="MCP Tic-Tac-Toe client-server sequence diagram showing both the direct board path and the agent chat path" width="800"/>
 
-<img src="images/client-server-sequence.png" alt="MCP Tic-Tac-Toe client-server sequence diagram" width="800"/>
-
-*Player turns call `makeMove` directly; AI turns call `aiMove`, which lets the server consult `gpt-4o-mini` and execute the chosen move — the client never talks to the LLM.*
-
-**Step-by-step:**
-
-1. **Player clicks "New Game"** — Client calls the `startNewGame` MCP tool; the server creates a game and returns an empty board.
-2. **Player clicks a cell** (e.g., position 4) — Client calls `makeMove(gameId, 4, "X")`; the server validates and executes the move.
-3. **AI turn** — Client calls `aiMove(gameId)`:
-   - Server fetches board state and available moves from its `GameEngine`.
-   - Server prompts Microsoft Foundry (`gpt-4o-mini`) via `ChatClient` to pick the best position.
-   - Server applies the LLM's chosen move as `O` and returns the updated board.
-4. **Board updates in the browser** — repeat until win or draw.
+Clicking the board calls `makeMove` then `aiMove` directly. Typing in the chat panel sends the message plus the visual board's `gameId` to the LLM, which picks the same MCP tools through the agent path. Either way, both paths drive the same MCP server, so the visual board and the chat always agree on the game state. (PlantUML source: [`images/client-server-sequence.puml`](images/client-server-sequence.puml).)
 
 ## Run the Application
 
-**Verify deployment:**
+This module needs **two Spring Boot applications running side by side** — start the server first, then the client.
 
-Ensure the `.env` file exists in the root directory with Azure credentials (created during Module 01). Run this from the module directory (`05-mcp/`):
+**Verify your `.env` exists in the repo root** (created by `azd up` in Module 01):
 
-**Bash:**
 ```bash
-cat ../.env  # Should show AZURE_OPENAI_ENDPOINT, API_KEY, DEPLOYMENT
+# Bash
+cat ../.env
+
+# PowerShell
+Get-Content ..\.env
 ```
 
-**PowerShell:**
-```powershell
-Get-Content ..\.env  # Should show AZURE_OPENAI_ENDPOINT, API_KEY, DEPLOYMENT
-```
+**Option 1: Spring Boot Dashboard (VS Code)**
 
-**Start the application:**
-
-This module requires **two Spring Boot applications** — the MCP server and the MCP client — running simultaneously.
-
-**Option 1: Using Spring Boot Dashboard (Recommended for VS Code users)**
-
-The dev container includes the Spring Boot Dashboard extension, which provides a visual interface to manage all Spring Boot applications. You can find it in the Activity Bar on the left side of VS Code (look for the Spring Boot icon).
-
-From the Spring Boot Dashboard, you can:
-- See all available Spring Boot applications in the workspace
-- Start/stop applications with a single click
-- View application logs in real-time
-- Monitor application status
-
-Start **`mcp-server`** first, wait for it to be ready on port 8085, then start **`mcp-client`** on port 8082.
+The dev container ships the Spring Boot Dashboard extension. Open it from the Activity Bar, start `mcp-server` (wait until it's listening on 8085), then start `mcp-client`.
 
 <img src="images/dashboard.png" alt="Spring Boot Dashboard" width="300"/>
 
-**Option 2: Using shell scripts**
+**Option 2: Start scripts**
 
-To start **all** modules at once (01-06, including both the MCP server and client in the correct order), run the root-level script from the repo root:
+From the `05-mcp/` directory, open two terminals — one per app:
 
-**Bash:**
 ```bash
-cd ..  # From root directory
-./start-all.sh
+# Terminal 1 — Bash
+cd 05-mcp && ./start-server.sh
+
+# Terminal 2 — Bash
+cd 05-mcp && ./start-client.sh
 ```
 
-**PowerShell:**
 ```powershell
-cd ..  # From root directory
-.\start-all.ps1
+# Terminal 1 — PowerShell
+cd 05-mcp; .\start-server.ps1
+
+# Terminal 2 — PowerShell
+cd 05-mcp; .\start-client.ps1
 ```
 
-To stop everything, run `./stop-all.sh` (or `.\stop-all.ps1`) from the same root directory.
+Server listens on **http://localhost:8085**, client on **http://localhost:8082**. Both scripts pick up Foundry credentials from the root `.env`.
 
-If you prefer to run **only this module**, you'll need **two terminal windows** — one for the MCP server and one for the MCP client. The server must start before the client.
+To start **every** module at once (01–06), run `./start-all.sh` (or `.\start-all.ps1`) from the repo root; use the matching `stop-all` script to tear everything down.
 
-### Terminal 1: Start the MCP Server
-
-**Bash:**
-```bash
-cd 05-mcp
-./start-server.sh
-```
-
-**PowerShell:**
-```powershell
-cd 05-mcp
-.\start-server.ps1
-```
-
-The server starts on **http://localhost:8085**. It exposes the game engine and AI strategy as MCP tools via the Streamable HTTP protocol. The startup script loads Microsoft Foundry credentials from the root `.env` file.
-
-### Terminal 2: Start the MCP Client
-
-**Bash:**
-```bash
-cd 05-mcp
-./start-client.sh
-```
-
-**PowerShell:**
-```powershell
-cd 05-mcp
-.\start-client.ps1
-```
-
-The client starts on **http://localhost:8082**. It connects to the MCP server to discover available tools — no Azure credentials needed on the client.
-
-> **Note:** If you prefer to build both modules manually before starting:
->
-> **Bash:**
-> ```bash
-> cd ..  # Go to root directory
-> mvn clean package -DskipTests
-> ```
->
-> **PowerShell:**
-> ```powershell
-> cd ..  # Go to root directory
-> mvn clean package -DskipTests
-> ```
-
-Open http://localhost:8082 in your browser.
+Open **http://localhost:8082** in your browser.
 
 ## Using the Application
 
 <img src="images/game-and-architecture.png" alt="Tic-Tac-Toe Game UI" width="800"/>
 
-The application provides a Tic-Tac-Toe game where you play as **X** against an AI opponent playing as **O**. The AI uses Microsoft Foundry to analyze the board and choose strategic moves — all game operations flow through MCP tools on the server.
+You play as **X** against an AI playing **O**. Every action — yours and the AI's — flows through MCP tools on the server.
 
-### Start a New Game
-
-Click **New Game** to begin. The client calls the MCP `startNewGame()` tool on the server, which creates a fresh 3×3 board and returns a game ID. You'll see an empty board with the status "Your turn! Place your X."
-
-### Make Your Move
-
-Click any empty cell to place your **X**. The client calls the MCP `makeMove` tool directly — no LLM involved for human moves. The server validates the position, places your mark, checks for wins, and returns the updated board.
-
-### Watch the AI Respond
-
-After your move, the client calls the server's `aiMove` MCP tool. The server analyzes the board, consults Microsoft Foundry through Spring AI's `ChatClient`, and picks the best strategic position — all server-side. The AI's **O** appears on the board moments later.
-
-### Track Your Score
-
-The scoreboard at the top tracks wins, draws, and losses across games. Scores persist in your browser's localStorage, so they survive page refreshes. Click **Reset Scores** to start fresh.
+- **Click New Game** to call `startNewGame` and get a fresh board.
+- **Click any empty cell** to place your X. The client invokes `makeMove` directly (no LLM for human moves).
+- **Watch the AI respond.** The client then calls `aiMove`; the server asks Microsoft Foundry which position to play and executes the move.
+- **Try the Agent Chat panel** below the board. This is the LLM-orchestrated path — describe what you want and the model picks the tool: *"Start a new game"*, *"Place my X at position 4"*, *"What positions are still open?"*. Chat memory holds the active `gameId`, so follow-ups don't need to repeat it. Click **🧹 Reset Chat** to start over with a fresh conversation.
+- **The board and the chat share one game.** The visual board updates whenever the agent moves a piece, and clicks on the board continue the same game the agent is playing.
+- **Track your score** at the top — wins, draws, and losses persist in `localStorage`. **Reset Scores** clears them.
 
 ## Code Walkthrough
 
@@ -359,111 +228,65 @@ The scoreboard at the top tracks wins, draws, and losses across games. Scores pe
 
 [TicTacToeTools.java](mcp-server/src/main/java/com/example/springai/mcp/server/TicTacToeTools.java)
 
-The server uses `@McpTool` and `@McpToolParam` annotations to expose game operations. The MCP framework automatically registers these as tools that clients can discover and invoke:
+The server uses `@McpTool` and `@McpToolParam` to expose game operations. Spring AI registers these automatically so any MCP client can discover and invoke them:
 
 ```java
 @Service
 public class TicTacToeTools {
+    // ... gameEngine + chatClient fields ...
 
-    private final ChatClient chatClient;
-
-    public TicTacToeTools(ChatClient.Builder chatClientBuilder) {
-        this.chatClient = chatClientBuilder.build();
-    }
-
-    @McpTool(description = "Start a new tic-tac-toe game. "
-            + "Returns the game ID and an empty 3x3 board.")
-    public String startNewGame() {
-        return gameEngine.newGame();
-    }
-
-    @McpTool(description = "Make a move on the tic-tac-toe board.")
+    @McpTool(description = "Make a move on the tic-tac-toe board. "
+            + "Returns the updated board state, game status "
+            + "(IN_PROGRESS, WON, or DRAW), and the winner if applicable.")
     public String makeMove(
-            @McpToolParam(description = "The game ID") String gameId,
-            @McpToolParam(description = "Board position 0-8") int position,
-            @McpToolParam(description = "Player symbol: X or O") String player) {
+            @McpToolParam(description = "The game ID returned by startNewGame") String gameId,
+            @McpToolParam(description = "Board position 0-8 (top-left=0, bottom-right=8)") int position,
+            @McpToolParam(description = "Player symbol: X for human, O for AI") String player) {
         return gameEngine.makeMove(gameId, position, player);
     }
 }
 ```
 
-Notice how the descriptions are written for AI consumption — they explain not just *what* the tool does, but *what it returns* and *how to use it*. This matters because MCP clients (and LLMs) rely on these descriptions to understand tool capabilities.
-
-> **🤖 Try with [GitHub Copilot](https://github.com/features/copilot) Chat:** Open [`TicTacToeTools.java`](mcp-server/src/main/java/com/example/springai/mcp/server/TicTacToeTools.java) and ask:
-> - "How do @McpTool annotations differ from @Tool annotations used in Module 04?"
-> - "What makes a good MCP tool description that helps AI clients use it correctly?"
-> - "How would I add a new tool like `undoMove` to this MCP server?"
+Descriptions are written **for AI consumption** — they explain *what* the tool does, *what it returns*, and *how to use it*. MCP clients and LLMs rely on them to choose tools. The other four `@McpTool` methods (`startNewGame`, `aiMove`, `getBoardState`, `getAvailableMoves`) follow the same pattern.
 
 ### Server: AI Strategy via ChatClient
 
-[TicTacToeTools.java](mcp-server/src/main/java/com/example/springai/mcp/server/TicTacToeTools.java) | [SpringAiConfig.java](mcp-server/src/main/java/com/example/springai/mcp/server/SpringAiConfig.java)
+[TicTacToeTools.java](mcp-server/src/main/java/com/example/springai/mcp/server/TicTacToeTools.java)
 
-The `aiMove` tool is where the LLM meets MCP. The server fetches the board state, asks Microsoft Foundry for the best strategic move via `ChatClient`, and executes it — all inside a single MCP tool call:
+The `aiMove` tool is where the LLM meets MCP. The server fetches the board, asks Microsoft Foundry for the best move via `ChatClient`, validates it, and executes — all inside one MCP tool call:
 
 ```java
-@McpTool(description = "AI makes a strategic move as player O using LLM-powered analysis. "
-        + "Returns the updated board state after the AI's move.")
+@McpTool(description = "AI makes a strategic move as player O using LLM-powered analysis...")
 public String aiMove(@McpToolParam(description = "The game ID") String gameId) {
     String boardState = gameEngine.getBoardState(gameId);
-    String availableMoves = gameEngine.getAvailableMoves(gameId);
+    Set<Integer> available = parseAvailableMoves(gameEngine.getAvailableMoves(gameId));
 
-    // Ask the LLM for the best strategic move
     String aiResponse = chatClient.prompt()
             .system(AI_STRATEGY_PROMPT)
-            .user("Current board: " + boardState
-                    + "\nAvailable: " + availableMoves)
+            .user("Board: " + boardState + "\nAvailable: " + available + "\nChoose:")
             .call()
             .content();
 
-    int position = parseAiPosition(aiResponse, availableMoves);
+    int position = selectMove(aiResponse, available);   // validates + falls back if needed
     return gameEngine.makeMove(gameId, position, "O");
 }
 ```
 
-This pattern — **game logic + LLM reasoning inside the MCP server** — means the client stays thin. Any MCP client can call `aiMove` without needing its own LLM configuration.
-
-> **🤖 Try with [GitHub Copilot](https://github.com/features/copilot) Chat:** Open [`TicTacToeTools.java`](mcp-server/src/main/java/com/example/springai/mcp/server/TicTacToeTools.java) and ask:
-> - "How does this tool combine MCP and ChatClient in a single method?"
-> - "What are the trade-offs of putting LLM logic on the server vs the client?"
-> - "How would I add difficulty levels that change the AI strategy prompt?"
-
-### Server: Game Engine Logic
-
-[GameEngine.java](mcp-server/src/main/java/com/example/springai/mcp/server/GameEngine.java)
-
-The game engine manages board state, validates moves, and detects wins. It stores games in `ConcurrentHashMap` for thread safety and returns JSON responses for easy MCP transport:
-
-```java
-private static final int[][] WIN_PATTERNS = {
-    {0, 1, 2}, {3, 4, 5}, {6, 7, 8},  // rows
-    {0, 3, 6}, {1, 4, 7}, {2, 5, 8},  // columns
-    {0, 4, 8}, {2, 4, 6}              // diagonals
-};
-
-private String checkWinner(String[] board) {
-    for (int[] pattern : WIN_PATTERNS) {
-        String a = board[pattern[0]], b = board[pattern[1]], c = board[pattern[2]];
-        if (!a.isEmpty() && a.equals(b) && b.equals(c)) return a;
-    }
-    return null;
-}
-```
+Game logic and LLM reasoning live together on the server, so the client stays thin — any MCP client can call `aiMove` without its own LLM configuration. `selectMove` extracts the first digit from the model's reply and falls back to a strategic order (center → corners → edges) if the model returns something invalid or already played — a small but important guardrail when you let an LLM pick from a constrained set.
 
 ### Client: Tool Discovery via ToolCallbackProvider
 
 [GameService.java](mcp-client/src/main/java/com/example/springai/mcp/client/GameService.java)
 
-When the MCP client starts, Spring AI's `ToolCallbackProvider` connects to the server and discovers all available tools. The `GameService` stores them in a map for direct invocation:
+At startup, Spring AI's `ToolCallbackProvider` connects to every configured MCP server and discovers its tools. The client just stores them in a map:
 
 ```java
 @Service
 public class GameService {
-
     private final Map<String, ToolCallback> mcpTools;
 
     public GameService(ToolCallbackProvider toolCallbackProvider) {
         this.mcpTools = new HashMap<>();
-        // Auto-discover MCP tools from the server
         for (ToolCallback cb : toolCallbackProvider.getToolCallbacks()) {
             mcpTools.put(cb.getToolDefinition().name(), cb);
         }
@@ -471,115 +294,97 @@ public class GameService {
 }
 ```
 
-This is a key Spring AI 2 pattern. The `ToolCallbackProvider` is injected automatically — Spring Boot discovers the MCP server connection from your `application.yaml` configuration and provides the callbacks at startup. Notice the client has **no LLM dependencies** — it just calls MCP tools.
+`ToolCallbackProvider` is injected automatically — Spring Boot discovers the server connection from `application.yaml`. **The same provider is reused by both the direct-call path and the agent path** below.
 
 ### Client: Direct MCP Tool Invocation
 
 [GameService.java](mcp-client/src/main/java/com/example/springai/mcp/client/GameService.java)
 
-For game operations where the outcome is deterministic, the client calls MCP tools directly — no LLM needed:
+For deterministic actions, the client calls MCP tools directly — no LLM involved:
 
 ```java
 public String playerMove(String gameId, int position) {
-    // Call MCP tool directly — no LLM involved
     return callTool("makeMove",
         String.format("{\"gameId\":\"%s\",\"position\":%d,\"player\":\"X\"}",
                       gameId, position));
 }
 
 public String aiMove(String gameId) {
-    // Call the server's aiMove tool — the server handles LLM strategy internally
     return callTool("aiMove",
         String.format("{\"gameId\":\"%s\"}", gameId));
 }
 ```
 
-Notice how the `aiMove` call is just another MCP tool invocation — the client doesn't know or care that the server uses an LLM internally. This is the power of MCP's abstraction: the AI complexity is hidden behind the tool interface.
+The `aiMove` call is just another MCP tool invocation — the client doesn't know or care that the server uses an LLM internally. That's MCP's abstraction in action: AI complexity stays behind the tool interface.
 
-> **🤖 Try with [GitHub Copilot](https://github.com/features/copilot) Chat:** Open [`GameService.java`](mcp-client/src/main/java/com/example/springai/mcp/client/GameService.java) and ask:
-> - "How does ToolCallbackProvider auto-discover tools from the MCP server?"
-> - "What's the difference between calling ToolCallback.call() directly vs passing tools to ChatClient?"
-> - "How would I add error handling for network failures between client and server?"
+### Client: Agent-style Tool Calling with ChatClient
+
+[AgentService.java](mcp-client/src/main/java/com/example/springai/mcp/client/AgentService.java)
+
+The agent path takes the **same** `ToolCallbackProvider` that `GameService` uses and hands it to a `ChatClient`. The LLM reads the tool descriptions discovered from the server and decides which to call. A `MessageChatMemoryAdvisor` (same pattern as [Module 01](../01-introduction/README.md)) keeps the conversation stateful so the agent remembers the active `gameId` across turns:
+
+```java
+this.chatClient = builder
+        .defaultSystem(SYSTEM_PROMPT)
+        .defaultToolCallbacks(mcpToolCallbacks)                                  // tools
+        .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())   // memory
+        .build();
+```
+
+When the LLM emits a `tool_calls` response, Spring AI looks up the callback, executes the underlying MCP call over Streamable HTTP, feeds the result back to the model, and loops until the model produces a final answer — no extra code on your side.
+
+**Cross-path sync.** `AgentService` exposes a three-arg `chat(conversationId, userMessage, boardGameId)` overload so a user who started a game by clicking the board can keep playing it through chat. Before every turn it appends a fresh `[Board snapshot]` `AssistantMessage` (built from a real `getBoardState` tool call) to chat memory, and the system prompt tells the model to treat the most recent snapshot as ground truth. To keep state flowing the other way — from chat back to the board — each discovered `ToolCallback` is wrapped with a small decorator that captures any `gameId` returned by `startNewGame`, using Spring AI's `ToolContext` to carry the conversation id. See [`AgentService.java`](mcp-client/src/main/java/com/example/springai/mcp/client/AgentService.java) for the full implementation.
+
+> **🤖 Try with [GitHub Copilot](https://github.com/features/copilot) Chat:** Open any of the files above and ask:
+> - *"How does ToolCallbackProvider auto-discover tools from the MCP server?"*
+> - *"What's the difference between `ToolCallback.call()` and passing tools to `ChatClient`?"*
+> - *"How would I restrict which discovered MCP tools the agent is allowed to call?"*
 
 ## Key Concepts
 
-### MCP Streamable HTTP Protocol
-
-The client and server communicate using MCP's **Streamable HTTP** transport — a modern replacement for the legacy Server-Sent Events (SSE) protocol. Configuration is minimal:
-
-```yaml
-# Server (application.yaml)
-spring:
-  ai:
-    mcp:
-      server:
-        name: tictactoe-server
-        protocol: STREAMABLE
-
-# Client (application.yaml)
-spring:
-  ai:
-    mcp:
-      client:
-        streamable-http:
-          connections:
-            tictactoe-server:
-              url: http://localhost:8085
-```
-
-The server declares itself as a Streamable HTTP MCP server. The client specifies the server URL — Spring AI handles the connection, discovery, and invocation automatically.
-
 ### Direct Tool Calls vs LLM-Orchestrated Calls
 
-This demo shows **both** patterns side by side:
+Both patterns live on the client and share the same `ToolCallbackProvider`. The only thing that changes is **who picks the tool**:
 
-| Pattern | When to Use | Example in This Module |
-|---------|-------------|------------------------|
-| **Direct calls** (`ToolCallback.call()`) | Deterministic operations where the outcome is known | New game, player moves, board state |
-| **LLM-orchestrated calls** (`ChatClient.prompt().call()`) | Decisions requiring intelligence or reasoning | AI choosing the best tic-tac-toe move |
+| Pattern | Who decides | Spring AI API | When to use |
+|---------|-------------|---------------|-------------|
+| **Direct calls** | Your code | `ToolCallback.call(input)` | Deterministic actions — button clicks, scheduled jobs, anything where you already know which tool to invoke. Used by the board UI. |
+| **Agent-style calls** | The LLM | `ChatClient.prompt(...).call()` with the tool callbacks attached | Free-form requests where intelligence is needed to choose, sequence, or combine tools. Used by the chat panel. |
 
-In Module 04, all tool calls were LLM-orchestrated — the model decided when and how to call tools. This module shows that MCP tools can also be called directly from your code, giving you precise control over deterministic operations while reserving LLM reasoning for decisions that actually need intelligence.
+A common production setup uses both: deterministic UI actions go through direct calls (cheap, predictable, no model call), and free-form user requests go through the agent path (flexible, but you pay one LLM round-trip per turn).
+
+### Beyond @McpTool — Other MCP Primitives
+
+This module focuses on `@McpTool`, but Spring AI 2.0 exposes the full MCP primitive set:
+
+| Side | Annotation | What it does |
+|------|------------|--------------|
+| Server | `@McpTool` | Exposes a method as an MCP tool (this module). |
+| Server | `@McpResource` | Exposes read-only data clients can fetch by URI. |
+| Server | `@McpPrompt` | Exposes named prompt templates clients can request. |
+| Client | `@McpSampling` | The **server** asks the **client's** LLM to generate a completion. |
+| Client | `@McpElicitation` | The server asks the client to collect structured input from the user mid-tool-call. |
+| Client | `@McpProgress` / `@McpLogging` | Receives progress notifications and structured log events from the server. |
+
+`@McpSampling` and `@McpElicitation` are what make MCP genuinely different from a typed REST or RPC API — they let the **server initiate** a call back into the client's LLM or user, which has no equivalent in plain tool calling. Both require the stateful Streamable HTTP transport.
 
 ### AI Strategy with ChatClient
 
-The AI opponent uses a priority-based strategy prompt:
-1. **Win** — Complete a line of three O's
-2. **Block** — Prevent the opponent from winning
-3. **Center** — Take position 4 if available
-4. **Corners** — Positions 0, 2, 6, 8
-5. **Edges** — Positions 1, 3, 5, 7
-
-The LLM evaluates the board state and returns a single position number, keeping the interaction fast and reliable. The system prompt constrains the response to a single digit — a prompt engineering technique from [Module 02](../02-prompt-engineering/README.md).
-
-## Spring AI 2 Features Demonstrated
-
-| Feature | How It's Used | Where to Find It |
-|---------|---------------|------------------|
-| **@McpTool** | Server-side tool definitions with automatic MCP registration | [TicTacToeTools.java](mcp-server/src/main/java/com/example/springai/mcp/server/TicTacToeTools.java) |
-| **@McpToolParam** | Parameter descriptions for AI-friendly tool discovery | [TicTacToeTools.java](mcp-server/src/main/java/com/example/springai/mcp/server/TicTacToeTools.java) |
-| **Streamable HTTP** | Modern MCP transport protocol between client and server | [application.yaml (server)](mcp-server/src/main/resources/application.yaml) |
-| **ToolCallbackProvider** | Auto-discovery of remote MCP tools on the client | [GameService.java](mcp-client/src/main/java/com/example/springai/mcp/client/GameService.java) |
-| **ToolCallback.call()** | Direct invocation of MCP tools without LLM intermediation | [GameService.java](mcp-client/src/main/java/com/example/springai/mcp/client/GameService.java) |
-| **ChatClient** | Fluent API for LLM interactions — AI game strategy on the server | [TicTacToeTools.java](mcp-server/src/main/java/com/example/springai/mcp/server/TicTacToeTools.java) |
-| **OpenAiChatModel** | Microsoft Foundry integration auto-configured by the OpenAI SDK starter | [SpringAiConfig.java](mcp-server/src/main/java/com/example/springai/mcp/server/SpringAiConfig.java) |
+The AI opponent uses a priority-based strategy prompt: **win → block → center → corners → edges**. The system prompt also constrains the model to return a single digit, keeping the round-trip fast and reliable — a prompt engineering technique from [Module 02](../02-prompt-engineering/README.md).
 
 ## MCP vs Tools (Module 04)
 
 Modules 04 and 05 both give AI applications access to tools, but in fundamentally different ways. Module 04's `@Tool` methods run **in-process** — they're Java methods in the same application. Module 05's `@McpTool` methods run on a **separate server** and are accessed over the network via MCP:
 
-<img src="images/mcp-comparison.png" alt="MCP vs Custom Tools Comparison" width="800"/>
-
-*@Tool methods run in-process with the AI; @McpTool methods run on a separate server and are accessed over the network. MCP enables service separation and tool sharing.*
-
-| Aspect | Module 04 (@Tool) | Module 05 (@McpTool) |
-|--------|-------------------|---------------------|
+| Aspect | Module 04 (`@Tool`) | Module 05 (`@McpTool`) |
+|--------|---------------------|------------------------|
 | **Location** | In-process, same JVM | Separate server, different process |
 | **Discovery** | Spring Boot component scan | MCP protocol auto-discovery |
 | **Transport** | Direct method call | Streamable HTTP / stdio |
 | **Sharing** | App-specific | Any MCP-compatible client |
 | **Deployment** | Single deployment unit | Independent services |
 
-In practice, many production systems combine both approaches: `@Tool` for app-specific logic and `@McpTool` for shared services.
+In practice, many production systems combine both: `@Tool` for app-specific logic and `@McpTool` for shared services.
 
 ## Next Steps
 
@@ -589,6 +394,8 @@ In practice, many production systems combine both approaches: `@Tool` for app-sp
 - **Add difficulty levels** — Make the AI sometimes pick random moves for "easy" mode
 - **Build your own MCP server** — Expose your own domain-specific tools for AI consumption
 - **Explore the MCP ecosystem** — Connect to third-party MCP servers for database access, cloud APIs, or code execution
+- **Try `@McpSampling` and `@McpElicitation`** — Reverse the call direction so the server can ask the client's LLM (or the user) for input mid-tool-call
+- **Expose your service to third-party hosts via [MCP Apps](https://spring.io/blog/2026/03/18/mcp-apps)** — Spring AI's MCP Apps extension lets a Spring service register itself as an MCP server discoverable by hosts like Claude Desktop or Cursor, without standing up a separate process
 
 ---
 
