@@ -180,3 +180,171 @@ function resetScores() {
 function saveScores() {
     localStorage.setItem('tictactoe-scores', JSON.stringify(scores));
 }
+
+// --- Agent Chat (LLM-orchestrated MCP tool calls) ---
+
+// Stable conversation ID per browser so the chat-memory advisor on the server
+// can recall prior turns (notably the active gameId) across reloads. Cleared
+// by the "Reset Chat" button.
+function getAgentConversationId() {
+    let id = localStorage.getItem('agent-conversation-id');
+    if (!id) {
+        id = (window.crypto && crypto.randomUUID)
+            ? crypto.randomUUID()
+            : 'conv-' + Date.now() + '-' + Math.random().toString(16).slice(2);
+        localStorage.setItem('agent-conversation-id', id);
+    }
+    return id;
+}
+
+async function sendAgentMessage(event) {
+    event.preventDefault();
+    const input = document.getElementById('agentInput');
+    const btn = document.getElementById('agentSendBtn');
+    const log = document.getElementById('agentLog');
+    const message = input.value.trim();
+    if (!message) return;
+
+    appendAgentMessage(log, 'agent-user', message);
+    input.value = '';
+    input.disabled = true;
+    btn.disabled = true;
+
+    const pending = appendAgentMessage(log, 'agent-pending', '🤖 thinking…');
+
+    try {
+        // Send the visual board's current gameId (if any) so the agent can
+        // pick up a game the user started by clicking "New Game" instead of
+        // asking via chat. Without this, the agent's conversation memory has
+        // no gameId and it responds "we don't have an active game".
+        const payload = {
+            message,
+            conversationId: getAgentConversationId()
+        };
+        if (gameId) {
+            payload.gameId = gameId;
+        }
+        const response = await fetch('/api/agent/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await response.json();
+        pending.remove();
+        if (data.error) {
+            appendAgentMessage(log, 'agent-error', 'Error: ' + data.error);
+        } else {
+            appendAgentMessage(log, 'agent-reply', data.reply || '(empty reply)', true);
+            // Sync the visual board so the human sees what the agent just did
+            // on the server — keeps the two client paths (direct + agent) in sync.
+            if (data.gameId) {
+                syncBoardFromAgent(data.gameId, data.gameState);
+            }
+        }
+    } catch (err) {
+        pending.remove();
+        appendAgentMessage(log, 'agent-error', 'Connection error: ' + err.message);
+    } finally {
+        input.disabled = false;
+        btn.disabled = false;
+        input.focus();
+    }
+}
+
+/**
+ * Render the current server-side state of the agent's game on the visual board.
+ * Called after every agent reply so the X's and O's the LLM placed via MCP tools
+ * actually show up to the user. Also rewires the board's `gameId` so subsequent
+ * direct-click moves operate on the same game the agent is working with.
+ */
+function syncBoardFromAgent(agentGameId, state) {
+    if (!state || state.error) return;
+    gameId = agentGameId;
+    const board = state.board || [];
+    const winningCells = state.winningCells || [];
+    renderBoard(board, winningCells);
+
+    const status = state.status;
+    if (status === 'WON') {
+        if (state.winner === 'X') {
+            updateStatus('🎉 You win! (the agent placed your move)', 'win');
+        } else {
+            updateStatus('🤖 AI wins! (the agent ran the turn)', 'lose');
+        }
+        gameActive = false;
+        disableBoard();
+    } else if (status === 'DRAW') {
+        updateStatus('🤝 It\'s a draw!', 'draw');
+        gameActive = false;
+        disableBoard();
+    } else {
+        // IN_PROGRESS — let the user keep playing on this same game by clicking.
+        gameActive = true;
+        enableBoard();
+        updateStatus('Your turn! Place your <strong>X</strong> (or keep chatting)', '');
+    }
+}
+
+async function resetAgentConversation() {
+    const log = document.getElementById('agentLog');
+    const conversationId = getAgentConversationId();
+    try {
+        await fetch('/api/agent/reset', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ conversationId })
+        });
+    } catch (err) {
+        // Best-effort: even if the server call fails, rotate the ID locally so
+        // the next message starts a brand-new conversation.
+        console.warn('Agent reset failed, rotating conversation ID locally', err);
+    }
+    localStorage.removeItem('agent-conversation-id');
+    // Pre-warm a fresh ID so the next message uses it.
+    getAgentConversationId();
+    // Clear the visible log and restore the seed message.
+    log.innerHTML = '';
+    const seed = document.createElement('div');
+    seed.className = 'agent-message agent-system';
+    seed.textContent = 'Conversation reset. Discovered MCP tools are still available.';
+    log.appendChild(seed);
+}
+
+function appendAgentMessage(log, cls, text, renderMarkdown = false) {
+    const el = document.createElement('div');
+    el.className = 'agent-message ' + cls;
+    if (renderMarkdown) {
+        el.innerHTML = formatAgentMarkdown(text);
+    } else {
+        el.textContent = text;
+    }
+    log.appendChild(el);
+    log.scrollTop = log.scrollHeight;
+    return el;
+}
+
+// Minimal markdown -> HTML for agent replies.
+// Escapes HTML first, then renders fenced code blocks, **bold**, *italic*,
+// inline `code`, and newlines.
+function formatAgentMarkdown(text) {
+    const escaped = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    return escaped
+        // Fenced code blocks ```lang\n...\n``` -> <pre><code>...</code></pre>
+        .replace(/```(?:[a-zA-Z0-9_-]*)\n?([\s\S]*?)```/g, (_, code) =>
+            '<pre><code>' + code.replace(/\n$/, '') + '</code></pre>')
+        .replace(/`([^`\n]+)`/g, '<code>$1</code>')
+        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+        .replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<em>$2</em>')
+        // Preserve newlines outside <pre> blocks. <pre> already preserves its own newlines.
+        .replace(/\n/g, (match, offset, full) => {
+            // Skip newlines inside <pre>...</pre>
+            const before = full.lastIndexOf('<pre>', offset);
+            const closed = full.lastIndexOf('</pre>', offset);
+            return before > closed ? '\n' : '<br>';
+        });
+}

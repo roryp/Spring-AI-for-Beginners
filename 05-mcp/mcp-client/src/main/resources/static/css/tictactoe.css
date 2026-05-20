@@ -216,10 +216,24 @@ body {
     user-select: none;
 }
 
+/* Faded position number on every empty cell so chat references like
+ * "place your X at position 4" map directly to the visible board. */
+.cell:not(.occupied)::before {
+    content: attr(data-pos);
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: rgba(102, 126, 234, 0.35);
+    pointer-events: none;
+}
+
 .cell:hover:not(.occupied):not(.disabled) {
     background: #f0f0ff;
     transform: scale(1.05);
     box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+}
+
+.cell:hover:not(.occupied):not(.disabled)::before {
+    color: rgba(102, 126, 234, 0.6);
 }
 
 .cell.occupied {
@@ -493,6 +507,136 @@ body {
     line-height: 1.5;
 }
 
+/* Agent Chat */
+.agent-intro {
+    color: #555;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.agent-intro code {
+    background: rgba(102, 126, 234, 0.1);
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    color: #667eea;
+}
+
+.agent-log {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    padding: 1rem;
+    min-height: 180px;
+    max-height: 320px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.agent-message {
+    padding: 0.6rem 0.9rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    max-width: 92%;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.agent-system {
+    background: #e9ecef;
+    color: #555;
+    font-style: italic;
+    align-self: center;
+    text-align: center;
+    font-size: 0.85rem;
+}
+
+.agent-user {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    align-self: flex-end;
+}
+
+.agent-pending {
+    background: linear-gradient(135deg, #fff3cd, #ffeeba);
+    color: #856404;
+    align-self: flex-start;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.agent-reply {
+    background: white;
+    color: #333;
+    align-self: flex-start;
+    border: 1px solid #dee2e6;
+}
+
+.agent-reply code {
+    background: #f1f3f5;
+    color: #d6336c;
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.9em;
+}
+
+.agent-reply pre {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 0.6rem 0.75rem;
+    margin: 0.5rem 0;
+    overflow-x: auto;
+}
+
+.agent-reply pre code {
+    background: transparent;
+    color: #212529;
+    padding: 0;
+    font-size: 0.85em;
+    line-height: 1.35;
+    white-space: pre;
+}
+
+.agent-reply strong {
+    color: #212529;
+}
+
+.agent-error {
+    background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+    color: #721c24;
+    align-self: flex-start;
+}
+
+.agent-form {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.agent-input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 2px solid #dee2e6;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease;
+}
+
+.agent-input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.agent-input:disabled {
+    opacity: 0.6;
+    background: #f8f9fa;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     body {
@@ -544,5 +688,9 @@ body {
     .btn {
         width: 100%;
         justify-content: center;
+    }
+
+    .agent-form {
+        flex-direction: column;
     }
 }

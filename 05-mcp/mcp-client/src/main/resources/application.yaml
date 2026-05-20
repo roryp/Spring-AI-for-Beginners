@@ -4,6 +4,15 @@ spring:
   main:
     web-application-type: servlet
   ai:
+    # Microsoft Foundry credentials — only used by the agent path (AgentService)
+    # where the LLM autonomously decides which MCP tools to invoke.
+    # The direct-call path (GameService) does not use these.
+    openai:
+      base-url: ${AZURE_OPENAI_ENDPOINT}
+      api-key: ${AZURE_OPENAI_API_KEY}
+      microsoft-deployment-name: ${AZURE_OPENAI_FAST_DEPLOYMENT}
+      chat:
+        model: ${AZURE_OPENAI_FAST_DEPLOYMENT}
     mcp:
       client:
         request-timeout: 30s

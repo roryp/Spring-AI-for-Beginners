@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tic-Tac-Toe with AI - Spring AI MCP Demo</title>
-    <link rel="stylesheet" th:href="@{/css/tictactoe.css}">
+    <link rel="stylesheet" th:href="@{/css/tictactoe.css(v=2)}">
 </head>
 <body>
     <div class="container">
@@ -71,6 +71,42 @@
             </div>
         </div>
 
+        <!-- Agent Chat Section -->
+        <div class="section-card">
+            <div class="section-header">
+                <span class="section-icon">💬</span>
+                <h2>Agent Chat — Let the LLM Drive the MCP Tools</h2>
+            </div>
+            <div class="section-body">
+                <p class="agent-intro">
+                    The board above uses <strong>direct</strong> MCP tool calls — the client picks which tool to invoke.
+                    This panel uses the <strong>LLM-orchestrated</strong> pattern: the same MCP tools are wired into a
+                    <code>ChatClient</code>, and the model decides when and how to call them. A
+                    <code>MessageChatMemoryAdvisor</code> remembers prior turns (notably the active <code>gameId</code>)
+                    so follow-up questions like <em>"Which positions are still open?"</em> just work — and both
+                    paths share the same game, so the board above updates whenever the agent moves a piece. Try
+                    <em>"Start a new game and place my X in the center, then let the AI move"</em>.
+                </p>
+                <div id="agentLog" class="agent-log" aria-live="polite">
+                    <div class="agent-message agent-system">
+                        Discovered MCP tools are available. Ask me anything about the game.
+                    </div>
+                </div>
+                <form id="agentForm" class="agent-form" onsubmit="sendAgentMessage(event)">
+                    <input id="agentInput" type="text" class="agent-input"
+                           placeholder='e.g. "Start a new game" or "What positions are available?"'
+                           autocomplete="off" required>
+                    <button type="submit" id="agentSendBtn" class="btn btn-primary">
+                        <span class="btn-icon">📤</span> Send
+                    </button>
+                    <button type="button" id="agentResetBtn" class="btn btn-secondary"
+                            onclick="resetAgentConversation()" title="Clear chat memory and start a fresh conversation">
+                        <span class="btn-icon">🧹</span> Reset Chat
+                    </button>
+                </form>
+            </div>
+        </div>
+
         <!-- How It Works -->
         <div class="section-card">
             <div class="section-header">
@@ -82,12 +118,12 @@
                     <div class="arch-box client-box">
                         <div class="arch-icon">🌐</div>
                         <h3>MCP Client</h3>
-                        <p>Thin Web UI + ToolCallbackProvider</p>
+                        <p>Two paths share one ToolCallbackProvider</p>
                         <ul>
-                            <li>Thymeleaf frontend</li>
-                            <li>REST API (GameController)</li>
-                            <li>MCP ToolCallbackProvider</li>
-                            <li>No LLM — just calls tools</li>
+                            <li>Direct: ToolCallback.call()</li>
+                            <li>Agent: ChatClient + tools</li>
+                            <li>Thymeleaf frontend + REST API</li>
+                            <li>Auto-discovers server tools</li>
                         </ul>
                     </div>
                     <div class="arch-arrow">
