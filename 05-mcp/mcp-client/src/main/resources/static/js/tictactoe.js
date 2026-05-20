@@ -11,6 +11,63 @@ if (savedScores) {
     updateScoreDisplay();
 }
 
+// Track which gameIds have already been scored so the same finished game can't
+// be counted twice. This matters because:
+//   1. The agent chat path also finishes games (see syncBoardFromAgent).
+//   2. After a game ends, the agent re-fetches its state on every chat turn
+//      and re-sends it as `data.gameState`, so the WON/DRAW status arrives
+//      multiple times for the same gameId.
+// Persisted to localStorage with a small cap so reloads stay idempotent too.
+const SCORED_GAMES_KEY = 'tictactoe-scored-games';
+const MAX_SCORED_GAMES = 50;
+const scoredGameIds = loadScoredGameIds();
+
+function loadScoredGameIds() {
+    try {
+        const arr = JSON.parse(localStorage.getItem(SCORED_GAMES_KEY) || '[]');
+        return new Set(Array.isArray(arr) ? arr : []);
+    } catch (e) {
+        return new Set();
+    }
+}
+
+function persistScoredGameIds() {
+    // Keep at most MAX_SCORED_GAMES, dropping oldest entries first.
+    const arr = Array.from(scoredGameIds);
+    const trimmed = arr.length > MAX_SCORED_GAMES ? arr.slice(-MAX_SCORED_GAMES) : arr;
+    if (trimmed.length !== arr.length) {
+        scoredGameIds.clear();
+        trimmed.forEach(id => scoredGameIds.add(id));
+    }
+    localStorage.setItem(SCORED_GAMES_KEY, JSON.stringify(trimmed));
+}
+
+/**
+ * Idempotently records the outcome of a finished game. Safe to call any number
+ * of times for the same gameId — only the first WON/DRAW observation per game
+ * increments the scoreboard. Called from both client paths:
+ *   - handleGameEnd      (direct ToolCallback path, after a board click)
+ *   - syncBoardFromAgent (LLM-orchestrated path, after an agent chat reply)
+ */
+function recordGameOutcome(state) {
+    if (!state || !state.gameId) return;
+    if (state.status !== 'WON' && state.status !== 'DRAW') return;
+    if (scoredGameIds.has(state.gameId)) return;
+    if (state.status === 'WON') {
+        if (state.winner === 'X') {
+            scores.player++;
+        } else {
+            scores.ai++;
+        }
+    } else { // DRAW
+        scores.draws++;
+    }
+    scoredGameIds.add(state.gameId);
+    persistScoredGameIds();
+    saveScores();
+    updateScoreDisplay();
+}
+
 // --- Game Actions ---
 
 async function newGame() {
@@ -110,17 +167,13 @@ function renderBoard(board, winningCells) {
 function handleGameEnd(data) {
     if (data.status === 'WON') {
         if (data.winner === 'X') {
-            scores.player++;
             updateStatus('🎉 You win! Great move!', 'win');
         } else {
-            scores.ai++;
             updateStatus('🤖 AI wins! Better luck next time.', 'lose');
         }
+        recordGameOutcome(data);
         gameActive = false;
-        saveScores();
-        updateScoreDisplay();
     } else if (data.status === 'DRAW') {
-        scores.draws++;
         updateStatus('🤝 It\'s a draw! Well played.', 'draw');
         // Add draw styling to all cells
         for (let i = 0; i < 9; i++) {
@@ -129,9 +182,8 @@ function handleGameEnd(data) {
                 cell.classList.add('draw-cell');
             }
         }
+        recordGameOutcome(data);
         gameActive = false;
-        saveScores();
-        updateScoreDisplay();
     } else {
         // Game continues — player's turn
         gameActive = true;
@@ -264,6 +316,10 @@ function syncBoardFromAgent(agentGameId, state) {
     const winningCells = state.winningCells || [];
     renderBoard(board, winningCells);
 
+    // Belt-and-braces: the controller already includes gameId in gameState, but
+    // ensure recordGameOutcome can always identify the game even if it doesn't.
+    const outcomeState = { ...state, gameId: state.gameId || agentGameId };
+
     const status = state.status;
     if (status === 'WON') {
         if (state.winner === 'X') {
@@ -271,10 +327,12 @@ function syncBoardFromAgent(agentGameId, state) {
         } else {
             updateStatus('🤖 AI wins! (the agent ran the turn)', 'lose');
         }
+        recordGameOutcome(outcomeState);
         gameActive = false;
         disableBoard();
     } else if (status === 'DRAW') {
         updateStatus('🤝 It\'s a draw!', 'draw');
+        recordGameOutcome(outcomeState);
         gameActive = false;
         disableBoard();
     } else {
