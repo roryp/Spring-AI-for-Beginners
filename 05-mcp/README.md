@@ -390,13 +390,6 @@ In practice, many production systems combine both: `@Tool` for app-specific logi
 
 **Next Module:** [06-agents - Agentic Patterns](../06-agents/README.md)
 
-- **Try modifying the AI prompt** in [`TicTacToeTools.java`](mcp-server/src/main/java/com/example/springai/mcp/server/TicTacToeTools.java) to change the AI's personality or strategy
-- **Add difficulty levels** — Make the AI sometimes pick random moves for "easy" mode
-- **Build your own MCP server** — Expose your own domain-specific tools for AI consumption
-- **Explore the MCP ecosystem** — Connect to third-party MCP servers for database access, cloud APIs, or code execution
-- **Try `@McpSampling` and `@McpElicitation`** — Reverse the call direction so the server can ask the client's LLM (or the user) for input mid-tool-call
-- **Expose your service to third-party hosts via [MCP Apps](https://spring.io/blog/2026/03/18/mcp-apps)** — Spring AI's MCP Apps extension lets a Spring service register itself as an MCP server discoverable by hosts like Claude Desktop or Cursor, without standing up a separate process
-
 ---
 
 **Navigation:** [← Previous: Module 04 - Tools](../04-tools/README.md) | [Back to Main](../README.md) | [Next: Module 06 - Agents →](../06-agents/README.md)
