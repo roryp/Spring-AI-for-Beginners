@@ -83,6 +83,12 @@ This module is two Spring Boot applications. The **server** uses the Web MVC MCP
     <artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>
 </dependency>
 
+<!-- Shared MCP server auto-configuration (conditions, properties, common beans) -->
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-autoconfigure-mcp-server-common</artifactId>
+</dependency>
+
 <!-- Microsoft Foundry via the OpenAI SDK starter -->
 <dependency>
     <groupId>org.springframework.ai</groupId>
@@ -96,7 +102,7 @@ This module is two Spring Boot applications. The **server** uses the Web MVC MCP
 </dependency>
 ```
 
-**Client dependencies** ([mcp-client/pom.xml](mcp-client/pom.xml)) mirror the server, replacing the server starter with `spring-ai-starter-mcp-client-webflux`. The OpenAI starter and `spring-ai-client-chat` are only needed for the agent path; the direct-call path doesn't use them.
+**Client dependencies** ([mcp-client/pom.xml](mcp-client/pom.xml)) mirror the server, replacing the server starter with `spring-ai-starter-mcp-client-webflux` and its matching `spring-ai-autoconfigure-mcp-client-common`. The OpenAI starter and `spring-ai-client-chat` are only needed for the agent path; the direct-call path doesn't use them.
 
 **Server configuration** ([application.yaml](mcp-server/src/main/resources/application.yaml)) wires Microsoft Foundry credentials and declares the MCP server:
 
