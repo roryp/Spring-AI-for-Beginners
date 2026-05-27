@@ -191,19 +191,103 @@ public class AgentService {
      * is ground truth, so this method runs on every chat call that carries a
      * {@code boardGameId} — ensuring the agent never answers from a stale
      * picture of the board.
+     *
+     * <p>The snapshot deliberately renders the board in two redundant forms
+     * in addition to the raw JSON:
+     * <ol>
+     *   <li>An explicit {@code position: occupant} list, so the model never
+     *       has to count commas in a 9-element JSON array (empty strings
+     *       between commas are nearly invisible — the failure mode that
+     *       caused the agent to misreport piece positions).</li>
+     *   <li>A pre-rendered 3×3 grid with position numbers shown in empty
+     *       cells, so the model can copy it verbatim into its reply.</li>
+     * </ol>
      */
     private void seedGameContext(String conversationId, String gameId) {
         try {
             String state = gameService.getBoardState(gameId);
-            chatMemory.add(conversationId, new AssistantMessage(
-                    "[Board snapshot] Live server state of the active visual game.\n"
-                            + "Game: " + gameId + "\n"
-                            + "Current state: " + state));
+            String snapshot = buildSnapshotMessage(gameId, state);
+            chatMemory.add(conversationId, new AssistantMessage(snapshot));
             log.info("Agent [{}] seeded snapshot for visual-board game {}", conversationId, gameId);
         } catch (Exception e) {
             log.warn("Agent [{}] failed to seed game context for {}", conversationId, gameId, e);
         }
     }
+
+    /**
+     * Renders the JSON game state returned by the {@code getBoardState} MCP
+     * tool into an unambiguous "[Board snapshot]" assistant message. Falls
+     * back to the raw JSON if the payload is malformed.
+     */
+    String buildSnapshotMessage(String gameId, String state) {
+        try {
+            JsonNode root = objectMapper.readTree(state);
+            JsonNode boardNode = root.get("board");
+            if (boardNode == null || !boardNode.isArray() || boardNode.size() != 9) {
+                return rawSnapshot(gameId, state);
+            }
+            String[] cells = new String[9];
+            for (int i = 0; i < 9; i++) {
+                String value = boardNode.get(i).asString("");
+                cells[i] = value == null ? "" : value;
+            }
+            String status = textOrNull(root.get("status"));
+            String winner = textOrNull(root.get("winner"));
+            String currentPlayer = textOrNull(root.get("currentPlayer"));
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("[Board snapshot] Live server state of the active visual game.\n");
+            sb.append("Game: ").append(gameId).append('\n');
+            sb.append("Status: ").append(status == null ? "UNKNOWN" : status).append('\n');
+            sb.append("Winner: ").append(winner == null ? "none" : winner).append('\n');
+            sb.append("Current player: ")
+                    .append(currentPlayer == null ? "game over" : currentPlayer)
+                    .append('\n');
+            sb.append("\nCell positions (position: occupant). Empty means the cell is unoccupied:\n");
+            for (int i = 0; i < 9; i++) {
+                sb.append("  ").append(i).append(": ")
+                        .append(cells[i].isEmpty() ? "empty" : cells[i])
+                        .append('\n');
+            }
+            sb.append("\nVisual board (rows top->bottom, columns left->right; position numbers shown for empty cells):\n");
+            sb.append("  ").append(cellOrIndex(cells, 0))
+                    .append(" | ").append(cellOrIndex(cells, 1))
+                    .append(" | ").append(cellOrIndex(cells, 2)).append('\n');
+            sb.append("  ---------\n");
+            sb.append("  ").append(cellOrIndex(cells, 3))
+                    .append(" | ").append(cellOrIndex(cells, 4))
+                    .append(" | ").append(cellOrIndex(cells, 5)).append('\n');
+            sb.append("  ---------\n");
+            sb.append("  ").append(cellOrIndex(cells, 6))
+                    .append(" | ").append(cellOrIndex(cells, 7))
+                    .append(" | ").append(cellOrIndex(cells, 8)).append('\n');
+            sb.append("\nRaw JSON: ").append(state);
+            return sb.toString();
+        } catch (Exception e) {
+            log.debug("Could not parse board state JSON for snapshot, falling back to raw: {}",
+                    e.getMessage());
+            return rawSnapshot(gameId, state);
+        }
+    }
+
+    private static String rawSnapshot(String gameId, String state) {
+        return "[Board snapshot] Live server state of the active visual game.\n"
+                + "Game: " + gameId + "\n"
+                + "Current state: " + state;
+    }
+
+    private static String cellOrIndex(String[] cells, int position) {
+        return cells[position].isEmpty() ? Integer.toString(position) : cells[position];
+    }
+
+    private static String textOrNull(JsonNode node) {
+        if (node == null || node.isNull()) {
+            return null;
+        }
+        String value = node.asString("");
+        return (value == null || value.isEmpty()) ? null : value;
+    }
+
 
     /**
      * Returns the most recent gameId the agent has been working with for this
