@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Multi-Turn Chat</title>
-    <link rel="stylesheet" th:href="@{/css/prompt-demo.css}">
+    <link rel="stylesheet" th:href="@{/css/prompt-demo.css(v=2)}">
 </head>
 <body>
     <div class="container">
@@ -27,7 +27,7 @@
                 </div>
 
                 <div id="chat-container" class="chat-container">
-                    <p style="text-align: center; color: #9ca3af;">No messages yet. Start chatting below!</p>
+                    <p class="chat-empty" style="text-align: center; color: #9ca3af;">No messages yet. Start chatting below!</p>
                 </div>
 
                 <div class="input-group">
@@ -64,7 +64,7 @@
         </div>
     </div>
 
-    <script th:src="@{/js/pattern-demo.js}"></script>
+    <script th:src="@{/js/pattern-demo.js(v=2)}"></script>
     <script>
         let sessionId = null;
 
@@ -88,10 +88,13 @@
 
             // Create streaming assistant message placeholder with unique elements
             const container = document.getElementById('chat-container');
+            // Remove empty state if still present
+            const emptyState = container.querySelector('.chat-empty');
+            if (emptyState) emptyState.remove();
             const messageDiv = document.createElement('div');
             messageDiv.className = 'chat-message assistant';
-            const outputEl = document.createElement('pre');
-            outputEl.style.cssText = 'white-space: pre-wrap; margin: 0;';
+            const outputEl = document.createElement('div');
+            outputEl.className = 'markdown-body';
             const statusEl = document.createElement('small');
             statusEl.style.color = '#888';
             statusEl.textContent = 'Connecting...';
@@ -103,6 +106,7 @@
             container.appendChild(messageDiv);
             container.scrollTop = container.scrollHeight;
             let tokenCount = 0;
+            let accumulated = '';
             let sseBuffer = '';
 
             try {
@@ -135,11 +139,13 @@
                             if (line.startsWith('event:')) {
                                 eventName = line.substring(6).trim();
                             } else if (line.startsWith('data:')) {
+                                // Spring writes "data:<value>" with no leading space.
                                 dataLines.push(line.substring(5));
                             }
                         }
 
-                        const data = dataLines.join('\n');
+                        if (dataLines.length === 0) continue;
+                        let data = dataLines.join('\n');
 
                         if (eventName === 'done' || data.trim() === '[DONE]') {
                             statusEl.textContent = `\u2713 ${tokenCount} tokens`;
@@ -155,11 +161,16 @@
                             return;
                         }
 
-                        if (eventName === 'token' && dataLines.length > 0) {
-                            outputEl.textContent += data;
-                            tokenCount++;
-                            container.scrollTop = container.scrollHeight;
+                        // The controller returns Flux<String>, which Spring serializes
+                        // as plain `data:` events with no `event:` line. Treat every
+                        // non-terminating data chunk as a token.
+                        if (data.startsWith('"') && data.endsWith('"')) {
+                            try { data = JSON.parse(data); } catch (e) { /* use raw */ }
                         }
+                        accumulated += data;
+                        outputEl.innerHTML = renderMarkdown(accumulated);
+                        tokenCount++;
+                        container.scrollTop = container.scrollHeight;
                     }
                 }
 
@@ -238,15 +249,22 @@
             const container = document.getElementById('chat-container');
             
             // Remove empty state
-            if (container.querySelector('p')) {
-                container.innerHTML = '';
-            }
+            const emptyState = container.querySelector('.chat-empty');
+            if (emptyState) emptyState.remove();
 
             const messageDiv = document.createElement('div');
             messageDiv.className = `chat-message ${role}`;
-            messageDiv.innerHTML = `
-                <div class="message-content">${escapeHtml(content)}</div>
-            `;
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            if (role === 'assistant') {
+                const md = document.createElement('div');
+                md.className = 'markdown-body';
+                md.innerHTML = renderMarkdown(content == null ? '' : String(content));
+                contentDiv.appendChild(md);
+            } else {
+                contentDiv.textContent = content == null ? '' : String(content);
+            }
+            messageDiv.appendChild(contentDiv);
             container.appendChild(messageDiv);
             container.scrollTop = container.scrollHeight;
         }
@@ -264,7 +282,7 @@
                 sessionId = null;
                 document.getElementById('session-info').style.display = 'none';
                 document.getElementById('chat-container').innerHTML = 
-                    '<p style="text-align: center; color: #9ca3af;">No messages yet. Start chatting below!</p>';
+                    '<p class="chat-empty" style="text-align: center; color: #9ca3af;">No messages yet. Start chatting below!</p>';
             }
         }
     </script>
