@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Parallelization Workflow</title>
-    <link rel="stylesheet" th:href="@{/css/agent-demo.css}">
+    <link rel="stylesheet" th:href="@{/css/agent-demo.css(v=2)}">
 </head>
 <body>
     <div class="container">
@@ -63,7 +63,7 @@
         </div>
     </div>
 
-    <script th:src="@{/js/pattern-demo.js}"></script>
+    <script th:src="@{/js/pattern-demo.js(v=2)}"></script>
     <script>
         function setParallelExample() {
             document.getElementById('prompt').value = 'Analyze how market changes will impact this stakeholder group. Provide 3-4 key insights.';

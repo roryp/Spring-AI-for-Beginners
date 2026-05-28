@@ -17,10 +17,6 @@
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-autoconfigure-mcp-server-common</artifactId>
-        </dependency>
 
         <!-- Microsoft Foundry via OpenAI SDK Starter (auto-configures OpenAiChatModel) -->
         <dependency>
