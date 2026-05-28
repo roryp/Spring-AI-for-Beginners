@@ -90,10 +90,10 @@ public class ToolIntegrationDemo {
                 .options(chatOptions)
                 .build();
 
-        // Wire the tool callbacks onto the ChatClient once via defaultToolCallbacks.
+        // Wire the tool callbacks onto the ChatClient once via the ToolSpec DSL.
         // Spring AI handles the tool-call loop (model -> tool -> model) automatically.
         ChatClient chatClient = ChatClient.builder(chatModel)
-                .defaultToolCallbacks(toolCallbacks)
+                .defaultTools(t -> t.callbacks(toolCallbacks))
                 .build();
 
         // Maintain conversation history for multi-turn context

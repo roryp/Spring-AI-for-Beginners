@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chain Workflow</title>
-    <link rel="stylesheet" th:href="@{/css/agent-demo.css}">
+    <link rel="stylesheet" th:href="@{/css/agent-demo.css(v=2)}">
 </head>
 <body>
     <div class="container">
@@ -60,7 +60,7 @@
         </div>
     </div>
 
-    <script th:src="@{/js/pattern-demo.js}"></script>
+    <script th:src="@{/js/pattern-demo.js(v=2)}"></script>
     <script>
         function submitChain() {
             const input = document.getElementById('input').value.trim();
