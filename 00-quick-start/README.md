@@ -20,7 +20,7 @@
 
 ## Introduction
 
-This quickstart is meant to get you up and running with Spring AI as quickly as possible. It covers the absolute basics of building AI applications with Spring AI and GitHub Models. In the next modules you'll switch to Microsoft Foundry and GPT-5.2 and dive deeper into each concept.
+This quickstart is meant to get you up and running with Spring AI as quickly as possible. It covers the absolute basics of building AI applications with Spring AI and GitHub Models. In the next modules you'll switch to Microsoft Foundry — using `gpt-4o-mini` in most modules and `gpt-5.2` in Module 02 — and dive deeper into each concept.
 
 ## What is Spring AI?
 

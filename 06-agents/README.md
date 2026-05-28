@@ -14,10 +14,6 @@ Consider these tasks:
 
 No single LLM call can reliably handle these. You need to **orchestrate multiple LLM calls** — chaining them, running them in parallel, routing between them, or looping until quality criteria are met. This orchestration is what makes a system "agentic."
 
-### From Single Calls to Agentic Systems
-
-
-
 Think of it as a progression:
 
 | Level | What It Does | Example |
