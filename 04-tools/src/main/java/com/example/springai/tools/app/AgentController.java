@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -126,13 +127,15 @@ public class AgentController {
         try {
             AgentRequest agentRequest = new AgentRequest(message, sessionId, true);
             AgentResponse response = agentService.executeTask(agentRequest);
-            
-            return ResponseEntity.ok(Map.of(
-                "sessionId", response.sessionId(),
-                "answer", response.answer(),
-                "toolsUsed", response.toolExecutions().size(),
-                "status", response.status()
-            ));
+
+            Map<String, Object> body = new LinkedHashMap<>();
+            body.put("sessionId", response.sessionId());
+            body.put("answer", response.answer());
+            body.put("toolExecutions", response.toolExecutions());
+            body.put("toolsUsed", response.toolExecutions().size());
+            body.put("status", response.status());
+
+            return ResponseEntity.ok(body);
             
         } catch (Exception e) {
             log.error("Agent chat failed", e);

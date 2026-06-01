@@ -11,4 +11,7 @@ public record AgentResponse(
     List<ToolExecutionInfo> toolExecutions,
     String status
 ) {
+    public AgentResponse {
+        toolExecutions = toolExecutions == null ? List.of() : List.copyOf(toolExecutions);
+    }
 }
