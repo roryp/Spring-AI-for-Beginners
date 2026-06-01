@@ -17,9 +17,8 @@ public class RagSearchProperties {
     private final double similarityThreshold;
 
     public RagSearchProperties(
-            @Value("${app.rag.search.max-results:5}") int maxResults,
-            @Value("${app.rag.search.similarity-threshold:0.5}") double similarityThreshold) {
-        if (maxResults < 1) {
+            @Value("${app.rag.search.max-results:" + DEFAULT_MAX_RESULTS + "}") int maxResults,
+            @Value("${app.rag.search.similarity-threshold:" + DEFAULT_SIMILARITY_THRESHOLD + "}") double similarityThreshold) {
             throw new IllegalArgumentException("RAG max results must be at least 1");
         }
         if (similarityThreshold < 0.0 || similarityThreshold > 1.0) {
