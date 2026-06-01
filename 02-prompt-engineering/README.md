@@ -378,29 +378,29 @@ The following diagram shows how this structured framework organizes a code revie
 
 *Framework for consistent code reviews with severity levels*
 
-**Multi-Turn Chat** - For conversations that need context. Spring AI's `MessageChatMemoryAdvisor` plus `MessageWindowChatMemory` automatically maintains a sliding window of recent messages per session, so the model remembers previous turns without you tracking the history yourself. Use this for interactive help sessions or complex Q&A.
+**Multi-Turn Chat** - For conversations that need context. This module uses Spring AI's `MessageWindowChatMemory` directly: each request adds the user's message, sends the session's recent messages to the model (via `ChatClient` for non-streaming calls, or via the streaming helper for streaming calls), then stores the assistant's response. The streaming path follows the same rule by accumulating streamed tokens and saving the completed assistant message when the stream finishes, so streaming and non-streaming turns share the same conversation memory.
 
 ```java
 ChatMemory chatMemory = MessageWindowChatMemory.builder()
-        .maxMessages(10)
-        .build();
-
-ChatClient memoryClient = ChatClient.builder(chatModel)
-        .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
-        .build();
+    .maxMessages(10)
+    .build();
 
 String sessionId = "user-session-1";
-String response1 = memoryClient.prompt()
-        .user("What is Spring Boot?")
-        .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, sessionId))
-        .call()
-        .content();
+chatMemory.add(sessionId, new UserMessage("What is Spring Boot?"));
 
-String response2 = memoryClient.prompt()
-        .user("Show me an example")
-        .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, sessionId))
+String response1 = chatClient.prompt()
+        .messages(chatMemory.get(sessionId))
         .call()
         .content();
+chatMemory.add(sessionId, new AssistantMessage(response1));
+
+chatMemory.add(sessionId, new UserMessage("Show me an example"));
+
+String response2 = chatClient.prompt()
+        .messages(chatMemory.get(sessionId))
+        .call()
+        .content();
+chatMemory.add(sessionId, new AssistantMessage(response2));
 ```
 
 The diagram below visualizes how conversation context accumulates with each turn and how it relates to the model's token limit.

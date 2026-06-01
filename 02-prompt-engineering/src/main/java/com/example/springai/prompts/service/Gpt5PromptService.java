@@ -73,7 +73,7 @@ public class Gpt5PromptService {
      * Spring AI SDK's collectList() which buffers the entire response.
      * Each token is emitted as it arrives from the API for real-time display.
      */
-    private Flux<String> streamResponse(String prompt) {
+    protected Flux<String> streamResponse(String prompt) {
         log.info("[STREAM] Starting streaming request");
         log.debug("[STREAM] Prompt length: {} chars", prompt.length());
 
@@ -477,9 +477,19 @@ public class Gpt5PromptService {
             }
         }
 
+        StringBuilder assistantResponse = new StringBuilder();
+
         return streamResponse(fullPrompt.toString())
+                .doOnNext(assistantResponse::append)
                 .doOnComplete(() -> {
+                    String responseText = assistantResponse.toString();
+                    if (!responseText.isBlank()) {
+                        chatMemory.add(sessionId, new AssistantMessage(responseText));
+                    }
                     log.info("[STREAM] Chat streaming completed for session: {}", sessionId);
+                })
+                .doOnError(error -> {
+                    log.warn("[STREAM] Chat streaming failed for session: {}", sessionId, error);
                 });
     }
 
