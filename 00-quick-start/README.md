@@ -268,7 +268,7 @@ String response2 = memoryClient.prompt()
 
 **Tool Integration** - [ToolIntegrationDemo.java](src/main/java/com/example/springai/quickstart/ToolIntegrationDemo.java)
 
-This is where Spring AI gets powerful. You register Java functions as `FunctionToolCallback` instances and wire them onto a `ChatClient` via `defaultToolCallbacks(...)`. The AI then automatically decides when to call them based on the user's request, and Spring AI handles the tool-call loop (model → tool → model) for you so `call().content()` returns just the final answer.
+This is where Spring AI gets powerful. You register Java functions as `FunctionToolCallback` instances and wire them onto a `ChatClient` via `defaultTools(t -> t.callbacks(...))`. The AI then automatically decides when to call them based on the user's request, and Spring AI handles the tool-call loop (model → tool → model) for you so `call().content()` returns just the final answer.
 
 ```java
 record TwoNumbers(double a, double b) {}
@@ -281,7 +281,7 @@ List<ToolCallback> toolCallbacks = List.of(
 );
 
 ChatClient chatClient = ChatClient.builder(chatModel)
-    .defaultToolCallbacks(toolCallbacks)
+    .defaultTools(t -> t.callbacks(toolCallbacks))
     .build();
 ```
 
@@ -289,7 +289,7 @@ ChatClient chatClient = ChatClient.builder(chatModel)
 > - "How does FunctionToolCallback work and what does Spring AI do with it behind the scenes?"
 > - "Can the AI call multiple tools in sequence to solve complex problems?"
 > - "What happens if a tool throws an exception - how should I handle errors?"
-> - "When should I use ChatClient.prompt().tools(...) per-call vs defaultToolCallbacks(...) at build time?"
+> - "When should I use ChatClient.prompt().tools(...) per-call vs defaultTools(...) at build time?"
 
 **Document Q&A** - [SimpleReaderDemo.java](src/main/java/com/example/springai/quickstart/SimpleReaderDemo.java)
 

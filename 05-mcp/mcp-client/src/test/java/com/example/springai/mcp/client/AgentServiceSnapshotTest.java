@@ -29,8 +29,8 @@ class AgentServiceSnapshotTest {
         // ChatClient.Builder uses a fluent API. RETURNS_SELF makes every
         // builder method that returns ChatClient.Builder return the same
         // mock, so the chain in AgentService's constructor resolves without
-        // needing to stub each overload (notably the varargs-taking
-        // defaultToolCallbacks, which is awkward to match with any()).
+        // needing to stub each overload (notably the tools DSL callbacks,
+        // which are awkward to match with any()).
         ChatClient.Builder builder = mock(ChatClient.Builder.class, Mockito.RETURNS_SELF);
         when(builder.build()).thenReturn(mock(ChatClient.class));
 

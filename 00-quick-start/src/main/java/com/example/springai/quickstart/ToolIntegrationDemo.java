@@ -29,7 +29,7 @@ import org.springframework.ai.tool.function.FunctionToolCallback;
  *
  * Key Concepts:
  * - {@link FunctionToolCallback} for registering tools
- * - {@link ChatClient.Builder#defaultToolCallbacks(List)} to attach tools once
+ * - ChatClient.Builder.defaultTools(...) to attach tools once
  * - Parameter extraction from natural language
  * - Multi-step reasoning with tools
  *
@@ -38,7 +38,7 @@ import org.springframework.ai.tool.function.FunctionToolCallback;
  * - "Can the AI call multiple tools in sequence to solve complex problems?"
  * - "What happens if a tool throws an exception - how should I handle errors?"
  * - "How would I integrate a real API (like weather or currency) instead of this calculator example?"
- * - "When should I use ChatClient.prompt().tools(...) per-call vs defaultToolCallbacks(...) at build time?"
+ * - "When should I use ChatClient.prompt().tools(...) per-call vs defaultTools(...) at build time?"
  */
 public class ToolIntegrationDemo {
 
