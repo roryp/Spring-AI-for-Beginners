@@ -1,5 +1,6 @@
 package com.example.springai.rag.service;
 
+import com.example.springai.rag.config.RagSearchProperties;
 import com.example.springai.rag.model.dto.RagRequest;
 import com.example.springai.rag.model.dto.RagResponse;
 import com.example.springai.rag.model.dto.SourceReference;
@@ -45,17 +46,17 @@ public class RagService {
 
     private static final Logger log = LoggerFactory.getLogger(RagService.class);
     
-    private static final int MAX_RESULTS = 5;
-    private static final double MIN_SCORE = 0.0;
-
     private final OpenAiChatModel chatModel;
     private final VectorStore vectorStore;
+    private final RagSearchProperties searchProperties;
 
     public RagService(
             OpenAiChatModel chatModel,
-            VectorStore vectorStore) {
+            VectorStore vectorStore,
+            RagSearchProperties searchProperties) {
         this.chatModel = chatModel;
         this.vectorStore = vectorStore;
+        this.searchProperties = searchProperties;
     }
 
     /**
@@ -69,15 +70,12 @@ public class RagService {
 
         try {
             // 1. Search for relevant document chunks (VectorStore handles embedding the query)
-            SearchRequest searchRequest = SearchRequest.builder()
-                .query(request.question())
-                .topK(MAX_RESULTS)
-                .similarityThreshold(MIN_SCORE)
-                .build();
+            SearchRequest searchRequest = searchProperties.buildSearchRequest(request.question());
             
             List<Document> matches = vectorStore.similaritySearch(searchRequest);
             
-            log.info("Found {} matches above MIN_SCORE {} for question", matches.size(), MIN_SCORE);
+            log.info("Found {} matches above similarity threshold {} for question",
+                    matches.size(), searchProperties.similarityThreshold());
             matches.forEach(doc -> log.info("Match score: {}", 
                     String.format("%.4f", doc.getScore() != null ? doc.getScore() : 0.0)));
             
