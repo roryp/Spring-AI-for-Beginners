@@ -2,6 +2,7 @@ package com.example.springai.tools.service;
 
 import com.example.springai.tools.model.dto.AgentRequest;
 import com.example.springai.tools.model.dto.AgentResponse;
+import com.example.springai.tools.model.dto.ToolExecutionInfo;
 import com.example.springai.tools.tools.TemperatureTool;
 import com.example.springai.tools.tools.WeatherTool;
 
@@ -43,6 +44,7 @@ public class AgentService {
     private final ChatClient chatClient;
     private final WeatherTool weatherTool;
     private final TemperatureTool temperatureTool;
+    private final ToolExecutionInfo.Recorder toolExecutionRecorder;
     private final ChatMemory chatMemory;
     private final Set<String> activeSessions = ConcurrentHashMap.newKeySet();
 
@@ -52,8 +54,9 @@ public class AgentService {
      */
     public AgentService(ChatClient.Builder chatClientBuilder) {
         this.chatClient = chatClientBuilder.build();
-        this.weatherTool = new WeatherTool();
-        this.temperatureTool = new TemperatureTool();
+        this.toolExecutionRecorder = new ToolExecutionInfo.Recorder();
+        this.weatherTool = new WeatherTool(toolExecutionRecorder);
+        this.temperatureTool = new TemperatureTool(toolExecutionRecorder);
         this.chatMemory = MessageWindowChatMemory.builder()
                 .maxMessages(20)
                 .build();
@@ -86,6 +89,7 @@ public class AgentService {
 
         try {
             activeSessions.add(sessionId);
+            toolExecutionRecorder.start();
 
             // Add user message to memory
             chatMemory.add(sessionId, new UserMessage(request.message()));
@@ -102,22 +106,24 @@ public class AgentService {
 
             // Add AI response to memory
             chatMemory.add(sessionId, new org.springframework.ai.chat.messages.AssistantMessage(answer));
+            List<ToolExecutionInfo> toolExecutions = toolExecutionRecorder.stop();
 
-            log.info("Agent completed task successfully");
+            log.info("Agent completed task successfully with {} tool execution(s)", toolExecutions.size());
 
             return new AgentResponse(
                 answer,
                 sessionId,
-                new ArrayList<>(),
+                toolExecutions,
                 "completed"
             );
 
         } catch (Exception e) {
+            List<ToolExecutionInfo> toolExecutions = toolExecutionRecorder.stop();
             log.error("Agent task execution failed", e);
             return new AgentResponse(
                 "I encountered an error: " + e.getMessage(),
                 sessionId,
-                new ArrayList<>(),
+                toolExecutions,
                 "failed"
             );
         }

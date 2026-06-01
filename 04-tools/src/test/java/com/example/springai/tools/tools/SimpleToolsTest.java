@@ -1,10 +1,26 @@
 package com.example.springai.tools.tools;
 
+import com.example.springai.tools.model.dto.ToolExecutionInfo;
+import com.example.springai.tools.model.dto.AgentRequest;
+import com.example.springai.tools.model.dto.AgentResponse;
+import com.example.springai.tools.service.AgentService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.model.Generation;
+import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Simple beginner-friendly tests demonstrating tool functionality.
@@ -267,5 +283,88 @@ class SimpleToolsTest {
                 .as("Temperature conversion should produce valid Fahrenheit")
                 .containsPattern("20[.,]0°C")
                 .containsPattern("68[.,]0°F"); // 20°C = 68°F
+    }
+
+    @Test
+    @DisplayName("Should record successful tool execution metadata")
+    void shouldRecordSuccessfulToolExecutionMetadata() {
+        // given
+        ToolExecutionInfo.Recorder recorder = new ToolExecutionInfo.Recorder();
+        TemperatureTool tempTool = new TemperatureTool(recorder);
+
+        // when
+        recorder.start();
+        String result = tempTool.fahrenheitToCelsius(100.0);
+        List<ToolExecutionInfo> executions = recorder.stop();
+
+        // then
+        assertThat(result).containsPattern("37[.,]8°C");
+        assertThat(executions).singleElement().satisfies(execution -> {
+            assertThat(execution.toolName()).isEqualTo("fahrenheitToCelsius");
+            assertThat(execution.arguments()).containsExactly("fahrenheit=100.0");
+            assertThat(execution.status()).isEqualTo("completed");
+        });
+    }
+
+    @Test
+    @DisplayName("Should record failed tool execution metadata")
+    void shouldRecordFailedToolExecutionMetadata() {
+        // given
+        ToolExecutionInfo.Recorder recorder = new ToolExecutionInfo.Recorder();
+        TemperatureTool tempTool = new TemperatureTool(recorder);
+
+        // when / then
+        recorder.start();
+        assertThatThrownBy(() -> tempTool.kelvinToCelsius(-1.0))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        assertThat(recorder.stop()).singleElement().satisfies(execution -> {
+            assertThat(execution.toolName()).isEqualTo("kelvinToCelsius");
+            assertThat(execution.arguments()).containsExactly("kelvin=-1.0");
+            assertThat(execution.status()).isEqualTo("failed");
+        });
+    }
+
+    @Test
+    @DisplayName("Should return metadata for tools that actually ran")
+    void shouldReturnActualToolExecutionMetadata() {
+        // given
+        OpenAiChatModel mockChatModel = mock(OpenAiChatModel.class);
+        when(mockChatModel.getDefaultOptions())
+                .thenReturn(OpenAiChatOptions.builder().build());
+
+        AssistantMessage.ToolCall toolCall = new AssistantMessage.ToolCall(
+                "call-1",
+                "function",
+                "fahrenheitToCelsius",
+                "{\"fahrenheit\":100.0}"
+        );
+        AssistantMessage toolCallMessage = AssistantMessage.builder()
+                .content("")
+                .toolCalls(List.of(toolCall))
+                .build();
+
+        when(mockChatModel.call(any(Prompt.class)))
+                .thenReturn(chatResponse(toolCallMessage))
+                .thenReturn(chatResponse(new AssistantMessage("100°F is 37.8°C.")));
+
+        AgentService agentService = new AgentService(ChatClient.builder(mockChatModel));
+
+        // when
+        AgentResponse response = agentService.executeTask(
+                new AgentRequest("Convert 100°F to Celsius", "metadata-session", true));
+
+        // then
+        assertThat(response.status()).isEqualTo("completed");
+        assertThat(response.answer()).isEqualTo("100°F is 37.8°C.");
+        assertThat(response.toolExecutions()).singleElement().satisfies(execution -> {
+            assertThat(execution.toolName()).isEqualTo("fahrenheitToCelsius");
+            assertThat(execution.arguments()).containsExactly("fahrenheit=100.0");
+            assertThat(execution.status()).isEqualTo("completed");
+        });
+    }
+
+    private ChatResponse chatResponse(AssistantMessage assistantMessage) {
+        return new ChatResponse(List.of(new Generation(assistantMessage)));
     }
 }

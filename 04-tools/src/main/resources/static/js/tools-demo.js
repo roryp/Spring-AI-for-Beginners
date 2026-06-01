@@ -102,7 +102,7 @@ async function sendMessage() {
             sessionId = data.sessionId;
             
             // Add agent response to chat
-            addAgentMessage(data.answer, data.toolsUsed);
+            addAgentMessage(data.answer, data.toolExecutions || []);
         } else {
             addErrorMessage(data.error || 'Failed to get response from agent');
         }
@@ -132,15 +132,16 @@ function addUserMessage(message) {
 }
 
 // Add Agent Message to Chat
-function addAgentMessage(answer, toolsUsed) {
+function addAgentMessage(answer, toolExecutions) {
     const messageDiv = document.createElement('div');
     messageDiv.className = 'chat-message agent';
     
     let toolsHtml = '';
-    if (toolsUsed && toolsUsed > 0) {
+    const toolBadges = formatToolExecutions(toolExecutions);
+    if (toolBadges) {
         toolsHtml = `
             <div class="tools-used">
-                <strong>🛠️ Tools Used:</strong> ${toolsUsed}
+                <strong>Tools run:</strong> ${toolBadges}
             </div>
         `;
     }
@@ -248,6 +249,9 @@ function formatToolExecutions(toolExecutions) {
     }
     
     return toolExecutions.map(tool => {
-        return `<span class="tool-badge">${escapeHtml(tool.toolName)}</span>`;
+        const args = Array.isArray(tool.arguments) ? tool.arguments.join(', ') : '';
+        const label = args ? `${tool.toolName}(${args})` : tool.toolName;
+        const status = tool.status ? ` status: ${tool.status}` : '';
+        return `<span class="tool-badge" title="${escapeHtml(status)}">${escapeHtml(label)}</span>`;
     }).join('');
 }

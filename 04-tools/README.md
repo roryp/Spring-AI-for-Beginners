@@ -60,7 +60,7 @@ spring:
         model: ${AZURE_OPENAI_FAST_DEPLOYMENT}
 ```
 
-Tools are registered as Spring `@Bean` methods annotated with `@Tool` — Spring AI discovers them automatically and makes them available to `ChatClient`.
+Tool methods are annotated with `@Tool`, and this module creates the tool instances in `AgentService` before passing them to `ChatClient` at call time with `.tools(weatherTool, temperatureTool)`. Spring AI uses those annotated instances to expose callable tools to the model for that request.
 
 ## Understanding AI Agents with Tools
 
@@ -312,9 +312,13 @@ The application provides a web interface where you can interact with an AI agent
 
 Start with a straightforward request: "Convert 100 degrees Fahrenheit to Celsius". The agent recognizes it needs the temperature conversion tool, calls it with the right parameters, and returns the result. Notice how natural this feels - you didn't specify which tool to use or how to call it.
 
+After the response, the chat message shows a **Tools run** line with the actual Java tool method that executed, such as `fahrenheitToCelsius(fahrenheit=100.0)`. This metadata is recorded from real tool invocations, so it reflects what actually ran rather than inferred model behavior.
+
 ### Test Tool Chaining
 
 Now try something more complex: "What's the weather in Seattle and convert it to Fahrenheit?" Watch the agent work through this in steps. It first gets the weather (which returns Celsius), recognizes it needs to convert to Fahrenheit, calls the conversion tool, and combines both results into one response.
+
+For chained requests, the **Tools run** line can show multiple tool calls in the same agent response, making the orchestration visible while you test the demo.
 
 ### See Conversation Flow
 

@@ -4,6 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
+import com.example.springai.tools.model.dto.ToolExecutionInfo;
+
+import java.util.List;
 
 /**
  * Temperature conversion tool.
@@ -19,15 +22,26 @@ import org.springframework.ai.tool.annotation.ToolParam;
 public class TemperatureTool {
 
     private static final Logger log = LoggerFactory.getLogger(TemperatureTool.class);
+    private final ToolExecutionInfo.Recorder toolExecutionRecorder;
+
+    public TemperatureTool() {
+        this(new ToolExecutionInfo.Recorder());
+    }
+
+    public TemperatureTool(ToolExecutionInfo.Recorder toolExecutionRecorder) {
+        this.toolExecutionRecorder = toolExecutionRecorder;
+    }
 
     /**
      * Convert temperature from Celsius to Fahrenheit.
      */
     @Tool(description = "Convert temperature from Celsius to Fahrenheit")
     public String celsiusToFahrenheit(@ToolParam(description = "Temperature in Celsius") double celsius) {
-        log.info("Converting {}°C to Fahrenheit", celsius);
-        double fahrenheit = (celsius * 9.0 / 5.0) + 32.0;
-        return String.format("%.1f°C = %.1f°F", celsius, fahrenheit);
+        return toolExecutionRecorder.record("celsiusToFahrenheit", List.of("celsius=" + celsius), () -> {
+            log.info("Converting {}°C to Fahrenheit", celsius);
+            double fahrenheit = (celsius * 9.0 / 5.0) + 32.0;
+            return String.format("%.1f°C = %.1f°F", celsius, fahrenheit);
+        });
     }
 
     /**
@@ -35,9 +49,11 @@ public class TemperatureTool {
      */
     @Tool(description = "Convert temperature from Fahrenheit to Celsius")
     public String fahrenheitToCelsius(@ToolParam(description = "Temperature in Fahrenheit") double fahrenheit) {
-        log.info("Converting {}°F to Celsius", fahrenheit);
-        double celsius = (fahrenheit - 32.0) * 5.0 / 9.0;
-        return String.format("%.1f°F = %.1f°C", fahrenheit, celsius);
+        return toolExecutionRecorder.record("fahrenheitToCelsius", List.of("fahrenheit=" + fahrenheit), () -> {
+            log.info("Converting {}°F to Celsius", fahrenheit);
+            double celsius = (fahrenheit - 32.0) * 5.0 / 9.0;
+            return String.format("%.1f°F = %.1f°C", fahrenheit, celsius);
+        });
     }
 
     /**
@@ -45,9 +61,11 @@ public class TemperatureTool {
      */
     @Tool(description = "Convert temperature from Celsius to Kelvin")
     public String celsiusToKelvin(@ToolParam(description = "Temperature in Celsius") double celsius) {
-        log.info("Converting {}°C to Kelvin", celsius);
-        double kelvin = celsius + 273.15;
-        return String.format("%.1f°C = %.2f K", celsius, kelvin);
+        return toolExecutionRecorder.record("celsiusToKelvin", List.of("celsius=" + celsius), () -> {
+            log.info("Converting {}°C to Kelvin", celsius);
+            double kelvin = celsius + 273.15;
+            return String.format("%.1f°C = %.2f K", celsius, kelvin);
+        });
     }
 
     /**
@@ -55,12 +73,14 @@ public class TemperatureTool {
      */
     @Tool(description = "Convert temperature from Kelvin to Celsius")
     public String kelvinToCelsius(@ToolParam(description = "Temperature in Kelvin") double kelvin) {
-        log.info("Converting {} K to Celsius", kelvin);
-        if (kelvin < 0) {
-            throw new IllegalArgumentException("Temperature cannot be below absolute zero (0 K)");
-        }
-        double celsius = kelvin - 273.15;
-        return String.format("%.2f K = %.1f°C", kelvin, celsius);
+        return toolExecutionRecorder.record("kelvinToCelsius", List.of("kelvin=" + kelvin), () -> {
+            log.info("Converting {} K to Celsius", kelvin);
+            if (kelvin < 0) {
+                throw new IllegalArgumentException("Temperature cannot be below absolute zero (0 K)");
+            }
+            double celsius = kelvin - 273.15;
+            return String.format("%.2f K = %.1f°C", kelvin, celsius);
+        });
     }
 
     /**
@@ -68,9 +88,11 @@ public class TemperatureTool {
      */
     @Tool(description = "Convert temperature from Fahrenheit to Kelvin")
     public String fahrenheitToKelvin(@ToolParam(description = "Temperature in Fahrenheit") double fahrenheit) {
-        log.info("Converting {}°F to Kelvin", fahrenheit);
-        double kelvin = (fahrenheit - 32.0) * 5.0 / 9.0 + 273.15;
-        return String.format("%.1f°F = %.2f K", fahrenheit, kelvin);
+        return toolExecutionRecorder.record("fahrenheitToKelvin", List.of("fahrenheit=" + fahrenheit), () -> {
+            log.info("Converting {}°F to Kelvin", fahrenheit);
+            double kelvin = (fahrenheit - 32.0) * 5.0 / 9.0 + 273.15;
+            return String.format("%.1f°F = %.2f K", fahrenheit, kelvin);
+        });
     }
 
     /**
@@ -78,11 +100,13 @@ public class TemperatureTool {
      */
     @Tool(description = "Convert temperature from Kelvin to Fahrenheit")
     public String kelvinToFahrenheit(@ToolParam(description = "Temperature in Kelvin") double kelvin) {
-        log.info("Converting {} K to Fahrenheit", kelvin);
-        if (kelvin < 0) {
-            throw new IllegalArgumentException("Temperature cannot be below absolute zero (0 K)");
-        }
-        double fahrenheit = (kelvin - 273.15) * 9.0 / 5.0 + 32.0;
-        return String.format("%.2f K = %.1f°F", kelvin, fahrenheit);
+        return toolExecutionRecorder.record("kelvinToFahrenheit", List.of("kelvin=" + kelvin), () -> {
+            log.info("Converting {} K to Fahrenheit", kelvin);
+            if (kelvin < 0) {
+                throw new IllegalArgumentException("Temperature cannot be below absolute zero (0 K)");
+            }
+            double fahrenheit = (kelvin - 273.15) * 9.0 / 5.0 + 32.0;
+            return String.format("%.2f K = %.1f°F", kelvin, fahrenheit);
+        });
     }
 }
