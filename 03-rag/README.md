@@ -218,7 +218,7 @@ When you ask a question, the `VectorStore` automatically embeds your question an
 SearchRequest searchRequest = SearchRequest.builder()
     .query(request.question())
     .topK(5)
-    .similarityThreshold(0.0)
+    .similarityThreshold(0.5)
     .build();
 
 List<Document> matches = vectorStore.similaritySearch(searchRequest);
@@ -392,7 +392,8 @@ The system processes your document, breaks it into chunks, and creates embedding
 
 ### Ask Questions
 
-Now ask specific questions about the document content. Try something factual that's clearly stated in the document. The system searches for relevant chunks, includes them in the prompt, and generates an answer.
+Now ask specific questions about the document content. Try something factual that's clearly stated in the document - e.g. "What is Spring AI?"
+The system searches for relevant chunks, includes them in the prompt, and generates an answer.
 
 ### Check Source References
 
@@ -447,7 +448,7 @@ public ChatClient chatClient(OpenAiChatModel chatModel) {
 ```java
 QuestionAnswerAdvisor qaAdvisor = QuestionAnswerAdvisor.builder(vectorStore)
         .searchRequest(SearchRequest.builder()
-                .similarityThreshold(0.0)
+                .similarityThreshold(0.5)
                 .topK(5)
                 .build())
         .build();
@@ -490,7 +491,7 @@ Scores range from 0 to 1:
 - 0.3-0.7: Relevant, good context
 - Below 0.3: Low relevance, may be noise
 
-The default threshold is set to `0.0` so that `SimpleVectorStore` (in-memory) returns all matches — its cosine-similarity scores tend to be lower than production vector databases. In production, raise the threshold (e.g., 0.5-0.7) once you're using a dedicated vector store like Azure AI Search.
+The default threshold is set to `0.5` so weak matches are filtered out before they reach the prompt. Tune this value for your corpus and vector store: lower it if relevant chunks are being missed, or raise it if unrelated chunks appear in source references.
 
 Embeddings work well when meaning clusters cleanly, but they have blind spots. The diagram below shows the common failure modes — chunks that are too large produce muddy vectors, chunks that are too small lack context, ambiguous terms point to multiple clusters, and exact-match lookups (IDs, part numbers) don't work with embeddings at all:
 

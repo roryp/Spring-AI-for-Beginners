@@ -1,5 +1,6 @@
 package com.example.springai.rag.service;
 
+import com.example.springai.rag.config.RagSearchProperties;
 import com.example.springai.rag.model.dto.RagRequest;
 import com.example.springai.rag.model.dto.RagResponse;
 import com.example.springai.rag.model.dto.SourceReference;
@@ -51,15 +52,14 @@ public class AdvisorRagService {
 
     private static final Logger log = LoggerFactory.getLogger(AdvisorRagService.class);
 
-    private static final int MAX_RESULTS = 5;
-    private static final double MIN_SCORE = 0.0;
-
     private final ChatClient chatClient;
     private final VectorStore vectorStore;
+    private final RagSearchProperties searchProperties;
 
-    public AdvisorRagService(ChatClient chatClient, VectorStore vectorStore) {
+    public AdvisorRagService(ChatClient chatClient, VectorStore vectorStore, RagSearchProperties searchProperties) {
         this.chatClient = chatClient;
         this.vectorStore = vectorStore;
+        this.searchProperties = searchProperties;
     }
 
     /**
@@ -75,10 +75,7 @@ public class AdvisorRagService {
         try {
             // Build QuestionAnswerAdvisor with search configuration
             QuestionAnswerAdvisor qaAdvisor = QuestionAnswerAdvisor.builder(vectorStore)
-                    .searchRequest(SearchRequest.builder()
-                            .similarityThreshold(MIN_SCORE)
-                            .topK(MAX_RESULTS)
-                            .build())
+                    .searchRequest(searchProperties.buildSearchRequest())
                     .build();
 
             // Single call: ChatClient + Advisor handles search, context assembly, and generation
@@ -109,11 +106,7 @@ public class AdvisorRagService {
      */
     private List<SourceReference> getSourceReferences(String question) {
         try {
-            SearchRequest searchRequest = SearchRequest.builder()
-                    .query(question)
-                    .topK(MAX_RESULTS)
-                    .similarityThreshold(MIN_SCORE)
-                    .build();
+            SearchRequest searchRequest = searchProperties.buildSearchRequest(question);
 
             List<Document> matches = vectorStore.similaritySearch(searchRequest);
 

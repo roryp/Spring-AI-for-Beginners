@@ -19,6 +19,12 @@ spring:
 server:
   port: 8081
 
+app:
+  rag:
+    search:
+      max-results: 5
+      similarity-threshold: 0.5
+
 # Spring Boot Actuator
 management:
   endpoints:

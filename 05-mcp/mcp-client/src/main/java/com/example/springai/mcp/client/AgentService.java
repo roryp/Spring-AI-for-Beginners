@@ -59,7 +59,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * - "What happens under the hood when the LLM emits a tool_calls response — who executes the MCP call?"
  * - "How does MessageChatMemoryAdvisor isolate one browser's conversation from another?"
  * - "How would I restrict which discovered MCP tools the agent is allowed to use?"
- * - "What's the difference between defaultToolCallbacks(...) and toolCallbacks(...) per-prompt?"
+ * - "What's the difference between defaultTools(...) and tools(...) per-prompt?"
  */
 @Service
 public class AgentService {
@@ -71,7 +71,7 @@ public class AgentService {
 
     // The MCP server publishes its tools (and their descriptions, parameters
     // and return contracts) over the protocol; Spring AI forwards that schema
-    // to the LLM on every request via .defaultToolCallbacks(...) below. So
+    // to the LLM on every request via .defaultTools(...) below. So
     // this prompt deliberately does NOT name any tools — that's the whole
     // point of MCP discovery. We only describe the game and the behaviours we
     // want; the model picks the right tool for each behaviour by reading the
