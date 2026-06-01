@@ -60,7 +60,7 @@ spring:
         model: ${AZURE_OPENAI_FAST_DEPLOYMENT}
 ```
 
-Tools are registered as Spring `@Bean` methods annotated with `@Tool` — Spring AI discovers them automatically and makes them available to `ChatClient`.
+Tool methods are annotated with `@Tool`, and this module creates the tool instances in `AgentService` before passing them to `ChatClient` at call time with `.tools(weatherTool, temperatureTool)`. Spring AI uses those annotated instances to expose callable tools to the model for that request.
 
 ## Understanding AI Agents with Tools
 
