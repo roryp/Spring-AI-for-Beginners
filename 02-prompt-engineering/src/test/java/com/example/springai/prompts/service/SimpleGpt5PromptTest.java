@@ -20,11 +20,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
+import java.time.Duration;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+
+import reactor.core.publisher.Flux;
 
 /**
  * Simple tests for Gpt5PromptService demonstrating GPT-5 prompting patterns.
@@ -205,6 +212,65 @@ class SimpleGpt5PromptTest {
     }
 
     @Test
+    @DisplayName("Should preserve streamed assistant response for later conversation turns")
+    void shouldPreserveStreamingConversationContext() {
+        // Given
+        TestableStreamingPromptService streamingService = new TestableStreamingPromptService(
+            Flux.just("Nice to meet you, ", "Alex."),
+            Flux.just("You told me your name is Alex.")
+        );
+        String sessionId = "streaming-session";
+
+        // When
+        List<String> firstResponse = streamingService
+            .continueConversationStreaming("My name is Alex.", sessionId)
+            .collectList()
+            .block(Duration.ofSeconds(1));
+        List<String> secondResponse = streamingService
+            .continueConversationStreaming("What is my name?", sessionId)
+            .collectList()
+            .block(Duration.ofSeconds(1));
+
+        // Then
+        assertThat(firstResponse).containsExactly("Nice to meet you, ", "Alex.");
+        assertThat(secondResponse).containsExactly("You told me your name is Alex.");
+        assertThat(streamingService.prompts()).hasSize(2);
+        assertThat(streamingService.prompts().get(1))
+            .contains("[User] My name is Alex.")
+            .contains("[Assistant] Nice to meet you, Alex.")
+            .contains("[User] What is my name?");
+    }
+
+    @Test
+    @DisplayName("Should not preserve partial streamed response when stream fails")
+    void shouldNotPreservePartialStreamingResponseOnError() {
+        // Given
+        TestableStreamingPromptService streamingService = new TestableStreamingPromptService(
+            Flux.concat(Flux.just("partial response"), Flux.error(new RuntimeException("stream failed"))),
+            Flux.just("Fresh response")
+        );
+        String sessionId = "failed-stream-session";
+
+        // When / Then
+        assertThatThrownBy(() -> streamingService
+            .continueConversationStreaming("First message", sessionId)
+            .collectList()
+            .block(Duration.ofSeconds(1)))
+            .hasMessageContaining("stream failed");
+
+        streamingService
+            .continueConversationStreaming("Second message", sessionId)
+            .collectList()
+            .block(Duration.ofSeconds(1));
+
+        assertThat(streamingService.prompts()).hasSize(2);
+        assertThat(streamingService.prompts().get(1))
+            .contains("[User] First message")
+            .doesNotContain("[Assistant] partial response")
+            .contains("[User] Second message");
+    }
+
+    @Test
     @DisplayName("Should include conversation guidelines in first message")
     void shouldIncludeConversationGuidelinesInFirstMessage() {
         // Given
@@ -375,6 +441,31 @@ class SimpleGpt5PromptTest {
             field.set(target, value);
         } catch (Exception e) {
             throw new RuntimeException("Failed to set field " + fieldName, e);
+        }
+    }
+
+    private static class TestableStreamingPromptService extends Gpt5PromptService {
+
+        private final Queue<Flux<String>> responses = new ArrayDeque<>();
+        private final List<String> prompts = new ArrayList<>();
+
+        @SafeVarargs
+        TestableStreamingPromptService(Flux<String>... responses) {
+            this.responses.addAll(List.of(responses));
+        }
+
+        @Override
+        protected Flux<String> streamResponse(String prompt) {
+            prompts.add(prompt);
+            Flux<String> response = responses.poll();
+            if (response == null) {
+                return Flux.error(new IllegalStateException("No streaming response configured"));
+            }
+            return response;
+        }
+
+        List<String> prompts() {
+            return prompts;
         }
     }
 }
