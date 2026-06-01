@@ -448,7 +448,7 @@ public ChatClient chatClient(OpenAiChatModel chatModel) {
 ```java
 QuestionAnswerAdvisor qaAdvisor = QuestionAnswerAdvisor.builder(vectorStore)
         .searchRequest(SearchRequest.builder()
-    .similarityThreshold(0.5)
+                .similarityThreshold(0.5)
                 .topK(5)
                 .build())
         .build();
