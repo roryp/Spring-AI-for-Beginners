@@ -72,7 +72,7 @@ This module uses **Streamable HTTP**, the modern recommended MCP transport (it r
 
 ## How This Uses Spring AI
 
-This module is two Spring Boot applications. The **server** uses the Web MVC MCP server starter to expose `@McpTool` endpoints over Streamable HTTP, plus the OpenAI starter so it can call Microsoft Foundry from inside the `aiMove` tool. The **client** uses the matching MCP client starter to discover those tools, plus the OpenAI starter so the agent path can hand the discovered tools to a `ChatClient`.
+Now that you understand what MCP is and how the client–server protocol works, here's how Spring AI implements both sides. This module is two Spring Boot applications. The **server** uses the Web MVC MCP server starter to expose `@McpTool` endpoints over Streamable HTTP, plus the OpenAI starter so it can call Microsoft Foundry from inside the `aiMove` tool. The **client** uses the matching MCP client starter to discover those tools, plus the OpenAI starter so the agent path can hand the discovered tools to a `ChatClient`.
 
 **Server dependencies** ([mcp-server/pom.xml](mcp-server/pom.xml)):
 

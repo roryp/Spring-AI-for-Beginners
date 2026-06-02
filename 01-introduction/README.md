@@ -9,7 +9,7 @@
 - [How Memory Works](#how-memory-works)
 - [How This Uses Spring AI](#how-this-uses-spring-ai)
 - [Deploy Microsoft Foundry Infrastructure](#deploy-microsoft-foundry-infrastructure)
-- [Run the Application Locally](#run-the-application-locally)
+- [Run the Application](#run-the-application)
 - [Using the Application](#using-the-application)
   - [Stateless Chat (Left Panel)](#stateless-chat-left-panel)
   - [Stateful Chat (Right Panel)](#stateful-chat-right-panel)
@@ -73,7 +73,7 @@ Spring AI provides conversation management through its `ChatMemory` abstraction.
 
 ## How This Uses Spring AI
 
-This module uses two core Spring AI capabilities — **ChatModel** for sending prompts and **Chat Memory** for maintaining conversation history. Here's how the pieces fit together:
+Now that you understand the problem (stateless models), the cost dimension (tokens), and the solution (a sliding memory window), here's how Spring AI implements all three. This module uses two core Spring AI capabilities — **ChatModel** for sending prompts and **Chat Memory** for maintaining conversation history. Here's how the pieces fit together:
 
 **Dependencies** - In the previous module you added `spring-ai-openai` — the plain SDK integration — because those demos built `OpenAiChatModel` by hand inside a `main()` method (calling `OpenAiChatModel.builder()...build()` directly). This module is a Spring Boot web app, so we swap to the **starter** variant, which pulls in the same OpenAI SDK *plus* Spring Boot auto-configuration: `OpenAiChatModel` is constructed for you from properties in `application.yaml` and injected wherever you need it. This is the standard pattern for Spring Boot applications, and it keeps your code clean and focused on business logic rather than boilerplate setup.
 
@@ -193,7 +193,7 @@ Get-Content ..\.env  # Should show AZURE_OPENAI_ENDPOINT, API_KEY, etc.
 > .\.azd-env.ps1
 > ```
 
-## Run the Application Locally
+## Run the Application
 
 **Verify deployment:**
 
