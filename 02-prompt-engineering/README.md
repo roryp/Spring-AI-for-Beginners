@@ -491,13 +491,13 @@ Start all web applications (all modules 01-06):
 
 **Bash:**
 ```bash
-cd ..  # From root directory
+cd ..  # Go to root directory
 ./start-all.sh
 ```
 
 **PowerShell:**
 ```powershell
-cd ..  # From root directory
+cd ..  # Go to root directory
 .\start-all.ps1
 ```
 
@@ -505,13 +505,13 @@ Or start just this module:
 
 **Bash:**
 ```bash
-cd 02-prompt-engineering
+# From this module directory
 ./start.sh
 ```
 
 **PowerShell:**
 ```powershell
-cd 02-prompt-engineering
+# From this module directory
 .\start.ps1
 ```
 
