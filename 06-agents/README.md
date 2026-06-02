@@ -2,6 +2,27 @@
 
 This module demonstrates five fundamental **agentic workflow patterns** for building effective LLM-based systems using Spring AI. Each pattern is implemented as an interactive demo you can run and explore in a web UI.
 
+## Table of Contents
+
+- [What You'll Learn](#what-youll-learn)
+- [What Are Agents?](#what-are-agents)
+- [Patterns](#patterns)
+- [Prerequisites](#prerequisites)
+- [How This Uses Spring AI](#how-this-uses-spring-ai)
+- [Run the Application](#run-the-application)
+- [How Each Pattern Works](#how-each-pattern-works)
+  - [1. Chain Workflow](#1-chain-workflow)
+  - [2. Parallelization Workflow](#2-parallelization-workflow)
+  - [3. Routing Workflow](#3-routing-workflow)
+  - [4. Orchestrator-Workers](#4-orchestrator-workers)
+  - [5. Evaluator-Optimizer](#5-evaluator-optimizer)
+- [Best Practices](#best-practices)
+- [Next Steps](#next-steps)
+
+## What You'll Learn
+
+In Modules 01-04 you built single-step interactions: one prompt, one response, optionally enhanced with memory, retrieval, or tools. Real-world problems often need more than one model call. In this module you'll learn the five core **agentic workflow patterns** — chaining, parallelization, routing, orchestrator-workers, and evaluator-optimizer — that combine multiple LLM calls into reliable, multi-step systems. Each pattern ships as an interactive demo you can run and explore in the browser.
+
 ## What Are Agents?
 
 In previous modules, every interaction with the LLM followed the same pattern: **you send one prompt, you get one response**. That works for simple tasks — answering a question, classifying sentiment, generating a summary. But real-world problems are rarely that simple.
@@ -78,7 +99,7 @@ spring:
 
 The difference in this module is how `ChatClient` calls are **orchestrated** — chained, parallelized, routed, delegated, or looped — rather than executed as single calls.
 
-## Quick Start
+## Run the Application
 
 1. **Set environment variables** in the root `.env` file:
    ```
