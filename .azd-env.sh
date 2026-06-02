@@ -34,9 +34,20 @@ AZD_API_KEY=$(azd env get-value AZURE_OPENAI_KEY 2>/dev/null | head -n 1 || true
 AZD_DEPLOYMENT=$(azd env get-value AZURE_OPENAI_DEPLOYMENT 2>/dev/null | head -n 1 || true)
 AZD_FAST_DEPLOYMENT=$(azd env get-value AZURE_OPENAI_FAST_DEPLOYMENT 2>/dev/null | head -n 1 || true)
 AZD_EMBEDDING=$(azd env get-value AZURE_OPENAI_EMBEDDING_DEPLOYMENT 2>/dev/null | head -n 1 || true)
+AZD_GITHUB_TOKEN=$(azd env get-value GITHUB_TOKEN 2>/dev/null | head -n 1 || true)
 
 # Return to script directory
 cd "$SCRIPT_DIR"
+
+# Strip any trailing carriage returns (CR) that azd may emit on Windows.
+# A stray CR turns a value like "text-embedding-3-small" into
+# "text-embedding-3-small\r", which Azure rejects with HTTP 400.
+AZD_ENDPOINT="${AZD_ENDPOINT//$'\r'/}"
+AZD_API_KEY="${AZD_API_KEY//$'\r'/}"
+AZD_DEPLOYMENT="${AZD_DEPLOYMENT//$'\r'/}"
+AZD_FAST_DEPLOYMENT="${AZD_FAST_DEPLOYMENT//$'\r'/}"
+AZD_EMBEDDING="${AZD_EMBEDDING//$'\r'/}"
+AZD_GITHUB_TOKEN="${AZD_GITHUB_TOKEN//$'\r'/}"
 
 # Use azd values if available, otherwise use existing or defaults
 AZURE_OPENAI_ENDPOINT="${AZD_ENDPOINT:-${AZURE_OPENAI_ENDPOINT}}"
@@ -44,6 +55,8 @@ AZURE_OPENAI_API_KEY="${AZD_API_KEY:-${AZURE_OPENAI_API_KEY}}"
 AZURE_OPENAI_DEPLOYMENT="${AZD_DEPLOYMENT:-${AZURE_OPENAI_DEPLOYMENT:-gpt-5.2}}"
 AZURE_OPENAI_FAST_DEPLOYMENT="${AZD_FAST_DEPLOYMENT:-${AZURE_OPENAI_FAST_DEPLOYMENT:-gpt-4o-mini}}"
 AZURE_OPENAI_EMBEDDING_DEPLOYMENT="${AZD_EMBEDDING:-${AZURE_OPENAI_EMBEDDING_DEPLOYMENT:-text-embedding-3-small}}"
+# Preserve GITHUB_TOKEN (used by Module 00 Quick Start) from azd or existing .env
+GITHUB_TOKEN="${AZD_GITHUB_TOKEN:-${GITHUB_TOKEN}}"
 
 # Validate required variables
 if [ -z "$AZURE_OPENAI_ENDPOINT" ]; then
@@ -69,6 +82,11 @@ AZURE_OPENAI_FAST_DEPLOYMENT=$AZURE_OPENAI_FAST_DEPLOYMENT
 AZURE_OPENAI_EMBEDDING_DEPLOYMENT=$AZURE_OPENAI_EMBEDDING_DEPLOYMENT
 EOF
 
+# Preserve GITHUB_TOKEN (Module 00 Quick Start) only if it has a value
+if [ -n "$GITHUB_TOKEN" ]; then
+    echo "GITHUB_TOKEN=$GITHUB_TOKEN" >> "$ENV_FILE"
+fi
+
 # Create .env files in module directories
 for module_dir in 01-introduction 02-prompt-engineering 03-rag 04-tools 05-mcp/mcp-server 05-mcp/mcp-client 06-agents; do
     module_env="$SCRIPT_DIR/$module_dir/.env"
@@ -81,6 +99,26 @@ for module_dir in 01-introduction 02-prompt-engineering 03-rag 04-tools 05-mcp/m
             echo "TOOLS_BASE_URL=http://localhost:8084" >> "$module_env"
         fi
     fi
+done
+
+# Final safety pass: strip any trailing carriage returns from every generated
+# .env file so a stray CRLF can never break a deployment name or endpoint.
+# Portable across GNU sed (Linux) and BSD sed (macOS): GNU's -i takes no
+# argument, BSD's -i requires an explicit (empty) backup suffix. ANSI-C
+# quoting ($'\r') passes a literal CR, since BSD sed does not expand \r.
+strip_cr() {
+    local file="$1"
+    [ -f "$file" ] || return 0
+    if sed --version >/dev/null 2>&1; then
+        sed -i $'s/\r$//' "$file"
+    else
+        sed -i '' $'s/\r$//' "$file"
+    fi
+}
+
+strip_cr "$ENV_FILE"
+for module_dir in 01-introduction 02-prompt-engineering 03-rag 04-tools 05-mcp/mcp-server 05-mcp/mcp-client 06-agents; do
+    strip_cr "$SCRIPT_DIR/$module_dir/.env"
 done
 
 echo "✓ Environment variables successfully loaded from azd"
