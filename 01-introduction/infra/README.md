@@ -107,15 +107,15 @@ The `azd up` command automatically creates a `.env` file in the root directory w
 
 **Bash:**
 ```bash
-# From the root directory
-cd ../..
+# From the 01-introduction directory, return to the repository root
+cd ..
 ./start-all.sh
 ```
 
 **PowerShell:**
 ```powershell
-# From the root directory
-cd ../..
+# From the 01-introduction directory, return to the repository root
+cd ..
 .\start-all.ps1
 ```
 
@@ -123,15 +123,13 @@ Or start a single module:
 
 **Bash:**
 ```bash
-# Example: Start just the introduction module
-cd ../01-introduction
+# From the 01-introduction directory, start just the introduction module
 ./start.sh
 ```
 
 **PowerShell:**
 ```powershell
-# Example: Start just the introduction module
-cd ../01-introduction
+# From the 01-introduction directory, start just the introduction module
 .\start.ps1
 ```
 

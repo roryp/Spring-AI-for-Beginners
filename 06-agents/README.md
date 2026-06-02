@@ -109,13 +109,13 @@ The difference in this module is how `ChatClient` calls are **orchestrated** —
 
    **Bash:**
    ```bash
-   cd ..  # From root directory
+   cd ..  # Go to root directory
    ./start-all.sh
    ```
 
    **PowerShell:**
    ```powershell
-   cd ..  # From root directory
+   cd ..  # Go to root directory
    .\start-all.ps1
    ```
 
