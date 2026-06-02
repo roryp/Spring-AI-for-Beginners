@@ -1,5 +1,5 @@
 # Normalize line endings to prevent the whole tree showing as modified.
-# All text files are stored as LF in the repo and checked out as LF.
+# All text files are stored as LF in the repo; checkouts default to LF unless overridden below.
 * text=auto eol=lf
 
 # Source & config files — explicit LF
