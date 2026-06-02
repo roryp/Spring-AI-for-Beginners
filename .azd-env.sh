@@ -103,10 +103,22 @@ done
 
 # Final safety pass: strip any trailing carriage returns from every generated
 # .env file so a stray CRLF can never break a deployment name or endpoint.
-sed -i 's/\r$//' "$ENV_FILE"
+# Portable across GNU sed (Linux) and BSD sed (macOS): GNU's -i takes no
+# argument, BSD's -i requires an explicit (empty) backup suffix. ANSI-C
+# quoting ($'\r') passes a literal CR, since BSD sed does not expand \r.
+strip_cr() {
+    local file="$1"
+    [ -f "$file" ] || return 0
+    if sed --version >/dev/null 2>&1; then
+        sed -i $'s/\r$//' "$file"
+    else
+        sed -i '' $'s/\r$//' "$file"
+    fi
+}
+
+strip_cr "$ENV_FILE"
 for module_dir in 01-introduction 02-prompt-engineering 03-rag 04-tools 05-mcp/mcp-server 05-mcp/mcp-client 06-agents; do
-    module_env="$SCRIPT_DIR/$module_dir/.env"
-    [ -f "$module_env" ] && sed -i 's/\r$//' "$module_env"
+    strip_cr "$SCRIPT_DIR/$module_dir/.env"
 done
 
 echo "✓ Environment variables successfully loaded from azd"
