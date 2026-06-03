@@ -21,7 +21,9 @@
 
 ## Introduction
 
-This quickstart is meant to get you up and running with Spring AI as quickly as possible. It covers the absolute basics of building AI applications with Spring AI and GitHub Models. In the next modules, you'll go deeper with Spring AI, switch to Microsoft Foundry, and explore each concept in more depth.
+This quickstart is meant to get you up and running with Spring AI as quickly as possible. It covers the absolute basics of building AI applications with Spring AI and GitHub Models.
+
+You'll get hands-on with five fundamentals: chat, prompt templates, tool calling, document Q&A, and safety guardrails. Later modules build on these basics as you switch to Microsoft Foundry and explore each concept in more depth.
 
 ## What is Spring AI?
 
@@ -37,8 +39,6 @@ It includes features like:
 <img src="images/how-springai-fits.png" alt="How Spring AI Fits" width="800"/>
 
 *Spring AI provides a unified API across AI providers — this course covers these capabilities one module at a time.*
-
-In this quickstart you'll get hands-on with five fundamentals: chat, prompt templates, tool calling, document Q&A, and safety guardrails. Later modules will build on these basics to show you how to build real-world applications with Spring AI and Microsoft Foundry.
 
 ## Prerequisites
 
