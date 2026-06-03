@@ -23,7 +23,7 @@
 
 This quickstart is meant to get you up and running with Spring AI as quickly as possible. It covers the absolute basics of building AI applications with Spring AI and GitHub Models.
 
-You'll get hands-on with five fundamentals: chat, prompt templates, tool calling, document Q&A, and safety guardrails. Later modules build on these basics as you switch to Microsoft Foundry and explore each concept in more depth.
+You'll get hands-on with five fundamentals: chat, prompt templates, tool calling (function calling), document Q&A, and safety guardrails. Later modules build on these basics as you switch to Microsoft Foundry and explore each concept in more depth.
 
 ## What is Spring AI?
 
