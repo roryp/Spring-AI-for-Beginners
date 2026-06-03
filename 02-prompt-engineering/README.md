@@ -4,7 +4,6 @@
 
 - [What You'll Learn](#what-youll-learn)
 - [Prerequisites](#prerequisites)
-- [How This Uses Spring AI](#how-this-uses-spring-ai)
 - [Understanding Prompt Engineering](#understanding-prompt-engineering)
 - [Prompt Engineering Fundamentals](#prompt-engineering-fundamentals)
   - [Zero-Shot Prompting](#zero-shot-prompting)
@@ -13,6 +12,7 @@
   - [Role-Based Prompting](#role-based-prompting)
   - [Prompt Templates](#prompt-templates)
 - [Advanced Patterns](#advanced-patterns)
+- [How This Uses Spring AI](#how-this-uses-spring-ai)
 - [Run the Application](#run-the-application)
 - [Application Screenshots](#application-screenshots)
 - [Exploring the Patterns](#exploring-the-patterns)
@@ -45,29 +45,6 @@ We'll use GPT-5.2 because it introduces reasoning control - you can tell the mod
 > **Note:** If you haven't completed Module 01, follow the deployment instructions there first.
 
 > **Why this module is different:** The other Foundry modules (01, 03, 04, 05, 06) use `gpt-4o-mini` for speed. This module is the *only* one that uses **gpt-5.2** because reasoning control is the subject of the demos — you'll be adjusting reasoning effort and watching the behaviour change. Expect responses here to be slower than in other modules; that's the point.
-
-## How This Uses Spring AI
-
-This module uses the same Spring AI dependency introduced in [Module 01](../01-introduction/README.md#how-this-uses-spring-ai) — `spring-ai-starter-model-openai` — which auto-configures `OpenAiChatModel` and a `ChatClient.Builder` for Microsoft Foundry. The service code in this module injects `ChatClient` and uses its fluent API for every call. No additional Spring AI dependencies are needed.
-
-The `application.yaml` configuration is identical to Module 01 ([application.yaml](src/main/resources/application.yaml)):
-
-```yaml
-spring:
-  ai:
-    openai:
-      base-url: ${AZURE_OPENAI_ENDPOINT}
-      api-key: ${AZURE_OPENAI_API_KEY}
-      microsoft-deployment-name: ${AZURE_OPENAI_DEPLOYMENT}
-      chat:
-        model: ${AZURE_OPENAI_DEPLOYMENT}
-```
-
-The difference in this module is how the prompts are constructed — the model configuration stays the same.
-
-The diagram below shows the Spring AI components involved in prompt engineering — `PromptTemplate` resolves variables into a `Prompt`, `ChatClient` sends it to the model via `ChatModel`, and you get a structured response back.
-
-<img src="images/how-springai-fits.png" alt="Spring AI Prompt Engineering Flow" width="800"/>
 
 ## Understanding Prompt Engineering
 
@@ -451,6 +428,29 @@ The following diagram shows how constraints guide the model to produce output th
 <img src="images/constrained-output-pattern.png" alt="Constrained Output Pattern" width="800"/>
 
 *Enforcing specific format, length, and structure requirements*
+
+## How This Uses Spring AI
+
+This module uses the same Spring AI dependency introduced in [Module 01](../01-introduction/README.md#how-this-uses-spring-ai) — `spring-ai-starter-model-openai` — which auto-configures `OpenAiChatModel` and a `ChatClient.Builder` for Microsoft Foundry. The service code in this module injects `ChatClient` and uses its fluent API for every call. No additional Spring AI dependencies are needed.
+
+The `application.yaml` configuration is nearly identical to Module 01 — the only difference is the deployment variable: this module points `AZURE_OPENAI_DEPLOYMENT` at the GPT-5.2 deployment, whereas Module 01 uses `AZURE_OPENAI_FAST_DEPLOYMENT` for gpt-4o-mini ([application.yaml](src/main/resources/application.yaml)):
+
+```yaml
+spring:
+  ai:
+    openai:
+      base-url: ${AZURE_OPENAI_ENDPOINT}
+      api-key: ${AZURE_OPENAI_API_KEY}
+      microsoft-deployment-name: ${AZURE_OPENAI_DEPLOYMENT}
+      chat:
+        model: ${AZURE_OPENAI_DEPLOYMENT}
+```
+
+Beyond that deployment swap, the difference in this module is how the prompts are constructed — the rest of the model configuration stays the same.
+
+The diagram below shows the Spring AI components involved in prompt engineering — `PromptTemplate` resolves variables into a `Prompt`, `ChatClient` sends it to the model via `ChatModel`, and you get a structured response back.
+
+<img src="images/how-springai-fits.png" alt="Spring AI Prompt Engineering Flow" width="800"/>
 
 ## Run the Application
 

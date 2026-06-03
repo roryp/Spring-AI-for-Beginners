@@ -5,9 +5,9 @@ This module demonstrates five fundamental **agentic workflow patterns** for buil
 ## Table of Contents
 
 - [What You'll Learn](#what-youll-learn)
+- [Prerequisites](#prerequisites)
 - [What Are Agents?](#what-are-agents)
 - [Patterns](#patterns)
-- [Prerequisites](#prerequisites)
 - [How This Uses Spring AI](#how-this-uses-spring-ai)
 - [Run the Application](#run-the-application)
 - [How Each Pattern Works](#how-each-pattern-works)
@@ -22,6 +22,13 @@ This module demonstrates five fundamental **agentic workflow patterns** for buil
 ## What You'll Learn
 
 In Modules 01-04 you built single-step interactions: one prompt, one response, optionally enhanced with memory, retrieval, or tools. Real-world problems often need more than one model call. In this module you'll learn the five core **agentic workflow patterns** — chaining, parallelization, routing, orchestrator-workers, and evaluator-optimizer — that combine multiple LLM calls into reliable, multi-step systems. Each pattern ships as an interactive demo you can run and explore in the browser.
+
+## Prerequisites
+
+- Completed [Module 01 - Introduction](../01-introduction/README.md) (Microsoft Foundry resources deployed)
+- Java 25 (Spring AI itself supports Java 17+, but this repo targets Java 25 via Spring Boot 4)
+- Maven 3.9+
+- `.env` file in root directory with Azure credentials (created by `azd up` in Module 01)
 
 ## What Are Agents?
 
@@ -72,13 +79,6 @@ That orchestration layer is what this module focuses on. The five patterns below
 | 3 | **Routing Workflow** | Classifies input and routes to the best-fit handler | Specialization |
 | 4 | **Orchestrator-Workers** | Central LLM decomposes tasks, delegates to workers | Adaptive problem-solving |
 | 5 | **Evaluator-Optimizer** | Iterative generate → evaluate → refine loop | Best quality via refinement |
-
-## Prerequisites
-
-- Completed [Module 01 - Introduction](../01-introduction/README.md) (Microsoft Foundry resources deployed)
-- Java 25 (Spring AI itself supports Java 17+, but this repo targets Java 25 via Spring Boot 4)
-- Maven 3.9+
-- `.env` file in root directory with Azure credentials (created by `azd up` in Module 01)
 
 ## How This Uses Spring AI
 
