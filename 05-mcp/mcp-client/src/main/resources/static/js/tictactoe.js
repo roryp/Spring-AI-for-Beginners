@@ -335,11 +335,15 @@ function syncBoardFromAgent(agentGameId, state) {
         recordGameOutcome(outcomeState);
         gameActive = false;
         disableBoard();
-    } else {
-        // IN_PROGRESS — let the user keep playing on this same game by clicking.
+    } else if (state.currentPlayer === 'X') {
+        // IN_PROGRESS and it is the human's turn - let the user keep playing on this same game by clicking.
         gameActive = true;
         enableBoard();
         updateStatus('Your turn! Place your <strong>X</strong> (or keep chatting)', '');
+    } else {
+        gameActive = false;
+        disableBoard();
+        updateStatus('AI turn. Ask the agent to let the server AI move, or keep chatting.', 'thinking');
     }
 }
 
