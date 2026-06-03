@@ -24,6 +24,7 @@
   - [Step-by-Step Reasoning](#step-by-step-reasoning)
   - [Constrained Output](#constrained-output)
 - [What You're Really Learning](#what-youre-really-learning)
+- [Summary](#summary)
 - [Next Steps](#next-steps)
 
 ## What You'll Learn
@@ -646,6 +647,10 @@ The self-reflecting patterns work by making quality criteria explicit. Instead o
 **Context Is Finite**
 
 Multi-turn conversations work by including message history with each request via `MessageWindowChatMemory`, which automatically trims old messages when the window is full. But there's still a limit — every model has a maximum token count. As conversations grow, the sliding window keeps the most recent context without hitting that ceiling. This module shows you how memory works; later you'll learn when to summarize, when to forget, and when to retrieve.
+
+## Summary
+
+In this module you focused on *how* you ask — using Microsoft Foundry's GPT-5.2 and its reasoning controls. You reviewed the fundamental prompting techniques and then worked through advanced patterns: tool preambles, self-reflecting code, structured analysis, multi-turn chat, step-by-step reasoning, and constrained output. The key lesson is that prompt structure dramatically affects response quality, and that making your quality criteria explicit turns generation into a repeatable process. Next, you'll ground responses in your own data with RAG.
 
 ## Next Steps
 

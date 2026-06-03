@@ -27,6 +27,7 @@
 - [Available Tools](#available-tools)
 - [When to Use Tool-Based Agents](#when-to-use-tool-based-agents)
 - [Tools vs RAG](#tools-vs-rag)
+- [Summary](#summary)
 - [Next Steps](#next-steps)
 
 ## What You'll Learn
@@ -384,6 +385,10 @@ Modules 03 and 04 both extend what the AI can do, but in fundamentally different
 *RAG retrieves information from static documents — Tools execute actions and fetch dynamic, real-time data. Many production systems combine both.*
 
 In practice, many production systems combine both approaches: RAG for grounding answers in your documentation, and Tools for fetching live data or performing operations.
+
+## Summary
+
+In this module you turned the model from a text generator into an agent that can take actions. By exposing functions as tools, you let the model decide when to call them, which to use, and what parameters to pass — while your code runs the function and returns the result. You explored the ReAct pattern, why tool descriptions matter, session management, and error handling, and you compared tools (actions) against RAG (knowledge). Next, you'll move those tools out of process and share them across services with the Model Context Protocol.
 
 ## Next Steps
 

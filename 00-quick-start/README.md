@@ -15,6 +15,7 @@
   - [4. Document Q&A](#4-document-qa)
   - [5. Responsible AI](#5-responsible-ai)
 - [What Each Example Shows](#what-each-example-shows)
+- [Summary](#summary)
 - [Next Steps](#next-steps)
 - [Troubleshooting](#troubleshooting)
 
@@ -337,6 +338,10 @@ private static String validateInput(String text) {
 > - "How can I use Spring AI advisors for output guardrails?"
 > - "What is the difference between a hard block and a soft refusal?"
 > - "Why use both guardrails and provider filters together?"
+
+## Summary
+
+In this quickstart you got hands-on with the absolute basics of Spring AI using GitHub Models: sending a simple chat prompt, applying different prompting patterns, grounding answers in a document, calling tools, and adding responsible-AI guardrails. These demos showed *what's possible* in a few lines of code. From here on, you'll switch to Microsoft Foundry and explore each of these concepts in depth — starting with conversational AI and memory.
 
 ## Next Steps
 
