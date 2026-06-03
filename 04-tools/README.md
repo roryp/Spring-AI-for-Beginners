@@ -4,7 +4,6 @@
 
 - [What You'll Learn](#what-youll-learn)
 - [Prerequisites](#prerequisites)
-- [How This Uses Spring AI](#how-this-uses-spring-ai)
 - [Understanding AI Agents with Tools](#understanding-ai-agents-with-tools)
 - [How Tool Calling Works](#how-tool-calling-works)
   - [Tool Definitions](#tool-definitions)
@@ -13,6 +12,7 @@
   - [Response Generation](#response-generation)
   - [Architecture: Spring Boot Auto-Wiring](#architecture-spring-boot-auto-wiring)
 - [Tool Chaining](#tool-chaining)
+- [How This Uses Spring AI](#how-this-uses-spring-ai)
 - [Run the Application](#run-the-application)
 - [Using the Application](#using-the-application)
   - [Try Simple Tool Usage](#try-simple-tool-usage)
@@ -43,25 +43,6 @@ Tools change this. By giving the model access to functions it can call, you tran
 - `.env` file in root directory with Azure credentials (created by `azd up` in Module 01)
 
 > **Note:** If you haven't completed Module 01, follow the deployment instructions there first.
-
-## How This Uses Spring AI
-
-This module reuses `spring-ai-starter-model-openai` from [Module 01](../01-introduction/README.md#how-this-uses-spring-ai) and `spring-ai-client-chat` introduced in [Module 03](../03-rag/README.md#how-this-uses-spring-ai). No new Spring AI dependencies are added — tool calling is built into `ChatClient` via the `.tools()` method ([pom.xml](pom.xml)).
-
-The `application.yaml` is the same chat-model configuration as Module 01 ([application.yaml](src/main/resources/application.yaml)):
-
-```yaml
-spring:
-  ai:
-    openai:
-      base-url: ${AZURE_OPENAI_ENDPOINT}
-      api-key: ${AZURE_OPENAI_API_KEY}
-      microsoft-deployment-name: ${AZURE_OPENAI_FAST_DEPLOYMENT}
-      chat:
-        model: ${AZURE_OPENAI_FAST_DEPLOYMENT}
-```
-
-Tool methods are annotated with `@Tool`, and this module creates the tool instances in `AgentService` before passing them to `ChatClient` at call time with `.tools(weatherTool, temperatureTool)`. Spring AI uses those annotated instances to expose callable tools to the model for that request.
 
 ## Understanding AI Agents with Tools
 
@@ -202,6 +183,25 @@ Alternative approaches (manual `ChatModel.call()` with tool handling) require mo
 *When a tool fails, the agent catches the error and responds with a helpful explanation instead of crashing.*
 
 This happens in a single conversation turn. The agent orchestrates multiple tool calls autonomously.
+
+## How This Uses Spring AI
+
+This module reuses `spring-ai-starter-model-openai` from [Module 01](../01-introduction/README.md#how-this-uses-spring-ai) and `spring-ai-client-chat` introduced in [Module 03](../03-rag/README.md#how-this-uses-spring-ai). No new Spring AI dependencies are added — tool calling is built into `ChatClient` via the `.tools()` method ([pom.xml](pom.xml)).
+
+The `application.yaml` is the same chat-model configuration as Module 01 ([application.yaml](src/main/resources/application.yaml)):
+
+```yaml
+spring:
+  ai:
+    openai:
+      base-url: ${AZURE_OPENAI_ENDPOINT}
+      api-key: ${AZURE_OPENAI_API_KEY}
+      microsoft-deployment-name: ${AZURE_OPENAI_FAST_DEPLOYMENT}
+      chat:
+        model: ${AZURE_OPENAI_FAST_DEPLOYMENT}
+```
+
+Tool methods are annotated with `@Tool`, and this module creates the tool instances in `AgentService` before passing them to `ChatClient` at call time with `.tools(weatherTool, temperatureTool)`. Spring AI uses those annotated instances to expose callable tools to the model for that request.
 
 ## Run the Application
 
