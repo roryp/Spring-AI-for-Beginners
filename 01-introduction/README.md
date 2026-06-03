@@ -13,6 +13,7 @@
 - [Using the Application](#using-the-application)
   - [Stateless Chat (Left Panel)](#stateless-chat-left-panel)
   - [Stateful Chat (Right Panel)](#stateful-chat-right-panel)
+- [Summary](#summary)
 - [Next Steps](#next-steps)
 
 ## What You'll Learn
@@ -314,6 +315,10 @@ Now try the same sequence here. Ask "My name is John" and then "What's my name?"
 *AI remembers your name from earlier in the conversation*
 
 Both panels use the same `gpt-4o-mini` model. The only difference is memory. This makes it clear what memory brings to your application and why it's essential for real use cases.
+
+## Summary
+
+In this module you moved from GitHub Models to Microsoft Foundry and built your first production-style Spring AI application. You saw why language models are inherently stateless, and how Spring AI's `MessageWindowChatMemory` adds stateful, multi-turn conversations with automatic sliding-window trimming. The side-by-side stateless vs. stateful demo made it clear why memory is essential for real applications. Next, you'll focus on the prompts themselves and how their structure shapes response quality.
 
 ## Next Steps
 

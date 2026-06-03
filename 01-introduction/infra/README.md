@@ -7,15 +7,14 @@
 - [Resources Created](#resources-created)
 - [Quick Start](#quick-start)
 - [Configuration](#configuration)
-- [Management Commands](#management-commands)
+- [Updating Infrastructure](#updating-infrastructure)
 - [Cost Optimization](#cost-optimization)
 - [Monitoring](#monitoring)
 - [Troubleshooting](#troubleshooting)
-- [Updating Infrastructure](#updating-infrastructure)
 - [Clean Up](#clean-up)
 - [File Structure](#file-structure)
 - [Security Recommendations](#security-recommendations)
-- [Additional Resources](#additional-resources)
+- [Summary](#summary)
 
 This directory contains the Azure infrastructure as code (IaC) using Bicep and Azure Developer CLI (azd) for deploying Microsoft Foundry resources.
 
@@ -59,6 +58,8 @@ All Spring Boot applications run locally on your machine:
 
 ### 1. Deploy Microsoft Foundry
 
+From the repository root:
+
 **Bash:**
 ```bash
 cd 01-introduction
@@ -73,7 +74,7 @@ azd up
 
 When prompted:
 - Select your Azure subscription
-- Choose a location (recommended: `eastus2` for GPT-5.2 availability)
+- Choose a location for the resource group. The Foundry model region is configured separately in `infra/main.bicep` and defaults to `eastus2`.
 - Confirm the environment name (default: `spring-ai-dev`)
 
 This will create:
@@ -94,7 +95,7 @@ azd env get-values
 
 This displays:
 - `AZURE_OPENAI_ENDPOINT`: Your Microsoft Foundry endpoint URL
-- `AZURE_OPENAI_KEY`: API key for authentication
+- `AZURE_OPENAI_KEY`: API key returned by `azd`; the post-provision scripts write this to `AZURE_OPENAI_API_KEY` in `.env` for local apps
 - `AZURE_OPENAI_DEPLOYMENT`: Reasoning chat model name (gpt-5.2) — used by Module 02
 - `AZURE_OPENAI_FAST_DEPLOYMENT`: Fast chat model name (gpt-4o-mini) — used by all other modules
 - `AZURE_OPENAI_EMBEDDING_DEPLOYMENT`: Embedding model name
@@ -175,13 +176,17 @@ Available models and versions: https://learn.microsoft.com/azure/ai-services/ope
 
 ### Changing Azure Regions
 
-To deploy in a different region, edit `infra/main.bicep`:
+To deploy Microsoft Foundry in a different model region, edit `infra/main.bicep`:
 
 ```bicep
 param openAiLocation string = 'eastus2'  // or other GPT-5.2 region
 ```
 
+The `azd` location prompt controls the resource group location; `openAiLocation` controls where the Foundry resource and model deployments are created.
+
 Check GPT-5.2 availability: https://learn.microsoft.com/azure/ai-services/openai/concepts/models#model-summary-table-and-region-availability
+
+## Updating Infrastructure
 
 To update the infrastructure after making changes to Bicep files:
 
@@ -209,43 +214,17 @@ azd provision --preview
 azd provision
 ```
 
-## Clean Up
-
-To delete all resources:
-
-**Bash:**
-```bash
-# Delete all resources
-azd down
-
-# Delete everything including the environment
-azd down --purge
-```
-
-**PowerShell:**
-```powershell
-# Delete all resources
-azd down
-
-# Delete everything including the environment
-azd down --purge
-```
-
-**Warning**: This will permanently delete all Azure resources.
-
-## File Structure
-
 ## Cost Optimization
 
 ### Development/Testing
 For dev/test environments, you can reduce costs:
 - Use Standard tier (S0) for Microsoft Foundry
-- Set lower capacity (10K TPM instead of 20K) in `infra/core/ai/cognitiveservices.bicep`
+- Lower deployment capacities in `infra/main.bicep` if your quota and traffic allow it
 - Delete resources when not in use: `azd down`
 
 ### Production
 For production:
-- Increase OpenAI capacity based on usage (50K+ TPM)
+- Increase deployment capacities based on usage and quota
 - Enable zone redundancy for higher availability
 - Implement proper monitoring and cost alerts
 
@@ -316,7 +295,7 @@ The subdomain name generated from your subscription/environment is already in us
      ```
 
 **Model Deployment Naming Guidelines:**
-- Use simple, consistent names: `gpt-5.2`, `gpt-4o`, `text-embedding-3-small`
+- Use simple, consistent names: `gpt-5.2`, `gpt-4o-mini`, `text-embedding-3-small`
 - Deployment names must match exactly what you configure in `.env`
 - Common mistake: Creating model with one name but referencing different name in code
 
@@ -326,13 +305,11 @@ The subdomain name generated from your subscription/environment is already in us
 - Choose a region with GPT-5.2 access (e.g., eastus2)
 - Check availability: https://learn.microsoft.com/azure/ai-services/openai/concepts/models
 
-
-
 ### Issue: Insufficient quota for deployment
 
 **Solution:**
 1. Request quota increase in Azure Portal
-2. Or use lower capacity in `main.bicep` (e.g., capacity: 10)
+2. Or reduce the affected deployment capacity in `main.bicep`
 
 ### Issue: "Resource not found" when running locally
 
@@ -402,9 +379,33 @@ The subdomain name generated from your subscription/environment is already in us
 **Solution**:
 1. Check OpenAI token usage and throttling in Azure Portal metrics
 2. Increase TPM capacity if you're hitting limits
-3. Consider using a higher reasoning-effort level (low/medium/high)
+3. Use lower reasoning effort or `gpt-4o-mini` when full reasoning is not needed
 
-## Updating Infrastructure
+## Clean Up
+
+To delete all resources:
+
+**Bash:**
+```bash
+# Delete all resources
+azd down
+
+# Delete everything including the environment
+azd down --purge
+```
+
+**PowerShell:**
+```powershell
+# Delete all resources
+azd down
+
+# Delete everything including the environment
+azd down --purge
+```
+
+**Warning**: This will permanently delete all Azure resources.
+
+## File Structure
 
 ```
 infra/
@@ -425,21 +426,10 @@ infra/
 4. **Limit access** - Use Azure RBAC to control who can access resources
 5. **Monitor usage** - Set up cost alerts in Azure Portal
 
-## Additional Resources
+## Summary
 
-- [Microsoft Foundry Service Documentation](https://learn.microsoft.com/azure/ai-services/openai/)
-- [GPT-5.2 Model Documentation](https://learn.microsoft.com/azure/ai-services/openai/concepts/models#gpt-5)
-- [Azure Developer CLI Documentation](https://learn.microsoft.com/azure/developer/azure-developer-cli/)
-- [Bicep Documentation](https://learn.microsoft.com/azure/azure-resource-manager/bicep/)
-- [Spring AI OpenAI SDK Chat](https://docs.spring.io/spring-ai/reference/api/chat/openai-sdk-chat.html)
+This infrastructure deploys a single Microsoft Foundry resource — with `gpt-5.2`, `gpt-4o-mini`, and `text-embedding-3-small` deployments — using Bicep and the Azure Developer CLI (`azd`). Running `azd up` from the `01-introduction` directory provisions the resource and writes a root `.env` file that every module reads, so all Spring Boot apps run locally against the same shared backend. Use the configuration, cost, monitoring, and troubleshooting sections above to customize regions and capacity, control spend, and diagnose common deployment issues. When you're finished, `azd down` removes everything.
 
-## Support
+---
 
-For issues:
-1. Check the [troubleshooting section](#troubleshooting) above
-2. Review Microsoft Foundry service health in Azure Portal
-3. Open an issue in the repository
-
-## License
-
-See the root [LICENSE](../../LICENSE) file for details.
+**Navigation:** [← Back to Module 01 - Introduction](../README.md)

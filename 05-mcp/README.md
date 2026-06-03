@@ -13,6 +13,7 @@
 - [Code Walkthrough](#code-walkthrough)
 - [Key Concepts](#key-concepts)
 - [MCP vs Tools (Module 04)](#mcp-vs-tools-module-04)
+- [Summary](#summary)
 - [Next Steps](#next-steps)
 
 ## What You'll Learn
@@ -385,6 +386,10 @@ Modules 04 and 05 both give AI applications access to tools, but in fundamentall
 | **Deployment** | Single deployment unit | Independent services |
 
 In practice, many production systems combine both: `@Tool` for app-specific logic and `@McpTool` for shared services.
+
+## Summary
+
+In this module you took tool calling across service boundaries with the Model Context Protocol. You built a Tic-Tac-Toe game where an MCP server exposes game-engine and AI-move tools, and an MCP client discovers and invokes them both via direct calls and agent-style `ChatClient` calls — all over the MCP Streamable HTTP transport. The key takeaway is that MCP decouples AI logic from tool implementations, letting any MCP-compatible client reuse tools hosted as independent services. Next, you'll combine everything into agentic patterns.
 
 ## Next Steps
 

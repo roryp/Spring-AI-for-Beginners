@@ -25,6 +25,7 @@
   - [In-Memory Storage](#in-memory-storage)
   - [Context Window Management](#context-window-management)
 - [When RAG Matters](#when-rag-matters)
+- [Summary](#summary)
 - [Next Steps](#next-steps)
 
 ## What You'll Learn
@@ -514,6 +515,10 @@ RAG isn't always the right approach. The decision guide below helps you determin
 <img src="images/when-to-use-rag.png" alt="When to Use RAG" width="800"/>
 
 *This diagram shows a decision guide for when RAG adds value versus when simpler approaches are sufficient.*
+
+## Summary
+
+In this module you overcame a fundamental limitation: models only know what they were trained on. You built a Retrieval-Augmented Generation pipeline that embeds a question, searches a vector store for the most relevant document chunks, and feeds that context into the prompt so the model answers from *your* data. Along the way you learned about chunking strategy, similarity scores, in-memory vector storage, and context-window management — plus when RAG is worth it versus simpler approaches. Next, you'll let the model take actions by calling tools.
 
 ## Next Steps
 
