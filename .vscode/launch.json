@@ -5,14 +5,16 @@
             "name": "ToolIntegrationDemo",
             "request": "launch",
             "mainClass": "com.example.springai.quickstart.ToolIntegrationDemo",
-            "projectName": "spring-ai-quickstart"
+            "projectName": "spring-ai-quickstart",
+            "envFile": "${workspaceFolder}/.env"
         },
         {
             "type": "java",
             "name": "SimpleReaderDemo",
             "request": "launch",
             "mainClass": "com.example.springai.quickstart.SimpleReaderDemo",
-            "projectName": "spring-ai-quickstart"
+            "projectName": "spring-ai-quickstart",
+            "envFile": "${workspaceFolder}/.env"
         },
         {
             "type": "java",
@@ -36,15 +38,6 @@
             "request": "launch",
             "mainClass": "com.example.springai.quickstart.PromptEngineeringDemo",
             "projectName": "spring-ai-quickstart",
-            "envFile": "${workspaceFolder}/.env"
-        },
-        {
-            "type": "java",
-            "name": "MCP: Stdio Transport Demo",
-            "request": "launch",
-            "cwd": "${workspaceFolder}/05-mcp",
-            "mainClass": "com.example.springai.mcp.StdioTransportDemo",
-            "projectName": "mcp-example",
             "envFile": "${workspaceFolder}/.env"
         },
         {
