@@ -45,7 +45,12 @@ public class ParallelizationWorkflow {
         try {
             List<CompletableFuture<String>> futures = inputs.stream()
                     .map(input -> CompletableFuture.supplyAsync(() ->
-                            chatClient.prompt(prompt + "\nInput: " + input).call().content(), executor))
+                            chatClient.prompt()
+                                    .user(u -> u.text("{prompt}\nInput: {input}")
+                                            .param("prompt", prompt)
+                                            .param("input", input))
+                                    .call()
+                                    .content(), executor))
                     .collect(Collectors.toList());
 
             CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).join();

@@ -74,8 +74,13 @@ public class ChainWorkflow {
         log.append(String.format("STEP %d:\n%s\n\n", step++, response));
 
         for (String prompt : systemPrompts) {
-            String input = String.format("{%s}\n {%s}", prompt, response);
-            response = chatClient.prompt(input).call().content();
+            String stepInput = response;
+            response = chatClient.prompt()
+                    .user(u -> u.text("{systemPrompt}\n\nInput:\n{stepInput}")
+                            .param("systemPrompt", prompt)
+                            .param("stepInput", stepInput))
+                    .call()
+                    .content();
             log.append(String.format("STEP %d:\n%s\n\n", step++, response));
         }
 

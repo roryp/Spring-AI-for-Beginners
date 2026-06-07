@@ -46,14 +46,20 @@ public class RoutingWorkflow {
             throw new IllegalArgumentException("Selected route '" + routeKey + "' not found in routes map");
         }
 
-        return "Route selected: **" + routeKey + "**\n\n"
-                + chatClient.prompt(selectedPrompt + "\nInput: " + input).call().content();
+        String specializedResponse = chatClient.prompt()
+                .user(u -> u.text("{routePrompt}\nInput: {input}")
+                        .param("routePrompt", selectedPrompt)
+                        .param("input", input))
+                .call()
+                .content();
+
+        return "Route selected: **" + routeKey + "**\n\n" + specializedResponse;
     }
 
     @SuppressWarnings("null")
     private String determineRoute(String input, Iterable<String> availableRoutes) {
-        String selectorPrompt = String.format("""
-                Analyze the input and select the most appropriate support team from these options: %s
+        String selectorPrompt = """
+                Analyze the input and select the most appropriate support team from these options: {routes}
                 First explain your reasoning, then provide your selection in this JSON format:
 
                 \\{
@@ -62,9 +68,12 @@ public class RoutingWorkflow {
                     "selection": "The chosen team name"
                 \\}
 
-                Input: %s""", availableRoutes, input);
+                Input: {input}""";
 
-        RoutingResponse routingResponse = chatClient.prompt(selectorPrompt)
+        RoutingResponse routingResponse = chatClient.prompt()
+                .user(u -> u.text(selectorPrompt)
+                        .param("routes", availableRoutes)
+                        .param("input", input))
                 .advisors(AdvisorParams.ENABLE_NATIVE_STRUCTURED_OUTPUT)
                 .call()
                 .entity(RoutingResponse.class);
