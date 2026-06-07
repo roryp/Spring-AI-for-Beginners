@@ -1,6 +1,7 @@
 package com.example.springai.agents.service;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,7 +17,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import com.example.springai.agents.patterns.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
@@ -44,8 +45,9 @@ class SimpleAgentPatternsTest {
 
     @BeforeEach
     void setUp() {
-        // Wire up the fluent API chain: chatClient.prompt(...) → requestSpec → callResponseSpec → content
-        when(chatClient.prompt(anyString())).thenReturn(requestSpec);
+        // Wire up the fluent API chain: chatClient.prompt().user(...) → requestSpec → callResponseSpec → content
+        when(chatClient.prompt()).thenReturn(requestSpec);
+        when(requestSpec.user(any(Consumer.class))).thenReturn(requestSpec);
         when(requestSpec.call()).thenReturn(callResponseSpec);
         when(callResponseSpec.content()).thenReturn("mocked response");
     }
@@ -60,7 +62,7 @@ class SimpleAgentPatternsTest {
         String result = chain.chain("Test input with numbers: 92 points, 45% growth");
 
         // The default chain has 4 steps, so chatClient.prompt() should be called 4 times
-        verify(chatClient, times(4)).prompt(anyString());
+        verify(chatClient, times(4)).prompt();
         assertThat(result).contains("STEP 0");
         assertThat(result).contains("STEP 4");
     }
@@ -83,7 +85,7 @@ class SimpleAgentPatternsTest {
 
         String result = chain.chain("Hello world");
 
-        verify(chatClient, times(2)).prompt(anyString());
+        verify(chatClient, times(2)).prompt();
         assertThat(result).contains("STEP 0").contains("STEP 2");
     }
 
@@ -98,7 +100,7 @@ class SimpleAgentPatternsTest {
         List<String> results = parallel.parallel("Analyze:", inputs, 3);
 
         assertThat(results).hasSize(3);
-        verify(chatClient, times(3)).prompt(anyString());
+        verify(chatClient, times(3)).prompt();
     }
 
     @Test
