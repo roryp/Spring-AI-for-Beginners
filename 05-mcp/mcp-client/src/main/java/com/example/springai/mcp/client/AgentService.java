@@ -127,7 +127,7 @@ public class AgentService {
                 .toArray(ToolCallback[]::new);
         this.chatClient = chatClientBuilder
                 .defaultSystem(SYSTEM_PROMPT)
-                .defaultTools(t -> t.callbacks(capturingCallbacks))
+                .defaultTools((Object[]) capturingCallbacks)
                 .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
                 .build();
         log.info("AgentService initialised with MCP tool callbacks: {}", capturingCallbacks.length);
@@ -175,7 +175,7 @@ public class AgentService {
         }
         String reply = chatClient.prompt()
                 .user(userMessage)
-                .tools(t -> t.context(CONVERSATION_ID_KEY, conversationId))
+                .toolContext(Map.of(CONVERSATION_ID_KEY, conversationId))
                 .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId))
                 .call()
                 .content();

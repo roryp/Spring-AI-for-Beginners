@@ -269,7 +269,7 @@ String response2 = memoryClient.prompt()
 
 **Tool Integration** - [ToolIntegrationDemo.java](src/main/java/com/example/springai/quickstart/ToolIntegrationDemo.java)
 
-This is where Spring AI gets powerful. You register Java functions as `FunctionToolCallback` instances and wire them onto a `ChatClient` via `defaultTools(t -> t.callbacks(...))`. The AI then automatically decides when to call them based on the user's request, and Spring AI handles the tool-call loop (model → tool → model) for you so `call().content()` returns just the final answer.
+This is where Spring AI gets powerful. You register Java functions as `FunctionToolCallback` instances and wire them onto a `ChatClient` via `defaultTools(...)`. The AI then automatically decides when to call them based on the user's request, and Spring AI handles the tool-call loop (model → tool → model) for you so `call().content()` returns just the final answer.
 
 ```java
 record TwoNumbers(double a, double b) {}
@@ -282,7 +282,7 @@ List<ToolCallback> toolCallbacks = List.of(
 );
 
 ChatClient chatClient = ChatClient.builder(chatModel)
-    .defaultTools(t -> t.callbacks(toolCallbacks))
+    .defaultTools(toolCallbacks)
     .build();
 ```
 
