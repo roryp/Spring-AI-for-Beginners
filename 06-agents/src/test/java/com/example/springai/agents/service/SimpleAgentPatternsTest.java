@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -17,7 +18,6 @@ import org.springframework.ai.chat.client.ChatClient;
 import com.example.springai.agents.patterns.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
@@ -47,7 +47,7 @@ class SimpleAgentPatternsTest {
     void setUp() {
         // Wire up the fluent API chain: chatClient.prompt().user(...) → requestSpec → callResponseSpec → content
         when(chatClient.prompt()).thenReturn(requestSpec);
-        when(requestSpec.user(any(Consumer.class))).thenReturn(requestSpec);
+        when(requestSpec.user(ArgumentMatchers.<Consumer<ChatClient.PromptUserSpec>>any())).thenReturn(requestSpec);
         when(requestSpec.call()).thenReturn(callResponseSpec);
         when(callResponseSpec.content()).thenReturn("mocked response");
     }

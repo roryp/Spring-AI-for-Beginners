@@ -330,7 +330,7 @@ class SimpleToolsTest {
     void shouldReturnActualToolExecutionMetadata() {
         // given
         OpenAiChatModel mockChatModel = mock(OpenAiChatModel.class);
-        when(mockChatModel.getDefaultOptions())
+        when(mockChatModel.getOptions())
                 .thenReturn(OpenAiChatOptions.builder().build());
 
         AssistantMessage.ToolCall toolCall = new AssistantMessage.ToolCall(

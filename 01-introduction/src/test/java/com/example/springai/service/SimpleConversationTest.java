@@ -60,9 +60,9 @@ class SimpleConversationTest {
         when(mockChatModel.call(any(Prompt.class)))
             .thenReturn(mockChatResponse("This is a test response"));
 
-        // ChatClient internally calls chatModel.getDefaultOptions().mutate() to
+        // ChatClient internally calls chatModel.getOptions().mutate() to
         // merge per-request options, so the mock must return a non-null instance.
-        when(mockChatModel.getDefaultOptions())
+        when(mockChatModel.getOptions())
             .thenReturn(OpenAiChatOptions.builder().build());
 
         // Real ChatMemory backed by an in-memory repository
