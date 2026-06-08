@@ -69,9 +69,9 @@ class SimpleGpt5PromptTest {
         when(mockChatModel.call(any(Prompt.class)))
             .thenReturn(mockChatResponse("Mocked response"));
 
-        // ChatClient internally calls chatModel.getDefaultOptions().mutate() to
+        // ChatClient internally calls chatModel.getOptions().mutate() to
         // merge per-request options, so the mock must return a non-null instance.
-        when(mockChatModel.getDefaultOptions())
+        when(mockChatModel.getOptions())
             .thenReturn(OpenAiChatOptions.builder().build());
 
         promptService = new Gpt5PromptService();
@@ -376,7 +376,7 @@ class SimpleGpt5PromptTest {
         reset(mockChatModel);
         when(mockChatModel.call(any(Prompt.class)))
             .thenReturn(mockChatResponse("Fresh response"));
-        when(mockChatModel.getDefaultOptions())
+        when(mockChatModel.getOptions())
             .thenReturn(OpenAiChatOptions.builder().build());
         
         promptService.continueConversation("New message 1", "session-1");
@@ -401,7 +401,7 @@ class SimpleGpt5PromptTest {
         // 2. Self-reflection (simplified in our implementation)
         reset(mockChatModel);
         when(mockChatModel.call(any(Prompt.class))).thenReturn(mockChatResponse("response"));
-        when(mockChatModel.getDefaultOptions()).thenReturn(OpenAiChatOptions.builder().build());
+        when(mockChatModel.getOptions()).thenReturn(OpenAiChatOptions.builder().build());
         promptService.generateCodeWithReflection("test");
         verify(mockChatModel, times(1)).call(promptCaptor.capture());
         assertThat(getPromptText(promptCaptor.getValue())).contains("production-quality");
@@ -409,7 +409,7 @@ class SimpleGpt5PromptTest {
         // 3. Structured output
         reset(mockChatModel);
         when(mockChatModel.call(any(Prompt.class))).thenReturn(mockChatResponse("response"));
-        when(mockChatModel.getDefaultOptions()).thenReturn(OpenAiChatOptions.builder().build());
+        when(mockChatModel.getOptions()).thenReturn(OpenAiChatOptions.builder().build());
         promptService.analyzeCode("test");
         verify(mockChatModel, times(1)).call(promptCaptor.capture());
         assertThat(getPromptText(promptCaptor.getValue())).contains("analysis_framework");
