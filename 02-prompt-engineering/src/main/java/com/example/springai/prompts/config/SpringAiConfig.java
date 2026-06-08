@@ -57,6 +57,7 @@ public class SpringAiConfig {
         return OpenAiSetup.setupAsyncClient(
                 azureEndpoint, azureApiKey, null, deploymentName,
                 null, null, true, false, deploymentName,
-                java.time.Duration.ofSeconds(60), 3, null, null);
+                java.time.Duration.ofSeconds(60), 3, null, null,
+                io.micrometer.observation.ObservationRegistry.NOOP, null, null);
     }
 }

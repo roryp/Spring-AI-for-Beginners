@@ -327,7 +327,7 @@ The agent path takes the **same** `ToolCallbackProvider` that `GameService` uses
 ```java
 this.chatClient = builder
         .defaultSystem(SYSTEM_PROMPT)
-        .defaultTools(t -> t.callbacks(mcpToolCallbacks.getToolCallbacks()))    // tools
+        .defaultTools((Object[]) mcpToolCallbacks.getToolCallbacks())    // tools
         .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())   // memory
         .build();
 ```

@@ -252,7 +252,7 @@ This module reuses `spring-ai-starter-model-openai` from [Module 01](../01-intro
 <!-- QuestionAnswerAdvisor — automatically retrieves relevant context and injects it into prompts -->
 <dependency>
     <groupId>org.springframework.ai</groupId>
-    <artifactId>spring-ai-advisors-vector-store</artifactId>
+    <artifactId>spring-ai-vector-store-advisor</artifactId>
 </dependency>
 
 <!-- SimpleVectorStore — in-memory vector store for document embeddings -->
@@ -431,7 +431,7 @@ Spring AI 2.0 provides a `QuestionAnswerAdvisor` that encapsulates the entire RA
 <!-- Spring AI Advisors for QuestionAnswerAdvisor -->
 <dependency>
     <groupId>org.springframework.ai</groupId>
-    <artifactId>spring-ai-advisors-vector-store</artifactId>
+    <artifactId>spring-ai-vector-store-advisor</artifactId>
 </dependency>
 ```
 

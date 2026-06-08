@@ -58,7 +58,8 @@ public class MyLoggingAdvisor implements BaseAdvisor {
 
         if (this.showAvailableTools) {
             Object tools = "No Tools";
-            if (chatClientRequest.prompt().getOptions() instanceof ToolCallingChatOptions toolOptions) {
+            if (chatClientRequest.prompt().getOptions() instanceof ToolCallingChatOptions toolOptions
+                    && toolOptions.getToolCallbacks() != null) {
                 tools = toolOptions.getToolCallbacks().stream()
                         .map(tc -> tc.getToolDefinition().name()).toList();
             }
