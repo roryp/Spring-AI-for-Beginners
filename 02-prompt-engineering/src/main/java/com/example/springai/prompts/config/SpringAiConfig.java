@@ -58,6 +58,6 @@ public class SpringAiConfig {
                 azureEndpoint, azureApiKey, null, deploymentName,
                 null, null, true, false, deploymentName,
                 java.time.Duration.ofSeconds(60), 3, null, null,
-                io.micrometer.observation.ObservationRegistry.NOOP, null, null);
+                io.micrometer.observation.ObservationRegistry.NOOP, null, java.util.List.of());
     }
 }
