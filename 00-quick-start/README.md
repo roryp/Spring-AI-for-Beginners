@@ -50,7 +50,7 @@ It includes features like:
 
 > **Note:** This module uses `gpt-4.1-nano` from GitHub Models. Do not modify the model name in the code - it's configured to work with GitHub's available models.
 >
-> **Note:** Spring AI 2.0.0-RC2 (release candidate) is used. The Spring Milestones repository is configured in the root `pom.xml`.
+> **Note:** Spring AI 2.0.0 (GA) is used, resolved from Maven Central — no extra repositories required.
 
 This module's [`pom.xml`](pom.xml) already includes the dependency below — if you're building your own project, add the same to your `<dependencies>` block:
 
@@ -62,7 +62,7 @@ This module's [`pom.xml`](pom.xml) already includes the dependency below — if 
 </dependency>
 ```
 
-The version is managed by the parent [`pom.xml`](../pom.xml) via the Spring AI BOM (`spring-ai-bom` 2.0.0-RC2), and the Spring Milestones repository is configured there as well.
+The version is managed by the parent [`pom.xml`](../pom.xml) via the Spring AI BOM (`spring-ai-bom` 2.0.0), available from Maven Central.
 
 ## Setup
 
